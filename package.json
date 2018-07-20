@@ -1,73 +1,63 @@
 {
-    "name": "NepSnowplow",
-    "version": "0.1.0",
-    "description": "A local Snowplow Collector and GUI to inspect collected events",
-    "author": "Picnic",
-    "keywords": [
-        "snowplow",
-        "picnic",
-        "eventlog"
-    ],
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/PicnicSupermarket/nepsnowplow"
+  "name": "nepsnowplow",
+  "version": "0.1.0",
+  "description": "A local Snowplow Collector and GUI to inspect collected events",
+  "author": "Picnic",
+  "keywords": ["snowplow", "picnic", "eventlog"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PicnicSupermarket/nepsnowplow"
+  },
+  "bugs": {
+    "url": "https://github.com/PicnicSupermarket/nepsnowplow/issues"
+  },
+  "licence": "MIT",
+  "scripts": {
+    "build": "sass app/css/sass/app.scss app/css/app.css",
+    "dist": "electron-builder",
+    "package": "electron-builder --dir",
+    "precommit": "pretty-quick --staged",
+    "release": "electron-builder --publish",
+    "start": "electron .",
+    "watch": "yarn run build --watch"
+  },
+  "main": "app.js",
+  "build": {
+    "appId": "com.picnic.nepsnowplow",
+    "directories": {
+      "output": "dist"
     },
-    "bugs": {
-        "url": "https://github.com/PicnicSupermarket/nepsnowplow/issues"
+    "files": ["app.js", "app/**/*", "server/**/*"],
+    "extraFiles": ["schemas/**/*"],
+    "win": {
+      "target": "zip"
     },
-    "licence": "MIT",
-    "scripts": {
-        "build": "sass app/css/sass/app.scss app/css/app.css",
-        "dist": "electron-builder",
-        "package": "electron-builder --dir",
-        "precommit": "pretty-quick --staged",
-        "release": "electron-builder --publish",
-        "start": "electron .",
-        "watch": "yarn run build --watch"
+    "linux": {
+      "target": "zip"
     },
-    "main": "app.js",
-    "build": {
-        "appId": "com.picnic.nepsnowplow",
-        "directories": {
-            "output": "dist"
-        },
-        "files": [
-            "app.js",
-            "app/**/*",
-            "server/**/*"
-        ],
-        "extraFiles": [
-            "schemas/**/*"
-        ],
-        "win": {
-            "target": "zip"
-        },
-        "linux": {
-            "target": "zip"
-        },
-        "mac": {
-            "target": "zip"
-        }
-    },
-    "devDependencies": {
-        "electron": "^2.0.2",
-        "electron-builder": "^20.20.4",
-        "husky": "^0.14.3",
-        "prettier": "1.13.7",
-        "pretty-quick": "^1.6.0",
-        "sass": "^1.10.0"
-    },
-    "dependencies": {
-        "ajv": "^6.5.2",
-        "argparse": "^1.0.10",
-        "body-parser": "^1.15.2",
-        "chalk": "^2.4.1",
-        "express": "^4.14.0",
-        "handlebars": "^4.0.11",
-        "jsonfile": "^4.0.0",
-        "mark.js": "^8.11.1",
-        "prettyjson": "^1.2.1",
-        "renderjson": "^1.4.0",
-        "z-schema": "^3.22.0"
+    "mac": {
+      "target": "zip"
     }
+  },
+  "devDependencies": {
+    "electron": "^2.0.2",
+    "electron-builder": "^20.20.4",
+    "husky": "^0.14.3",
+    "prettier": "1.13.7",
+    "pretty-quick": "^1.6.0",
+    "sass": "^1.10.0"
+  },
+  "dependencies": {
+    "ajv": "^6.5.2",
+    "argparse": "^1.0.10",
+    "body-parser": "^1.15.2",
+    "chalk": "^2.4.1",
+    "express": "^4.14.0",
+    "handlebars": "^4.0.11",
+    "jsonfile": "^4.0.0",
+    "mark.js": "^8.11.1",
+    "prettyjson": "^1.2.1",
+    "renderjson": "^1.4.0",
+    "z-schema": "^3.22.0"
+  }
 }
