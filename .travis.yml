@@ -12,35 +12,18 @@ matrix:
       services: docker
       language: generic
 
-env:
-  global:
-    # We distinguish two types of builds:
-    # - review, for pull request analysis/feedback
-    # - push, for pushes
-    - TYPE="$( test ${TRAVIS_EVENT_TYPE} = pull_request && echo review || echo push )"
-    # Retrieve the version that this source bundle represents
-    - CURRENT_VERSION=$( cat package.json | grep "version" | sed 's/[^0-9\.]*//g' )
-
-before_install:
-  # Retrieve the last known published version
-  - export LAST_RELEASED_VERSION=$( npm view nepsnowplow | grep "latest" | sed 's/[^0-9\.]*//g' )
-  # If this is a push to `master` and it is a new version, we need to publish to NPM
-  - export DEPLOY_TO_GITHUB=$( test ${TRAVIS_BRANCH} = "master" && ( test ${TYPE} = "push" && ( test "${CURRENT_VERSION}" != "${LAST_RELEASED_VERSION}" && echo true ) ) || echo false )
-
 after_success:
   - >
-    if [ "${DEPLOY_TO_GITHUB}" = "true" ]; then
-      if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-        docker run --rm \
-          --env-file <(env | grep -iE 'DEBUG|NODE_|ELECTRON_|YARN_|NPM_|CI|CIRCLE|TRAVIS|APPVEYOR_|CSC_|_TOKEN|_KEY|AWS_|STRIP|BUILD_') \
-          -v ${PWD}:/project \
-          -v ~/.cache/electron:/root/.cache/electron \
-          -v ~/.cache/electron-builder:/root/.cache/electron-builder \
-          electronuserland/builder:wine \
-          /bin/bash -c "yarn --link-duplicates --pure-lockfile && yarn build && yarn release --linux --win"
-      else
-        yarn build && yarn release
-      fi
+    if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+      docker run --rm \
+        --env-file <(env | grep -iE 'DEBUG|NODE_|ELECTRON_|YARN_|NPM_|CI|CIRCLE|TRAVIS|APPVEYOR_|CSC_|_TOKEN|_KEY|AWS_|STRIP|BUILD_') \
+        -v ${PWD}:/project \
+        -v ~/.cache/electron:/root/.cache/electron \
+        -v ~/.cache/electron-builder:/root/.cache/electron-builder \
+        electronuserland/builder:wine \
+        /bin/bash -c "yarn --link-duplicates --pure-lockfile && yarn build && yarn release --linux --win"
+    else
+      yarn build && yarn release
     fi
 
 before_cache:
