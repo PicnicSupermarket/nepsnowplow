@@ -1,0 +1,28 @@
+.info_msg,
+.success_msg,
+.warning_msg,
+.error_msg {
+    margin: 10px 0px;
+    padding: 12px;
+    width: 100%;
+
+    & span {
+        font-size: 15px;
+    }
+}
+.info_msg {
+    color: #00529b;
+    background-color: #bde5f8;
+}
+.success_msg {
+    color: #4f8a10;
+    background-color: #dff2bf;
+}
+.warning_msg {
+    color: #9f6000;
+    background-color: #feefb3;
+}
+.error_msg {
+    color: #d8000c;
+    background-color: #ffd2d2;
+}

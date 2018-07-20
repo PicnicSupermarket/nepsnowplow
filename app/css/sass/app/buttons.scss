@@ -1,0 +1,12 @@
+.clickable,
+.clickable *,
+.btn,
+.btn * {
+    cursor: pointer;
+    -webkit-app-region: no-drag;
+}
+
+.icon.clickable:hover::before,
+.btn:hover span {
+    color: #555;
+}

@@ -1,0 +1,30 @@
+<li class="list-group-item clickable" style="display:none;" id="event-{{index}}">
+    <div class="media-body">
+        <p>
+            <strong>
+                {{#if isValid eq="positive"}}
+                <span class="validity icon icon-check icon-color-positive"></span>
+                {{else if isValid eq='negative'}}
+                <span class="validity icon icon-cancel icon-color-negative"></span>
+                {{else}}
+                <span class="validity icon icon-attention icon-color-warning"></span>
+                {{/if}}
+                <span class="schema-name">{{schemaName}}</span>: 
+                <span class="schema-version">{{schemaVersion}}</span>
+            </strong>
+        </p>
+        {{#each contexts}}
+        <p>
+            {{#if this.isValid eq="positive"}}
+            <span class="validity icon icon-check icon-color-positive"></span>
+            {{else if this.isValid eq='negative'}}
+            <span class="validity icon icon-cancel icon-color-negative"></span>
+            {{else}}
+            <span class="validity icon icon-attention icon-color-warning"></span>
+            {{/if}}
+            <span class="schema-name">{{this.schemaName}}</span>: 
+            <span class="schema-version">{{this.schemaVersion}}</span>
+        </p>
+        {{/each}}
+    </div>
+</li>

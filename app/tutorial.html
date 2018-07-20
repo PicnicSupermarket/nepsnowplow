@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Device Setup</title>
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/app.css">
+    <style>
+        body {
+            overflow: scroll;
+            padding-top: 20px;
+            /*padding-left: 20px;*/
+            padding-right: 20px;
+            padding-bottom: 20px;
+        }
+        
+        img {
+            width: 375px;
+            margin-left: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <center>
+        <h4>iOS Instructions</h4>
+    </center>
+    <div style="width: 1630px;">
+        <img src="./img/tutorial-ios/1.png"></img>
+        <img src="./img/tutorial-ios/2.png"></img>
+        <img src="./img/tutorial-ios/3.png"></img>
+        <img src="./img/tutorial-ios/4.png"></img>
+    </div>
+    <br>
+    <hr></hr>
+    <center>
+        <h4>Android Instructions</h4>
+    </center>
+    <div style="width: 1630px;">
+        <img src="./img/tutorial-android/1.png"></img>
+        <img src="./img/tutorial-android/2.png"></img>
+        <img src="./img/tutorial-android/3.png"></img>
+        <img src="./img/tutorial-android/4.png"></img>
+    </div>
+    <footer class="toolbar toolbar-footer" style="position: fixed; width: 100%; bottom: 0px;">
+        <h1 class=" title " id="footer"></h1>
+    </footer>
+
+    <script>
+        const network = require("../server/network_interfaces.js");
+        document.getElementById("footer").innerHTML = "<font size='5'>Your IP Address is <strong>" + network.currentIpAddress() + "</strong></font>";
+    </script>
+</body>
+</html>

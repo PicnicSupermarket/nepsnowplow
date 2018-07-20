@@ -1,0 +1,13 @@
+.validity {
+    // Hide validity by default
+    display: none;
+}
+
+.show-validation {
+    & span.validity {
+        display: inline;
+    }
+    & div.validity {
+        display: block;
+    }
+}

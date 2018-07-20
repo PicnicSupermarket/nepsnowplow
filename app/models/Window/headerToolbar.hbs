@@ -1,0 +1,31 @@
+<header class="toolbar toolbar-header">
+    <h1 class="title">{{title}}</h1>
+
+    <!-- Windows fallback window buttons -->
+    {{#if isWindows}}
+    <div id="window-actions">
+        <span class="icon icon-color-negative icon-cancel-circled clickable" id="close-button"></span>
+        <span class="icon icon-color-positive icon-plus-circled clickable" id="max-button"></span>
+        <span class="icon icon-color-warning icon-minus-circled clickable" id="min-button"></span>
+    </div>
+    {{/if}}
+
+    <div class="toolbar-actions">
+        <div class="btn-group">
+            <button class="btn btn-default" id="reset-button" title="Remove all events">
+                <span class="icon icon-trash"></span>
+            </button>
+            <button class="btn btn-default {{#if validationOn}}active{{/if}}" id="validation-toggle" title="Validate events with schema">
+                <span class="icon icon-attention"></span>
+            </button>
+        </div>
+        <button class="btn btn-default pull-right" id="help-button" title="How to configure your device">
+            <span class="icon icon-help"></span>
+        </button>
+        <div class="filter pull-right">
+            <span class="icon icon-search"></span>
+            <input type="search" placeholder="Filter" id="filter-events" />
+            <span class="icon" id="clear-filter"></span>
+        </div>
+    </div>
+</header>
