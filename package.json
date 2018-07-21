@@ -21,7 +21,6 @@
         "dist": "electron-builder",
         "package": "electron-builder --dir",
         "precommit": "pretty-quick --staged",
-        "release": "electron-builder --publish onTagOrDraft",
         "start": "electron .",
         "watch": "yarn run build --watch"
     },
