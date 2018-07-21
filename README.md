@@ -52,6 +52,13 @@ To test a package locally for distribution, use:
 yarn package
 ```
 
+## Roadmap
+
+There are a few features that are on the roadmap to be developed and increase further usability.
+
+-   [ ] Multi-device support: create the ability to show events for a specific device
+-   [ ] Tree-based event viewer: introduce the abiltiy to switch to a hierarchical tree based on event name
+
 ## Contributing
 
 Contributions are welcome! Feel free to file an [issue](https://github.com/PicnicSupermarket/nepsnowplow/issues/new) or open a [pull request](https://github.com/PicnicSupermarket/nepsnowplow/compare).
