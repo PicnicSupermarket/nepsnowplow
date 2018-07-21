@@ -44,10 +44,10 @@
             "target": "zip"
         },
         "linux": {
-            "target": "zip"
+            "target": "tar.gz"
         },
         "mac": {
-            "target": "zip"
+            "target": "tar.gz"
         }
     },
     "devDependencies": {
