@@ -5,7 +5,6 @@ const network = require("../../../server/network_interfaces");
 const filter = require("../../..//server/filter");
 const { Template } = require("../Template");
 const { PaneGroup, SidebarListPane, DetailsPane } = require("../Pane");
-const tutorialWindow = require("./tutorialWindow");
 
 function mainWindowRenderer() {
     startServer();
@@ -111,13 +110,6 @@ function renderFooter(target) {
 }
 
 function enableToolbarButtonListeners() {
-    document
-        .getElementById("help-button")
-        .addEventListener("click", function(e) {
-            let tutWin = new tutorialWindow(remote.getCurrentWindow());
-            tutWin.show();
-        });
-
     document
         .getElementById("reset-button")
         .addEventListener("click", function(e) {
