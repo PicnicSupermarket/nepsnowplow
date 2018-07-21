@@ -17,7 +17,7 @@ install:
 
 script:
   # Compile and test sources
-  - yarn build
+  - yarn compile
   # Build the release package, but only push to GitHub on Tag or Draft after succesful build
   - >
     if [ "$TRAVIS_OS_NAME" == "linux" ]; then
@@ -27,9 +27,9 @@ script:
         -v ~/.cache/electron:/root/.cache/electron \
         -v ~/.cache/electron-builder:/root/.cache/electron-builder \
         electronuserland/builder:wine \
-        /bin/bash -c "yarn dist --linux --win --publish onTagOrDraft"
+        /bin/bash -c "yarn build --linux --win --publish onTagOrDraft"
     else
-      yarn dist --publish onTagOrDraft
+      yarn build --publish onTagOrDraft
     fi
 
 before_cache:

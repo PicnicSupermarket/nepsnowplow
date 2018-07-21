@@ -7,7 +7,10 @@ This little gem of a tool sets-up a local server that acts as a collector for Sn
 Simply run:
 
 ```bash
+# Install dependencies
 yarn
+
+# Start NepSnowplow
 yarn start
 ```
 

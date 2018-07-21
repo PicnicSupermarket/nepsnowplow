@@ -17,12 +17,13 @@
     },
     "licence": "MIT",
     "scripts": {
-        "build": "sass app/css/sass/app.scss app/css/app.css",
-        "dist": "electron-builder",
+        "build": "electron-builder",
+        "compile": "sass app/css/sass/app.scss app/css/app.css",
         "package": "electron-builder --dir",
+        "postinstall": "yarn compile",
         "precommit": "pretty-quick --staged",
         "start": "electron .",
-        "watch": "yarn run build --watch"
+        "watch": "yarn compile --watch"
     },
     "main": "app.js",
     "build": {
