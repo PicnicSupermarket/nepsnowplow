@@ -7,7 +7,7 @@ This little gem of a tool sets-up a local server that acts as a collector for Sn
 Simply run:
 
 ```bash
-# Install dependencies
+# Install dependencies and compile styles
 yarn
 
 # Start NepSnowplow
@@ -16,36 +16,40 @@ yarn start
 
 ## Configure
 
-Options can be set in `app.js`, the defaults are:
-
-_TODO make JSON_
+Options can be set in `settings.json`, the defaults are:
 
 ```javascript
 global.options = {
-    showSchemaValidation: false,
-    schemaDir: "schemas/",
-    listeningPort: 3000
+    showSchemaValidation: false, // where to turn validation on or off on startup
+    schemaDir: "schemas/", // folder where Snowplow schemas as situated
+    listeningPort: 3000 // port NepSnowplow listens to
 };
 ```
 
 ## Development
 
+### Style compilation
+
 During development, one can compile new styles in one of the SCSS files using:
 
 ```bash
-grunt sass:[dev|dist] # dev is compiled expanded and includes a sourcemap, dist comiples to minified css
-```
-
-To test a package locally:
-
-```bash
-yarn package
+yarn compile
 ```
 
 Alternatively, each change can be automatically compiled using:
 
 ```bash
-grunt watch
+yarn watch
+```
+
+### Packaging
+
+This electron app is packaged and published through [electron-builder](https://electron.build).
+
+To test a package locally for distribution, use:
+
+```bash
+yarn package
 ```
 
 ## Contributing

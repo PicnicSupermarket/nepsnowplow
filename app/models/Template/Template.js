@@ -16,16 +16,15 @@ class Template {
     }
 
     render(data, callback) {
-        let tmpl;
+        let template;
         // only read Handlebars templates once
         if (this.path in compiledTemplates) {
-            let tmpl = compiledTemplates[this.path];
-            this.readFileCallback(tmpl, data, callback);
+            template = compiledTemplates[this.path];
         } else {
             let tmpl = fs.readFileSync(this.path, "utf-8");
-            let template = Handlebars.compile(tmpl.toString());
-            this.readFileCallback(template, data, callback);
+            template = Handlebars.compile(tmpl.toString());
         }
+        this.readFileCallback(template, data, callback);
     }
 
     readFileCallback(compiledTemplate, data, callback) {

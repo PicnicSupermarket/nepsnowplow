@@ -3,15 +3,12 @@ process.env.NODE_PATH = __dirname;
 require("module").Module._initPaths();
 require("module").globalPaths.push(__dirname);
 
-const os = require("os");
 const { app, ipcMain, BrowserWindow, Menu } = require("electron");
+const os = require("os");
+const fs = require("fs");
 
 global.trackedEvents = [];
-global.options = {
-    showSchemaValidation: false,
-    schemaDir: "schemas/",
-    listeningPort: 3000
-};
+global.options = loadOptions();
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -43,6 +40,16 @@ app.on("activate", function() {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 app.on("ready", createMainWindow);
+
+function loadOptions() {
+    let defaults = {
+        showSchemaValidation: false,
+        schemaDir: "schemas/",
+        listeningPort: 3000
+    };
+    let userOptions = JSON.parse(fs.readFileSync("settings.json", "utf-8"));
+    return Object.assign(defaults, userOptions);
+}
 
 function createMainWindow() {
     var isWindows = os.platform() === "win32";

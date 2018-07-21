@@ -37,7 +37,8 @@
             "server/**/*"
         ],
         "extraFiles": [
-            "schemas/**/*"
+            "schemas/**/*",
+            "settings.json"
         ],
         "win": {
             "target": "zip"
