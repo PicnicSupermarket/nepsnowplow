@@ -10,6 +10,7 @@ function filterItems(items, value) {
     if (value === "") {
         clearFilter();
     }
+
     let events = remote.getGlobal("trackedEvents");
     [].forEach.call(items, (eventEl) => {
         let index = eventEl.id.substring("events-".length - 1);
@@ -22,11 +23,18 @@ function filterItems(items, value) {
         // 3. event and context payload data
         try {
             if (!match) {
-                match = getSchemaName(event.payload).indexOf(value) > -1;
+                match =
+                    getSchemaName(event.payload)
+                        .toLowerCase()
+                        .indexOf(value) > -1;
             }
             if (!match) {
                 for (let i = event.contexts.length - 1; i >= 0; i--) {
-                    if (getSchemaName(event.contexts[i]).indexOf(value) > -1) {
+                    if (
+                        getSchemaName(event.contexts[i])
+                            .toLowerCase()
+                            .indexOf(value) > -1
+                    ) {
                         match = true;
                         break;
                     }
@@ -39,7 +47,12 @@ function filterItems(items, value) {
                     let payload = payloads[j].obj.data;
                     for (let prop in payload) {
                         if (payload.hasOwnProperty(prop)) {
-                            if (payload[prop].toString().indexOf(value) > -1) {
+                            if (
+                                payload[prop]
+                                    .toString()
+                                    .toLowerCase()
+                                    .indexOf(value) > -1
+                            ) {
                                 match = true;
                                 break;
                             }
@@ -76,16 +89,16 @@ function filterEvents(value, keycode) {
                 "#events-container .list-group-item"
             );
 
-            // when not tapping backspace,
-            // we can narrow the search
-            if (keycode !== 8) {
+            // when not tapping backspace (8) or delete (46),
+            // we can narrow the search by only looking at the current result
+            if (keycode !== 8 && keycode !== 46) {
                 // faster than Array.from()
                 eventItems = Array.prototype.slice
                     .call(eventItems)
                     .filter((item) => item.style.display === "");
             }
             filterItems(eventItems, value);
-        }, 250);
+        }, 200);
     }
 }
 

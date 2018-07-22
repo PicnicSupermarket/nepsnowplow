@@ -1,23 +1,22 @@
 #!/usr/bin/node
-const { remote } = require("electron");
-const fs = require("fs");
 const express = require("express");
 const bodyParser = require("body-parser");
-const path = require("path");
 const jsonfile = require("jsonfile");
+const fs = require("fs");
+const path = require("path");
 
-const networkInterfaces = require("./network_interfaces");
-const base64Decode = require("./b64.js");
+const appLogger = require("./logger/app_logger.js");
 const SnowplowEvent = require("./model/snowplow_event.js");
 const ValidationSchema = require("./model/validation_schema.js");
-const appLogger = require("./logger/app_logger.js");
+const networkInterfaces = require("./network_interfaces");
+const base64Decode = require("./b64.js");
 
 var app = express();
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
 var schemas = {};
-var schemaDir = remote.getGlobal("options").schemaDir;
+var schemaDir = global.options.schemaDir;
 if (!!schemaDir) {
     readSchema(path.join(__dirname, "..", schemaDir));
 }
@@ -76,7 +75,7 @@ app.post("*", function(req, res) {
 });
 
 // Start server
-var port = remote.getGlobal("options").listeningPort;
+var port = global.options.listeningPort;
 app.listen(port, function() {
     var ifaces = networkInterfaces.getNetworkInterfacesIps();
     console.log("Listening for SnowPlow analytics on");
