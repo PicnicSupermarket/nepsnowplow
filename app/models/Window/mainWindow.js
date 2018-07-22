@@ -2,21 +2,11 @@ const { remote, ipcRenderer, BrowserWindow, Menu } = require("electron");
 const os = require("os");
 const appLogger = require("../../../server/logger/app_logger");
 const network = require("../../../server/network_interfaces");
-const filter = require("../../..//server/filter");
 const { Template } = require("../Template");
 const { PaneGroup, SidebarListPane, DetailsPane } = require("../Pane");
 const path = require("path");
 
 function mainWindowRenderer() {
-    startServer();
-    renderWindow();
-}
-
-function startServer() {
-    require("../../../server/server");
-}
-
-function renderWindow() {
     let target = document.getElementById("window");
     renderHeader(target);
     renderMain(target);
@@ -70,24 +60,23 @@ function enableSearchListener() {
     });
 
     filterEventsInput.addEventListener("keyup", function(e) {
-        var value = this.value;
         if (e.keyCode === 27) {
             // escape (27) was pressed
-            filter.clearFilter();
+            ipcRenderer.send("clear-filter");
             this.blur();
         } else if (e.keyCode === 13) {
             // enter(13) was pressed
             e.preventDefault();
             this.blur();
         } else {
-            filter.filterEvents(value, e.keyCode);
+            ipcRenderer.send("filter-events", this.value, e.keyCode);
         }
     });
 
     clearFilterButton.addEventListener("click", function(e) {
         this.classList.remove("icon-cancel-circled", "clickable");
         filterEventsInput.value = "";
-        filter.clearFilter();
+        ipcRenderer.send("clear-filter");
     });
 }
 

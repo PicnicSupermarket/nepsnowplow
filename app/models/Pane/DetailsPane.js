@@ -1,4 +1,5 @@
 "use strict";
+const { ipcRenderer } = require("electron");
 const { Template } = require("../Template");
 const Mark = require("mark.js");
 const path = require("path");
@@ -18,8 +19,8 @@ class DetailsPane {
     }
 
     enableListeners() {
-        document.addEventListener("highlight", (event) => {
-            this.highlightDetails(event.detail);
+        ipcRenderer.on("highlight", (event, value) => {
+            this.highlightDetails(value);
         });
     }
 

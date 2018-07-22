@@ -4,6 +4,7 @@ require("module").Module._initPaths();
 require("module").globalPaths.push(__dirname);
 
 const { app, ipcMain, BrowserWindow, Menu } = require("electron");
+const { filterEvent, filterEvents, clearFilter } = require("server/filter");
 const os = require("os");
 const fs = require("fs");
 const path = require("path");
@@ -15,13 +16,13 @@ global.options = loadOptions();
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow = null;
 
-ipcMain.on("add-event", (event, spEvent) => {
-    global.trackedEvents.push(spEvent);
-});
-
 ipcMain.on("clear-events", () => {
     global.trackedEvents = [];
 });
+
+ipcMain.on("filter-event", filterEvent);
+ipcMain.on("filter-events", filterEvents);
+ipcMain.on("clear-filter", clearFilter);
 
 // Quit when all windows are closed.
 app.on("window-all-closed", () => {
@@ -41,6 +42,10 @@ app.on("activate", function() {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 app.on("ready", createMainWindow);
+
+function startServer() {
+    require("server/server");
+}
 
 function loadOptions() {
     let defaults = {
@@ -115,4 +120,6 @@ function createMainWindow() {
         // when you should delete the corresponding element.
         mainWindow = null;
     });
+
+    startServer();
 }

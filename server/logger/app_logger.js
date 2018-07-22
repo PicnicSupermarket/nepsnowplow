@@ -1,11 +1,5 @@
-const { remote } = require("electron");
+const { BrowserWindow } = require("electron");
 const sortObject = require("../sort_object.js");
-const filter = require("../filter.js");
-const { Event } = require("../../app/models/Event");
-
-const renderjson = require("renderjson");
-renderjson.set_show_to_level("all");
-renderjson.set_icons("+", "-");
 
 function displayEvents(events) {
     events.forEach((event, index) => {
@@ -14,16 +8,14 @@ function displayEvents(events) {
 }
 
 function displayEvent(event, index) {
-    let eventItem = new Event(event, index);
-    eventItem.logItem();
+    BrowserWindow.getAllWindows().forEach((win) => {
+        win.webContents.send("log-event", event, index);
+    });
 }
 
 function logEvent(event) {
-    var ipcRenderer = require("electron").ipcRenderer;
-    ipcRenderer.send("add-event", event);
-
-    var index = remote.getGlobal("trackedEvents").length - 1;
-    displayEvent(event, index);
+    let length = global.trackedEvents.push(event);
+    displayEvent(event, length - 1);
 }
 
 module.exports = {

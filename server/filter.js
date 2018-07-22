@@ -1,20 +1,15 @@
-const { remote } = require("electron");
+const { ipcMain } = require("electron");
 
 var filterTimer,
     filterState = false;
 
 function filterItems(items, value) {
-    if (typeof value === "undefined") {
-        value = document.getElementById("filter-events").value;
-    }
     if (value === "") {
         clearFilter();
     }
 
-    let events = remote.getGlobal("trackedEvents");
-    [].forEach.call(items, (eventEl) => {
-        let index = eventEl.id.substring("events-".length - 1);
-        let event = events[index];
+    let filterMap = {};
+    [].forEach.call(items, (event, idx) => {
         let match = !filterState; // when not filtering, assume matched
 
         // match events through the order of importance:
@@ -24,14 +19,16 @@ function filterItems(items, value) {
         try {
             if (!match) {
                 match =
-                    getSchemaName(event.payload)
+                    event
+                        .getSchemaName()
                         .toLowerCase()
                         .indexOf(value) > -1;
             }
             if (!match) {
                 for (let i = event.contexts.length - 1; i >= 0; i--) {
                     if (
-                        getSchemaName(event.contexts[i])
+                        event.contexts[i]
+                            .getSchemaName()
                             .toLowerCase()
                             .indexOf(value) > -1
                     ) {
@@ -58,66 +55,50 @@ function filterItems(items, value) {
                             }
                         }
                     }
-                    if (match) {
-                        break;
-                    }
+                    if (match) break;
                 }
             }
-            eventEl.style.display = match ? "" : "none";
+            filterMap[idx] = match;
         } catch (err) {
             console.log(err);
         }
     });
-    highlight(value);
+    return filterMap;
+}
+
+function filterEvent(event, value, index) {
+    let filterMap = filterItems(global.trackedEvents[index], value);
+    event.sender.send("filter-events", filterMap);
+    event.sender.send("highlight", value);
+}
+
+function filterEvents(event, value, keyCode) {
+    // go easy on the processing when user types fast,
+    // only execute 50ms after last keyup
+    clearTimeout(filterTimer);
+    if (value === "" || typeof value === "undefined") {
+        clearFilter(event);
+    } else {
+        filterState = true;
+        filterTimer = setTimeout(function() {
+            let filterMap = filterItems(global.trackedEvents, value);
+            event.sender.send("filter-events", filterMap);
+            event.sender.send("highlight", value);
+        }, 50);
+    }
 }
 
 function getSchemaName(event) {
     return event.obj.schema.split("/")[1];
 }
 
-function filterEvents(value, keycode) {
-    // go easy on the processing when user types fast,
-    // only execute 100ms after last keyup
-    clearTimeout(filterTimer);
-
-    if (value === "" || typeof value === "undefined") {
-        clearFilter();
-    } else {
-        filterState = true;
-        filterTimer = setTimeout(function() {
-            let eventItems = document.querySelectorAll(
-                "#events-container .list-group-item"
-            );
-
-            // when not tapping backspace (8) or delete (46),
-            // we can narrow the search by only looking at the current result
-            if (keycode !== 8 && keycode !== 46) {
-                // faster than Array.from()
-                eventItems = Array.prototype.slice
-                    .call(eventItems)
-                    .filter((item) => item.style.display === "");
-            }
-            filterItems(eventItems, value);
-        }, 200);
-    }
-}
-
-function clearFilter() {
+function clearFilter(event) {
     filterState = false;
-    highlight("");
-}
-
-function highlight(value) {
-    document.dispatchEvent(
-        new CustomEvent("highlight", {
-            detail: value
-        })
-    );
+    event.sender.send("highlight", "");
 }
 
 module.exports = {
-    filterItems: filterItems,
+    filterEvent: filterEvent,
     filterEvents: filterEvents,
-    highlight: highlight,
     clearFilter: clearFilter
 };

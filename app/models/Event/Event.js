@@ -1,6 +1,5 @@
 "use strict";
-const { remote } = require("electron");
-const filter = require("../../../server/filter");
+const { remote, ipcRenderer } = require("electron");
 const Payload = require("./Payload");
 const Context = require("./Context");
 const { Template } = require("../Template");
@@ -58,7 +57,8 @@ class Event extends Payload {
                 contexts[idx].appendChild(ctx.getJson());
             });
 
-            filter.highlight(document.getElementById("filter-events").value);
+            let filterValue = document.getElementById("filter-events").value;
+            ipcRenderer.send("filter-event", filterValue, this.index);
         });
     }
 
@@ -89,9 +89,8 @@ class Event extends Payload {
             // event items are hidden by default
             // if filter is set and events match the filter,
             // below will unhide the generated element
-            filter.filterItems(
-                document.querySelectorAll("#event-" + this.index)
-            );
+            let filterValue = document.getElementById("filter-events");
+            ipcRenderer.send("filter-event", filterValue, this.index);
         });
     }
 }

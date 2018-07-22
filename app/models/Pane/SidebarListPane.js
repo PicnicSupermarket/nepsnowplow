@@ -1,5 +1,7 @@
 "use strict";
+const { ipcRenderer } = require("electron");
 const { Template } = require("../Template");
+const { Event } = require("../Event");
 const Mark = require("mark.js");
 const path = require("path");
 
@@ -18,8 +20,31 @@ class SidebarListPane {
     }
 
     enableListeners() {
-        document.addEventListener("highlight", (event) => {
-            this.highlightEvents(event.detail);
+        ipcRenderer.on("log-event", (event, spEvent, index) => {
+            let eventItem = new Event(spEvent, index);
+            eventItem.logItem();
+        });
+
+        ipcRenderer.on("filter-events", (event, filterMap) => {
+            this.filterEvents(filterMap);
+        });
+
+        ipcRenderer.on("highlight", (event, value) => {
+            this.highlightEvents(value);
+        });
+    }
+
+    filterEvents(filterMap) {
+        let eventItems = document.querySelectorAll(
+            "#events-container .list-group-item"
+        );
+        eventItems.forEach((item, idx) => {
+            // when undefined, fallback to showing the event
+            item.style.display = !!!filterMap[
+                item.id.substring("event-").length
+            ]
+                ? "none"
+                : "";
         });
     }
 

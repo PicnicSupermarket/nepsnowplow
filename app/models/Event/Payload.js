@@ -1,5 +1,7 @@
 "use strict";
 const renderjson = require("renderjson");
+renderjson.set_show_to_level("all");
+renderjson.set_icons("+", "-");
 
 class Payload {
     constructor(data) {
