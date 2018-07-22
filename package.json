@@ -6,7 +6,9 @@
     "keywords": [
         "snowplow",
         "picnic",
-        "eventlog"
+        "event",
+        "logger",
+        "inspector"
     ],
     "repository": {
         "type": "git",
@@ -28,6 +30,8 @@
     "main": "app.js",
     "build": {
         "appId": "com.picnic.nepsnowplow",
+        "productName": "NepSnowplow",
+        "copyright": "Copyright © 2018 Picnic",
         "directories": {
             "output": "dist"
         },
@@ -41,7 +45,10 @@
             "settings.json"
         ],
         "win": {
-            "target": "zip"
+            "target": [
+                "zip",
+                "nsis"
+            ]
         },
         "linux": {
             "target": "tar.gz"

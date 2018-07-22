@@ -57,10 +57,11 @@ function createMainWindow() {
     mainWindow = new BrowserWindow({
         width: 1024,
         height: 768,
-        "min-width": 1024,
-        "min-height": 768,
-        "accept-first-mouse": true,
-        "title-bar-style": "hidden",
+        minWidth: 1024,
+        minHeight: 768,
+        acceptFirstMouse: true,
+        title: "NepSnowplow",
+        titleBarStyle: "hiddenInset",
         frame: !isWindows
     });
 
