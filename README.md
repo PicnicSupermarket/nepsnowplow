@@ -46,7 +46,7 @@ Options can be set in `settings.json`, the defaults are:
 
 ```javascript
 {
-    "showSchemaValidation": false, // where to turn validation on or off on startup
+    "showSchemaValidation": false, // whether to turn validation on or off on startup
     "schemaDir": "schemas/", // folder where Snowplow schemas are situated
     "listeningPort": 3000 // port NepSnowplow listens to
 }

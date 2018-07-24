@@ -2,7 +2,7 @@
     "name": "nepsnowplow",
     "version": "0.1.0",
     "description": "A local Snowplow Collector and GUI to inspect collected events",
-    "author": "Picnic",
+    "author": "Picnic Technologies",
     "keywords": [
         "snowplow",
         "picnic",
@@ -31,7 +31,7 @@
     "build": {
         "appId": "com.picnic.nepsnowplow",
         "productName": "NepSnowplow",
-        "copyright": "Copyright © 2018 Picnic",
+        "copyright": "Copyright © 2017-2018 Picnic Technologies BV",
         "directories": {
             "output": "dist"
         },

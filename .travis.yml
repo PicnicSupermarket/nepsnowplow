@@ -12,11 +12,27 @@ matrix:
       services: docker
       language: generic
 
+env:
+  global:
+    # We distinguish two types of builds:
+    # - review, for pull request analysis/feedback
+    # - push, for pushes
+    - TYPE="$( test ${TRAVIS_EVENT_TYPE} = pull_request && echo review || echo push )"
+    # Retrieve the version that this source bundle represents
+    - CURRENT_VERSION=$( cat package.json | grep "version" | sed 's/[^0-9\.]*//g' )
+
+before_install:
+    # Retrieve the last known published version
+    - git fetch --tags
+    - export LAST_RELEASED_VERSION=$( git tag | tail -1 | sed 's/v//' )
+    # If this is a push to `master` and it is a new version, we need to publish to NPM
+    - export DEPLOY_TYPE=$( test ${TRAVIS_BRANCH} = "master" && ( test ${TYPE} = "push" && ( test "${CURRENT_VERSION}" != "${LAST_RELEASED_VERSION}" && echo onTag ) ) || echo never )
+
 install:
   - yarn --link-duplicates --pure-lockfile
 
 script:
-  # Compile and test sources
+  # Compile sources
   - yarn compile
   # Build the release package, but only push to GitHub on Tag or Draft after succesful build
   - >
@@ -27,15 +43,16 @@ script:
         -v ~/.cache/electron:/root/.cache/electron \
         -v ~/.cache/electron-builder:/root/.cache/electron-builder \
         electronuserland/builder:wine \
-        /bin/bash -c "yarn build --linux --win --publish onTagOrDraft"
+        /bin/bash -c "yarn build --linux --win --publish ${DEPLOY_TYPE}"
     else
-      yarn build --publish onTagOrDraft
+      yarn build --publish ${DEPLOY_TYPE}
     fi
 
 before_cache:
   - rm -rf $HOME/.cache/electron-builder/wine
 
 cache:
+  yarn: true
   directories:
     - node_modules
     - $HOME/.cache/electron
