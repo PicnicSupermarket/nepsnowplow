@@ -52,9 +52,11 @@ Options can be set in `settings.json`, the defaults are:
 }
 ```
 
-**Windows default installation path**
+Depending on your operating system, the settings and schemas can be found in the following location:
 
-`C:\Users\<username>\AppData\Local\Programs\nepsnowplow`
+Windows: `C:\Users\<username>\AppData\Local\Programs\nepsnowplow`
+OS X: `a`
+Linux: where you extract the tar.gz
 
 ## Development
 

@@ -54,7 +54,11 @@
             "target": "tar.gz"
         },
         "mac": {
-            "target": "tar.gz"
+            "category": "public.app-category.developer-tools",
+            "target": [
+                "tar.gz",
+                "dmg"
+            ]
         }
     },
     "devDependencies": {
