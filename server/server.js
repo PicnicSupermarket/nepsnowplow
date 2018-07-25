@@ -30,10 +30,14 @@ function readSchema(file) {
         // catch in case when file or directory could not be resolved,
         // e.g. somebody deleted the schemas folder
         console.log(err);
+        return;
     }
 
-    if (stats.isFile() && path.extname(file) !== ".md") {
-        // ignore readme.md
+    if (
+        stats.isFile() &&
+        (path.extname(file) === "" || path.extname(file) === ".json")
+    ) {
+        // only accept .json or no extension
         try {
             let schemaName = file
                 .substring(schemaDir.length)
