@@ -5,6 +5,7 @@ const network = require("../../../server/network_interfaces");
 const filter = require("../../..//server/filter");
 const { Template } = require("../Template");
 const { PaneGroup, SidebarListPane, DetailsPane } = require("../Pane");
+const path = require("path");
 
 function mainWindowRenderer() {
     startServer();
@@ -28,7 +29,7 @@ function renderHeader(target) {
     let validationOn = !!remote.getGlobal("options").showSchemaValidation;
 
     let tmpl = new Template({
-        path: __dirname + "\\headerToolbar.hbs",
+        path: path.join(__dirname, "headerToolbar.hbs"),
         parent: target
     });
     let data = {
@@ -99,7 +100,7 @@ function renderMain(target) {
 
 function renderFooter(target) {
     let tmpl = new Template({
-        path: __dirname + "\\footerToolbar.hbs",
+        path: path.join(__dirname, "footerToolbar.hbs"),
         parent: target
     });
     let data = {

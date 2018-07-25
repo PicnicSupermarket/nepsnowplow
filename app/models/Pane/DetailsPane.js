@@ -1,6 +1,7 @@
 "use strict";
 const { Template } = require("../Template");
 const Mark = require("mark.js");
+const path = require("path");
 
 class DetailsPane {
     constructor(parent) {
@@ -10,7 +11,7 @@ class DetailsPane {
 
     show() {
         let tmpl = new Template({
-            path: __dirname + "\\DetailsPane.hbs",
+            path: path.join(__dirname, "DetailsPane.hbs"),
             parent: this.parent
         });
         tmpl.render();

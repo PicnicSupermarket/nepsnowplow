@@ -1,5 +1,6 @@
 "use strict";
 const { Template } = require("../Template");
+const path = require("path");
 
 class PaneGroup {
     constructor(parent) {
@@ -9,7 +10,7 @@ class PaneGroup {
 
     show() {
         let tmpl = new Template({
-            path: __dirname + "\\PaneGroup.hbs",
+            path: path.join(__dirname, "PaneGroup.hbs"),
             parent: this.parent
         });
         tmpl.render({}, () => {

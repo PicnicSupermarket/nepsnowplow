@@ -1,6 +1,7 @@
 "use strict";
 const { Template } = require("../Template");
 const Mark = require("mark.js");
+const path = require("path");
 
 class SidebarListPane {
     constructor(parent) {
@@ -10,7 +11,7 @@ class SidebarListPane {
 
     show() {
         let tmpl = new Template({
-            path: __dirname + "\\SidebarListPane.hbs",
+            path: path.join(__dirname, "SidebarListPane.hbs"),
             parent: this.parent
         });
         tmpl.render();

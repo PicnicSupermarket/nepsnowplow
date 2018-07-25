@@ -6,6 +6,7 @@ require("module").globalPaths.push(__dirname);
 const { app, ipcMain, BrowserWindow, Menu } = require("electron");
 const os = require("os");
 const fs = require("fs");
+const path = require("path");
 
 global.trackedEvents = [];
 global.options = loadOptions();
@@ -47,7 +48,16 @@ function loadOptions() {
         schemaDir: "schemas/",
         listeningPort: 3000
     };
-    let userOptions = JSON.parse(fs.readFileSync("settings.json", "utf-8"));
+    let userOptions = {};
+    try {
+        userOptions = JSON.parse(
+            fs.readFileSync(path.resolve(__dirname, "settings.json"), "utf-8")
+        );
+    } catch (err) {
+        // catch in case when file could not be resolved,
+        // e.g. somebody deleted the settings file
+        console.log(err);
+    }
     return Object.assign(defaults, userOptions);
 }
 
@@ -66,7 +76,7 @@ function createMainWindow() {
     });
 
     // and load the index.html of the app.
-    mainWindow.loadFile("app/index.html");
+    mainWindow.loadFile(path.join(__dirname, "app", "index.html"));
 
     var template = [
         {

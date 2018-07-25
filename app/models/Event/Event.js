@@ -4,6 +4,7 @@ const filter = require("../../../server/filter");
 const Payload = require("./Payload");
 const Context = require("./Context");
 const { Template } = require("../Template");
+const path = require("path");
 
 class Event extends Payload {
     constructor(data, index) {
@@ -31,7 +32,7 @@ class Event extends Payload {
     }
 
     renderDetails() {
-        let tmpl = new Template(__dirname + "\\EventDetails.hbs");
+        let tmpl = new Template(path.join(__dirname, "EventDetails.hbs"));
         let data = {
             schemaName: this.getSchemaName(),
             errors: this.errors,
@@ -62,7 +63,7 @@ class Event extends Payload {
     }
 
     logItem() {
-        let tmpl = new Template(__dirname + "\\EventLogItem.hbs");
+        let tmpl = new Template(path.join(__dirname, "EventLogItem.hbs"));
         let data = {
             index: this.index,
             schemaName: this.getSchemaName(),
