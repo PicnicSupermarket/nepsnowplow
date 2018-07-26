@@ -50,8 +50,15 @@ function loadOptions() {
     };
     let userOptions = {};
     try {
+        // in production, remove app.asar from the path
+        // cannot use process.resourcesPath in development,
+        // as that will point to electron/dist in node_modules
+        let resourcesPath = app.getAppPath().replace("app.asar", "");
         userOptions = JSON.parse(
-            fs.readFileSync(path.resolve(__dirname, "settings.json"), "utf-8")
+            fs.readFileSync(
+                path.resolve(resourcesPath, "settings.json"),
+                "utf-8"
+            )
         );
     } catch (err) {
         // catch in case when file could not be resolved,
@@ -71,7 +78,7 @@ function createMainWindow() {
         minHeight: 768,
         acceptFirstMouse: true,
         title: "NepSnowplow",
-        titleBarStyle: "hiddenInset",
+        titleBarStyle: "hidden",
         frame: !isWindows
     });
 

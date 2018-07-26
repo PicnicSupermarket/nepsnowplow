@@ -54,9 +54,14 @@ Options can be set in `settings.json`, the defaults are:
 
 Depending on your operating system, the settings and schemas can be found in the following location:
 
-Windows: `C:\Users\<username>\AppData\Local\Programs\nepsnowplow`
-OS X: `a`
-Linux: where you extract the tar.gz
+Windows:
+
+-   Installed version (exe): `C:\Users\<username>\AppData\Local\Programs\nepsnowplow\Resources`
+-   Portable version (zip): where you've extracted the zip
+
+OS X: `~/Applications/NepSnowplow/Contents/Resources`
+
+Linux: where you've extracted the tar.gz
 
 ## Development
 

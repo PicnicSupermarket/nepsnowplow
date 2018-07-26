@@ -40,7 +40,7 @@
             "app/**/*",
             "server/**/*"
         ],
-        "extraFiles": [
+        "extraResources": [
             "schemas/**/*",
             "settings.json"
         ],

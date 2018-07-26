@@ -12,14 +12,18 @@ const SnowplowEvent = require("./model/snowplow_event.js");
 const ValidationSchema = require("./model/validation_schema.js");
 const appLogger = require("./logger/app_logger.js");
 
-var app = express();
-app.use(bodyParser.json()); // for parsing application/json
-app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+var server = express();
+server.use(bodyParser.json()); // for parsing application/json
+server.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
 var schemas = {};
 var schemaDir = remote.getGlobal("options").schemaDir;
 if (!!schemaDir) {
-    readSchema(path.join(__dirname, "..", schemaDir));
+    // in production, remove app.asar from the path
+    // cannot use process.resourcesPath in development,
+    // as that will point to electron/dist in node_modules
+    let resourcesPath = remote.app.getAppPath().replace("app.asar", "");
+    readSchema(path.join(resourcesPath, schemaDir));
 }
 
 function readSchema(file) {
@@ -59,7 +63,7 @@ function readSchema(file) {
 }
 
 // Capturing every post events to this server
-app.post("*", function(req, res) {
+server.post("*", function(req, res) {
     var body = req.body;
 
     var bundle = body.data.reverse();
@@ -76,9 +80,9 @@ app.post("*", function(req, res) {
 });
 
 // Start server
-var port = remote.getGlobal("options").listeningPort;
-app.listen(port, function() {
-    var ifaces = networkInterfaces.getNetworkInterfacesIps();
+let port = remote.getGlobal("options").listeningPort;
+server.listen(port, function() {
+    let ifaces = networkInterfaces.getNetworkInterfacesIps();
     console.log("Listening for SnowPlow analytics on");
     ifaces.forEach(function(iface) {
         console.log(" - %s:%s", iface, port);
