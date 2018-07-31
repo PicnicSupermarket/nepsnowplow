@@ -6,11 +6,11 @@ const bodyParser = require("body-parser");
 const path = require("path");
 const jsonfile = require("jsonfile");
 
-const networkInterfaces = require("./network_interfaces");
-const base64Decode = require("./b64.js");
-const SnowplowEvent = require("./model/snowplow_event.js");
-const ValidationSchema = require("./model/validation_schema.js");
-const appLogger = require("./logger/app_logger.js");
+const networkInterfaces = require("./networkInterfaces");
+const base64Decode = require("./base64Decode");
+const SnowplowEvent = require("./model/SnowplowEvent");
+const ValidationSchema = require("./model/ValidationSchema");
+const appLogger = require("./appLogger");
 
 var server = express();
 server.use(bodyParser.json()); // for parsing application/json

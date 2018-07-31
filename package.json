@@ -71,14 +71,11 @@
     },
     "dependencies": {
         "ajv": "^6.5.2",
-        "argparse": "^1.0.10",
         "body-parser": "^1.15.2",
-        "chalk": "^2.4.1",
         "express": "^4.14.0",
         "handlebars": "^4.0.11",
         "jsonfile": "^4.0.0",
         "mark.js": "^8.11.1",
-        "prettyjson": "^1.2.1",
         "renderjson": "^1.4.0",
         "z-schema": "^3.22.0"
     }

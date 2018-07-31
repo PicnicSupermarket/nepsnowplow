@@ -1,7 +1,7 @@
 const { remote, ipcRenderer, BrowserWindow, Menu } = require("electron");
 const os = require("os");
-const appLogger = require("../../../server/logger/app_logger");
-const network = require("../../../server/network_interfaces");
+const appLogger = require("../../../server/appLogger");
+const network = require("../../../server/networkInterfaces");
 const filter = require("../../..//server/filter");
 const { Template } = require("../Template");
 const { PaneGroup, SidebarListPane, DetailsPane } = require("../Pane");
@@ -29,7 +29,7 @@ function renderHeader(target) {
     let validationOn = !!remote.getGlobal("options").showSchemaValidation;
 
     let tmpl = new Template({
-        path: path.join(__dirname, "headerToolbar.hbs"),
+        path: path.join(__dirname, "HeaderToolbar.hbs"),
         parent: target
     });
     let data = {
@@ -100,7 +100,7 @@ function renderMain(target) {
 
 function renderFooter(target) {
     let tmpl = new Template({
-        path: path.join(__dirname, "footerToolbar.hbs"),
+        path: path.join(__dirname, "FooterToolbar.hbs"),
         parent: target
     });
     let data = {

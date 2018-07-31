@@ -1,5 +1,5 @@
 "use strict";
-const ValidatedSnowplowObject = require("./validated_snowplow_object.js");
+const ValidatedSnowplowObject = require("./ValidatedSnowplowObject");
 
 class SnowplowEvent {
     constructor(userId, payload, ctxs) {

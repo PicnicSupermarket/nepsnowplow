@@ -1,7 +1,7 @@
 const { remote } = require("electron");
-const sortObject = require("../sort_object.js");
-const filter = require("../filter.js");
-const { Event } = require("../../app/models/Event");
+const sortObject = require("./sortObject");
+const filter = require("./filter.js");
+const { Event } = require("../app/models/Event");
 
 const renderjson = require("renderjson");
 renderjson.set_show_to_level("all");
