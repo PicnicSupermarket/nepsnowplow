@@ -10,6 +10,9 @@ function filterItems(items, value) {
     if (value === "") {
         clearFilter();
     }
+    // we're filtering case insensitive
+    value = value.toLowerCase();
+
     let events = remote.getGlobal("trackedEvents");
     [].forEach.call(items, (eventEl) => {
         let index = eventEl.id.substring("events-".length - 1);
@@ -22,11 +25,18 @@ function filterItems(items, value) {
         // 3. event and context payload data
         try {
             if (!match) {
-                match = getSchemaName(event.payload).indexOf(value) > -1;
+                match =
+                    getSchemaName(event.payload)
+                        .toLowerCase()
+                        .indexOf(value) > -1;
             }
             if (!match) {
                 for (let i = event.contexts.length - 1; i >= 0; i--) {
-                    if (getSchemaName(event.contexts[i]).indexOf(value) > -1) {
+                    if (
+                        getSchemaName(event.contexts[i])
+                            .toLowerCase()
+                            .indexOf(value) > -1
+                    ) {
                         match = true;
                         break;
                     }
@@ -39,7 +49,12 @@ function filterItems(items, value) {
                     let payload = payloads[j].obj.data;
                     for (let prop in payload) {
                         if (payload.hasOwnProperty(prop)) {
-                            if (payload[prop].toString().indexOf(value) > -1) {
+                            if (
+                                payload[prop]
+                                    .toString()
+                                    .toLowerCase()
+                                    .indexOf(value) > -1
+                            ) {
                                 match = true;
                                 break;
                             }
