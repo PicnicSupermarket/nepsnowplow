@@ -28,7 +28,7 @@ before_install:
     # If this is a push to `master` and it is a new version, we need to publish to NPM
     - export DEPLOY_TYPE=$( test ${TRAVIS_BRANCH} = "master" && ( test ${TYPE} = "push" && ( test "${CURRENT_VERSION}" != "${LAST_RELEASED_VERSION}" && echo onTag ) ) || echo never )
     # Fix possible permission issues
-    sudo chown -R $(whoami) .
+    - sudo chown -R $(whoami) .
 
 install:
   # Install dependencies
