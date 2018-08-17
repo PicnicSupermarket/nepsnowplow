@@ -43,13 +43,14 @@ function readSchema(file) {
     ) {
         // only accept .json or no extension
         try {
-            let schemaName = file
-                .substring(schemaDir.length)
-                .replace(/\\/g, "/"); // force forard slashes irrespective of platform
-            schemas[schemaName] = new ValidationSchema(
-                schemaName,
-                jsonfile.readFileSync(file)
-            );
+            let schema = jsonfile.readFileSync(file);
+            let schemaName =
+                schema.self.vendor +
+                "/" +
+                schema.self.name +
+                "/jsonschema/" +
+                schema.self.version;
+            schemas[schemaName] = new ValidationSchema(schemaName, schema);
         } catch (err) {
             // catch non-valid JSON schemas
             console.log(err);
