@@ -10,9 +10,9 @@ function sortObject(object) {
         return 0;
     });
 
-    for (var index in keys) {
-        var key = keys[index];
-        if (typeof object[key] == "object" && !(object[key] instanceof Array)) {
+    for (let index in keys) {
+        let key = keys[index];
+        if (typeof object[key] === "object" && !(object[key] instanceof Array)) {
             sortedObj[key] = sortObject(object[key]);
         } else {
             sortedObj[key] = object[key];

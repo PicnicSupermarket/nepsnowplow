@@ -51,7 +51,7 @@ function readSchema(file) {
             console.log(err);
         }
     } else if (stats.isDirectory(file)) {
-        var files = fs.readdirSync(file);
+        let files = fs.readdirSync(file);
         files.forEach(function(f) {
             readSchema(path.join(file, f));
         });

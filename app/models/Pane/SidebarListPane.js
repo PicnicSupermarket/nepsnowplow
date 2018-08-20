@@ -24,9 +24,7 @@ class SidebarListPane {
     }
 
     highlightEvents(value) {
-        var markInst = new Mark(
-            document.querySelectorAll("#events-container .schema-name")
-        );
+        let markInst = new Mark(document.querySelectorAll("#events-container .schema-name"));
         markInst.unmark({
             done: function() {
                 if (typeof value !== "undefined" && value !== "") {
@@ -34,7 +32,7 @@ class SidebarListPane {
                         separateWordSearch: false
                     });
                 } else {
-                    var eventItems = document.querySelectorAll(
+                    let eventItems = document.querySelectorAll(
                         "#events-container .list-group-item"
                     );
                     [].forEach.call(eventItems, function(eventEl) {

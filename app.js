@@ -1,3 +1,5 @@
+"use strict";
+
 // Include app.js directory in node path
 process.env.NODE_PATH = __dirname;
 require("module").Module._initPaths();
@@ -55,10 +57,7 @@ function loadOptions() {
         // as that will point to electron/dist in node_modules
         let resourcesPath = app.getAppPath().replace("app.asar", "");
         userOptions = JSON.parse(
-            fs.readFileSync(
-                path.resolve(resourcesPath, "settings.json"),
-                "utf-8"
-            )
+            fs.readFileSync(path.resolve(resourcesPath, "settings.json"), "utf-8")
         );
     } catch (err) {
         // catch in case when file could not be resolved,
@@ -69,7 +68,7 @@ function loadOptions() {
 }
 
 function createMainWindow() {
-    var isWindows = os.platform() === "win32";
+    let isWindows = os.platform() === "win32";
     // Create the browser window.
     mainWindow = new BrowserWindow({
         width: 1024,
@@ -85,7 +84,7 @@ function createMainWindow() {
     // and load the index.html of the app.
     mainWindow.loadFile(path.join(__dirname, "app", "index.html"));
 
-    var template = [
+    let template = [
         {
             label: "NepSnowplow",
             submenu: [

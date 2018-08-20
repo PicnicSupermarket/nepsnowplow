@@ -1,3 +1,4 @@
+"use strict";
 const { remote } = require("electron");
 
 var filterTimer,
@@ -87,9 +88,7 @@ function filterEvents(value, keycode) {
     } else {
         filterState = true;
         filterTimer = setTimeout(function() {
-            let eventItems = document.querySelectorAll(
-                "#events-container .list-group-item"
-            );
+            let eventItems = document.querySelectorAll("#events-container .list-group-item");
 
             // when not tapping backspace,
             // we can narrow the search

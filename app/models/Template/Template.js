@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const Handlebars = require("./Handlebars");
 
-var compiledTemplates = {};
+let compiledTemplates = {};
 
 class Template {
     constructor(options) {

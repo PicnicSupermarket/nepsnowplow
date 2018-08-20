@@ -1,11 +1,16 @@
+"use strict";
+
 const { remote } = require("electron");
-const sortObject = require("./sortObject");
-const filter = require("./filter.js");
 const { Event } = require("../app/models/Event");
 
 const renderjson = require("renderjson");
 renderjson.set_show_to_level("all");
 renderjson.set_icons("+", "-");
+
+function displayEvent(event, index) {
+    let eventItem = new Event(event, index);
+    eventItem.logItem();
+}
 
 function displayEvents(events) {
     events.forEach((event, index) => {
@@ -13,16 +18,11 @@ function displayEvents(events) {
     });
 }
 
-function displayEvent(event, index) {
-    let eventItem = new Event(event, index);
-    eventItem.logItem();
-}
-
 function logEvent(event) {
-    var ipcRenderer = require("electron").ipcRenderer;
+    let ipcRenderer = require("electron").ipcRenderer;
     ipcRenderer.send("add-event", event);
 
-    var index = remote.getGlobal("trackedEvents").length - 1;
+    let index = remote.getGlobal("trackedEvents").length - 1;
     displayEvent(event, index);
 }
 

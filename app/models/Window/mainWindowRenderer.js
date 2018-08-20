@@ -1,27 +1,104 @@
-const { remote, ipcRenderer, BrowserWindow, Menu } = require("electron");
+"use strict";
+
+const { remote, ipcRenderer } = require("electron");
 const os = require("os");
+const path = require("path");
+
 const appLogger = require("../../../server/appLogger");
 const network = require("../../../server/networkInterfaces");
 const filter = require("../../..//server/filter");
 const { Template } = require("../Template");
 const { PaneGroup, SidebarListPane, DetailsPane } = require("../Pane");
-const path = require("path");
-
-function mainWindowRenderer() {
-    startServer();
-    renderWindow();
-}
 
 function startServer() {
     require("../../../server/server");
 }
 
-function renderWindow() {
-    let target = document.getElementById("window");
-    renderHeader(target);
-    renderMain(target);
-    renderFooter(target);
-    appLogger.displayEvents(remote.getGlobal("trackedEvents"));
+function enableSearchListener() {
+    const filterEventsInput = document.getElementById("filter-events");
+    const clearFilterButton = document.getElementById("clear-filter");
+
+    filterEventsInput.addEventListener("focus", () => {
+        clearFilterButton.classList.add("icon-cancel-circled", "clickable");
+    });
+
+    filterEventsInput.addEventListener("blur", (e) => {
+        if (e.target.value === "") {
+            clearFilterButton.classList.remove("icon-cancel-circled", "clickable");
+        }
+    });
+
+    filterEventsInput.addEventListener("keyup", function(e) {
+        let value = this.value;
+        if (e.keyCode === 27) {
+            // escape (27) was pressed
+            filter.clearFilter();
+            this.blur();
+        } else if (e.keyCode === 13) {
+            // enter(13) was pressed
+            e.preventDefault();
+            this.blur();
+        } else {
+            filter.filterEvents(value, e.keyCode);
+        }
+    });
+
+    clearFilterButton.addEventListener("click", function(e) {
+        this.classList.remove("icon-cancel-circled", "clickable");
+        filterEventsInput.value = "";
+        filter.clearFilter();
+    });
+}
+
+function enableToolbarButtonListeners() {
+    document.getElementById("reset-button").addEventListener("click", () => {
+        // remove events from memory
+        ipcRenderer.send("clear-events");
+
+        // clear events from window
+        const eventsContainer = document.getElementById("events-container");
+        const detailsContainer = document.getElementById("details-container");
+
+        while (eventsContainer.firstChild) {
+            eventsContainer.removeChild(eventsContainer.firstChild);
+        }
+        while (detailsContainer.firstChild) {
+            detailsContainer.removeChild(detailsContainer.firstChild);
+        }
+    });
+
+    document.getElementById("validation-toggle").addEventListener("click", (e) => {
+        let validationOn = !!remote.getGlobal("options").showSchemaValidation;
+
+        if (validationOn) {
+            // was previously on
+            e.target.classList.remove("active");
+            document.body.classList.remove("show-validation");
+        } else {
+            e.target.classList.add("active");
+            document.body.classList.add("show-validation");
+        }
+        remote.getGlobal("options").showSchemaValidation = !validationOn;
+    });
+}
+
+function enableWindowButtonListeners() {
+    document.getElementById("close-button").addEventListener("click", () => {
+        remote.getCurrentWindow().close();
+    });
+
+    document.getElementById("min-button").addEventListener("click", () => {
+        remote.getCurrentWindow().minimize();
+    });
+
+    document.getElementById("max-button").addEventListener("click", () => {
+        let window = remote.getCurrentWindow();
+        if (!window.isMaximized()) {
+            window.maximize();
+        } else {
+            window.unmaximize();
+        }
+    });
 }
 
 function renderHeader(target) {
@@ -52,45 +129,6 @@ function renderHeader(target) {
     }
 }
 
-function enableSearchListener() {
-    var filterEventsInput = document.getElementById("filter-events");
-    var clearFilterButton = document.getElementById("clear-filter");
-
-    filterEventsInput.addEventListener("focus", function(e) {
-        clearFilterButton.classList.add("icon-cancel-circled", "clickable");
-    });
-
-    filterEventsInput.addEventListener("blur", function(e) {
-        if (this.value === "") {
-            clearFilterButton.classList.remove(
-                "icon-cancel-circled",
-                "clickable"
-            );
-        }
-    });
-
-    filterEventsInput.addEventListener("keyup", function(e) {
-        var value = this.value;
-        if (e.keyCode === 27) {
-            // escape (27) was pressed
-            filter.clearFilter();
-            this.blur();
-        } else if (e.keyCode === 13) {
-            // enter(13) was pressed
-            e.preventDefault();
-            this.blur();
-        } else {
-            filter.filterEvents(value, e.keyCode);
-        }
-    });
-
-    clearFilterButton.addEventListener("click", function(e) {
-        this.classList.remove("icon-cancel-circled", "clickable");
-        filterEventsInput.value = "";
-        filter.clearFilter();
-    });
-}
-
 function renderMain(target) {
     let paneGroup = new PaneGroup(target);
     paneGroup.createSubPane(new SidebarListPane());
@@ -104,73 +142,23 @@ function renderFooter(target) {
         parent: target
     });
     let data = {
-        ip_address: network.currentIpAddress(),
+        ipAddress: network.currentIpAddress(),
         port: remote.getGlobal("options").listeningPort
     };
     tmpl.render(data);
 }
 
-function enableToolbarButtonListeners() {
-    document
-        .getElementById("reset-button")
-        .addEventListener("click", function(e) {
-            // remove events from memory
-            ipcRenderer.send("clear-events");
-
-            // clear events from window
-            var eventsContainer = document.getElementById("events-container");
-            var detailsContainer = document.getElementById("details-container");
-            while (eventsContainer.firstChild) {
-                eventsContainer.removeChild(eventsContainer.firstChild);
-            }
-            while (detailsContainer.firstChild) {
-                detailsContainer.removeChild(detailsContainer.firstChild);
-            }
-        });
-
-    document
-        .getElementById("validation-toggle")
-        .addEventListener("click", function(e) {
-            let validationOn = !!remote.getGlobal("options")
-                .showSchemaValidation;
-
-            if (validationOn) {
-                // was previously on
-                this.classList.remove("active");
-                document.body.classList.remove("show-validation");
-            } else {
-                this.classList.add("active");
-                document.body.classList.add("show-validation");
-            }
-            remote.getGlobal("options").showSchemaValidation = !validationOn;
-        });
+function renderWindow() {
+    let target = document.getElementById("window");
+    renderHeader(target);
+    renderMain(target);
+    renderFooter(target);
+    appLogger.displayEvents(remote.getGlobal("trackedEvents"));
 }
 
-function enableWindowButtonListeners() {
-    document
-        .getElementById("close-button")
-        .addEventListener("click", function(e) {
-            var window = remote.getCurrentWindow();
-            window.close();
-        });
-
-    document
-        .getElementById("min-button")
-        .addEventListener("click", function(e) {
-            var window = remote.getCurrentWindow();
-            window.minimize();
-        });
-
-    document
-        .getElementById("max-button")
-        .addEventListener("click", function(e) {
-            var window = remote.getCurrentWindow();
-            if (!window.isMaximized()) {
-                window.maximize();
-            } else {
-                window.unmaximize();
-            }
-        });
+function mainWindowRenderer() {
+    startServer();
+    renderWindow();
 }
 
 module.exports = mainWindowRenderer;
