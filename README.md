@@ -27,7 +27,9 @@ For each event, NepSnowplow will list the event details and all associated conte
 
 ### Schemas
 
-To validate events and contexts, you need to place their schemas in the `schemas` folder (or whichever folder you've [defined](#configure)). To get started, check out Snowplow's own set of schemas on [Iglu Central](https://github.com/snowplow/iglu-central). The recommended structure is `<vendor>/<event_or_context>/jsonschema/<schema_version>`. For example:
+To validate events and contexts, you need to place their schemas in the `schemas` folder (or whichever folder you've [defined](#configure)). To get started, check out Snowplow's own set of schemas on [Iglu Central](https://github.com/snowplow/iglu-central).
+
+Make sure each schema is a separate file with either no extension or `.json`. The recommended structure is `<vendor>/<event_or_context>/jsonschema/<schema_version>`. For example:
 
 ```
 schemas

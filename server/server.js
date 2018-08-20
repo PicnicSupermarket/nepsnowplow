@@ -1,4 +1,6 @@
 #!/usr/bin/node
+"use strict";
+
 const { remote } = require("electron");
 const fs = require("fs");
 const express = require("express");
@@ -13,18 +15,11 @@ const ValidationSchema = require("./model/ValidationSchema");
 const appLogger = require("./appLogger");
 
 var server = express();
-server.use(bodyParser.json()); // for parsing application/json
-server.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+server.use(bodyParser.json()); // to parse application/json
+server.use(bodyParser.urlencoded({ extended: true })); // to parse application/x-www-form-urlencoded
 
 var schemas = {};
 var schemaDir = remote.getGlobal("options").schemaDir;
-if (!!schemaDir) {
-    // in production, remove app.asar from the path
-    // cannot use process.resourcesPath in development,
-    // as that will point to electron/dist in node_modules
-    let resourcesPath = remote.app.getAppPath().replace("app.asar", "");
-    readSchema(path.join(resourcesPath, schemaDir));
-}
 
 function readSchema(file) {
     let stats;
@@ -37,10 +32,7 @@ function readSchema(file) {
         return;
     }
 
-    if (
-        stats.isFile() &&
-        (path.extname(file) === "" || path.extname(file) === ".json")
-    ) {
+    if (stats.isFile() && (path.extname(file) === "" || path.extname(file) === ".json")) {
         // only accept .json or no extension
         try {
             let schema = jsonfile.readFileSync(file);
@@ -48,11 +40,14 @@ function readSchema(file) {
                 schema.self.vendor +
                 "/" +
                 schema.self.name +
-                "/jsonschema/" +
+                "/" +
+                schema.self.format +
+                "/" +
                 schema.self.version;
             schemas[schemaName] = new ValidationSchema(schemaName, schema);
         } catch (err) {
             // catch non-valid JSON schemas
+            console.log(file);
             console.log(err);
         }
     } else if (stats.isDirectory(file)) {
@@ -63,16 +58,24 @@ function readSchema(file) {
     }
 }
 
+if (!!schemaDir) {
+    // in production, remove app.asar from the path
+    // cannot use process.resourcesPath in development,
+    // as that will point to electron/dist in node_modules
+    let resourcesPath = remote.app.getAppPath().replace("app.asar", "");
+    readSchema(path.join(resourcesPath, schemaDir));
+}
+
 // Capturing every post events to this server
 server.post("*", function(req, res) {
-    var body = req.body;
+    let body = req.body;
 
-    var bundle = body.data.reverse();
+    let bundle = body.data.reverse();
     bundle.forEach(function(data) {
-        var context = JSON.parse(base64Decode(data.cx));
-        var payload = JSON.parse(base64Decode(data.ue_px));
+        let context = JSON.parse(base64Decode(data.cx));
+        let payload = JSON.parse(base64Decode(data.ue_px));
 
-        var event = new SnowplowEvent(data.uid, payload, context);
+        let event = new SnowplowEvent(data.uid, payload, context);
         event.validate(schemas);
 
         appLogger.logEvent(event);
@@ -88,11 +91,7 @@ server.listen(port, function() {
     ifaces.forEach(function(iface) {
         console.log(" - %s:%s", iface, port);
     });
-    console.log(
-        "Please check you both of your devices are on the same network"
-    );
-    console.log(
-        "________________________________________________________________________________"
-    );
+    console.log("Please check you both of your devices are on the same network");
+    console.log("________________________________________________________________________________");
     console.log("");
 });
