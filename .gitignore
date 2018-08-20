@@ -42,3 +42,7 @@ dist
 node_modules
 bower_components
 example-components
+
+#
+schemas/*
+!schemas/*.md
