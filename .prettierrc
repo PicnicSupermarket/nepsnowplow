@@ -1,6 +1,24 @@
 {
+    // Enforce the use of semi-colons at line-ends
+    // even if they're not strictly necessary
     "semi": true,
+
+    // Enforce spaces between brackets
     "bracketSpacing": true,
+
+    // Enforce the use of paratheses on a single argument when using arrow function
+    // e.g. (x) => { x+1 } instead of x => { x +1 }
     "arrowParens": "always",
-    "tabWidth": 4
+
+    // Enforce using spaces over tabs
+    "useTabs": false,
+
+    // Enforce tab width of 4 spaces
+    "tabWidth": 4,
+
+    // Enforce line lenght of 100 characters
+    "printWidth": 100,
+
+    // Enforce using double quotes
+    "singleQuote": false
 }
