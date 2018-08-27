@@ -8,13 +8,13 @@ matrix:
         - ELECTRON_CACHE=$HOME/.cache/electron
         - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
       script:
-        # Build the release package, but only push to GitHub on Tag or Draft after succesful build
+        # Build the release package, but only push to GitHub on Tag or Draft after succesful build.
         - yarn build --publish ${DEPLOY_TYPE}
     - os: linux
       services: docker
       language: generic
       script:
-        # Build the release package, but only push to GitHub on Tag or Draft after succesful build
+        # Build the release package, but only push to GitHub on Tag or Draft after succesful build.
         - >
           docker run --rm \
             --env-file <(env | grep -iE 'DEBUG|NODE_|ELECTRON_|YARN_|NPM_|CI|CIRCLE|TRAVIS|APPVEYOR_|CSC_|_TOKEN|_KEY|AWS_|STRIP|BUILD_') \
@@ -34,17 +34,17 @@ env:
     - CURRENT_VERSION=$( jq -r '.version' < package.json )
 
 before_install:
-    # Retrieve the last known published version
+    # Retrieve the last known published version.
     - git fetch --tags
     - export LAST_RELEASED_VERSION=$( git tag | tail -1 | sed 's/v//' )
-    # If this is a push to `master` and it is a new version, we need to publish to NPM
+    # If this is a push to `master` and it is a new version, we need to publish to NPM.
     - export DEPLOY_TYPE=$( test ${TRAVIS_BRANCH} = "master" && ( test ${TYPE} = "push" && ( test "${CURRENT_VERSION}" != "${LAST_RELEASED_VERSION}" && echo onTag ) ) || echo never )
-    # Fix possible permission issues
+    # Fix possible permission issues.
     - sudo chown -R $(whoami) .
 
 install:
-  # Install dependencies
-  # source compilation is triggered automatically after install
+  # Install dependencies.
+  # Source compilation is triggered automatically after install.
   - yarn --link-duplicates --pure-lockfile
 
 before_cache:
