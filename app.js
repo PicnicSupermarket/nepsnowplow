@@ -60,8 +60,8 @@ function loadOptions() {
             fs.readFileSync(path.resolve(resourcesPath, "settings.json"), "utf-8")
         );
     } catch (err) {
-        // catch in case when file could not be resolved,
-        // e.g. somebody deleted the settings file
+        // catch in case the file could not be resolved,
+        // e.g. when somebody deleted the settings file
         console.log(err);
     }
     return Object.assign(defaults, userOptions);

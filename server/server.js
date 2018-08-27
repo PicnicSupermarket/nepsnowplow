@@ -26,8 +26,8 @@ function readSchema(file) {
     try {
         stats = fs.lstatSync(file);
     } catch (err) {
-        // catch in case when file or directory could not be resolved,
-        // e.g. somebody deleted the schemas folder
+        // catch in case the file or directory could not be resolved,
+        // when e.g. somebody deleted the schemas folder
         console.log(err);
         return;
     }
