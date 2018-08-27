@@ -52,8 +52,11 @@
   // Warn when variables are defined but never used.
   "unused": true,
 
-  // 
+  // Always filter inherited properties when using for ... in
   "forin": true,
+
+  // Enforce curly brackets
+  "curly": true,
 
   /*
    * RELAXING OPTIONS

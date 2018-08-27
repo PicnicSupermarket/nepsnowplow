@@ -37,7 +37,9 @@ class Template {
             item.outerHTML = html;
         }
 
-        if (typeof callback === "function") callback(html);
+        if (typeof callback === "function") {
+            callback(html);
+        }
     }
 }
 
