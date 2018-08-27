@@ -43,8 +43,8 @@ function enableSearchListener() {
         }
     });
 
-    clearFilterButton.addEventListener("click", function(e) {
-        this.classList.remove("icon-cancel-circled", "clickable");
+    clearFilterButton.addEventListener("click", (e) => {
+        e.target.classList.remove("icon-cancel-circled", "clickable");
         filterEventsInput.value = "";
         filter.clearFilter();
     });
@@ -117,7 +117,9 @@ function renderHeader(target) {
     tmpl.render(
         data,
         () => {
-            if (isWindows) enableWindowButtonListeners();
+            if (isWindows) {
+                enableWindowButtonListeners();
+            }
             enableToolbarButtonListeners();
             enableSearchListener();
         },

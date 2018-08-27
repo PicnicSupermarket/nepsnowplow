@@ -15,7 +15,7 @@ function filterItems(items, value) {
     value = value.toLowerCase();
 
     let events = remote.getGlobal("trackedEvents");
-    [].forEach.call(items, (eventEl) => {
+    Array.from(items).forEach((eventEl) => {
         let index = eventEl.id.substring("events-".length - 1);
         let event = events[index];
         let match = !filterState; // when not filtering, assume matched
@@ -84,7 +84,7 @@ function filterEvents(value, keycode) {
                     .filter((item) => item.style.display === "");
             }
             filterItems(eventItems, value);
-        }, 250);
+        }, 100);
     }
 }
 

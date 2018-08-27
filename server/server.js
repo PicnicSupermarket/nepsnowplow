@@ -36,14 +36,12 @@ function readSchema(file) {
         // only accept .json or no extension
         try {
             let schema = jsonfile.readFileSync(file);
-            let schemaName =
-                schema.self.vendor +
-                "/" +
-                schema.self.name +
-                "/" +
-                schema.self.format +
-                "/" +
-                schema.self.version;
+            let schemaName = [
+                schema.self.vendor,
+                schema.self.name,
+                schema.self.format,
+                schema.self.version
+            ].join("/");
             schemas[schemaName] = new ValidationSchema(schemaName, schema);
         } catch (err) {
             // catch non-valid JSON schemas

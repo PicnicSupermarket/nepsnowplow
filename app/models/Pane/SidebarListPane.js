@@ -35,7 +35,8 @@ class SidebarListPane {
                     let eventItems = document.querySelectorAll(
                         "#events-container .list-group-item"
                     );
-                    [].forEach.call(eventItems, function(eventEl) {
+
+                    eventItems.forEach((eventEl) => {
                         eventEl.style.display = "";
                     });
                 }

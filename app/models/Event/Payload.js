@@ -21,13 +21,12 @@ class Payload {
     }
 
     getSchemaValidity() {
-        if (typeof this.isValid === "undefined") {
-            return "warning";
-        } else if (this.isValid === true) {
+        if (this.isValid === true) {
             return "positive";
         } else if (this.isValid === false) {
             return "negative";
         }
+        return "warning";
     }
 }
 
