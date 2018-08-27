@@ -7,10 +7,22 @@ matrix:
       env:
         - ELECTRON_CACHE=$HOME/.cache/electron
         - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
-
+      script:
+        # Build the release package, but only push to GitHub on Tag or Draft after succesful build
+        - yarn build --publish ${DEPLOY_TYPE}
     - os: linux
       services: docker
       language: generic
+      script:
+        # Build the release package, but only push to GitHub on Tag or Draft after succesful build
+        - >
+          docker run --rm \
+            --env-file <(env | grep -iE 'DEBUG|NODE_|ELECTRON_|YARN_|NPM_|CI|CIRCLE|TRAVIS|APPVEYOR_|CSC_|_TOKEN|_KEY|AWS_|STRIP|BUILD_') \
+            -v ${PWD}:/project \
+            -v ~/.cache/electron:/root/.cache/electron \
+            -v ~/.cache/electron-builder:/root/.cache/electron-builder \
+            electronuserland/builder:wine \
+            /bin/bash -c "yarn build --linux --win --publish ${DEPLOY_TYPE}"
 
 env:
   global:
@@ -34,21 +46,6 @@ install:
   # Install dependencies
   # source compilation is triggered automatically after install
   - yarn --link-duplicates --pure-lockfile
-
-script:
-  # Build the release package, but only push to GitHub on Tag or Draft after succesful build
-  - >
-    if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-      docker run --rm \
-        --env-file <(env | grep -iE 'DEBUG|NODE_|ELECTRON_|YARN_|NPM_|CI|CIRCLE|TRAVIS|APPVEYOR_|CSC_|_TOKEN|_KEY|AWS_|STRIP|BUILD_') \
-        -v ${PWD}:/project \
-        -v ~/.cache/electron:/root/.cache/electron \
-        -v ~/.cache/electron-builder:/root/.cache/electron-builder \
-        electronuserland/builder:wine \
-        /bin/bash -c "yarn build --linux --win --publish ${DEPLOY_TYPE}"
-    else
-      yarn build --publish ${DEPLOY_TYPE}
-    fi
 
 before_cache:
   - rm -rf $HOME/.cache/electron-builder/wine
