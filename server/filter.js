@@ -25,44 +25,20 @@ function filterItems(items, value) {
         // 2. context schema names
         // 3. event and context payload data
         try {
-            if (!match) {
-                match =
-                    getSchemaName(event.payload)
-                        .toLowerCase()
-                        .indexOf(value) > -1;
-            }
-            if (!match) {
-                for (let i = event.contexts.length - 1; i >= 0; i--) {
-                    if (
-                        getSchemaName(event.contexts[i])
-                            .toLowerCase()
-                            .indexOf(value) > -1
-                    ) {
-                        match = true;
-                        break;
-                    }
-                }
+            match = match || contains(getSchemaName(event.payload), value);
+            for (let i = event.contexts.length - 1; !match && i >= 0; i--) {
+                match = match || contains(getSchemaName(event.contexts[i]), value);
             }
             if (!match) {
                 // check contents of both event as well as the contexts
                 let payloads = [event.payload].concat(event.contexts);
-                for (let j = payloads.length - 1; j >= 0; j--) {
+                for (let j = payloads.length - 1; !match && j >= 0; j--) {
                     let payload = payloads[j].obj.data;
                     for (let prop in payload) {
-                        if (payload.hasOwnProperty(prop)) {
-                            if (
-                                payload[prop]
-                                    .toString()
-                                    .toLowerCase()
-                                    .indexOf(value) > -1
-                            ) {
-                                match = true;
-                                break;
-                            }
+                        if (payload.hasOwnProperty(prop) && contains(payload[prop], value)) {
+                            match = true;
+                            break;
                         }
-                    }
-                    if (match) {
-                        break;
                     }
                 }
             }
@@ -76,6 +52,15 @@ function filterItems(items, value) {
 
 function getSchemaName(event) {
     return event.obj.schema.split("/")[1];
+}
+
+function contains(haystack, needle) {
+    return (
+        haystack
+            .toString()
+            .toLowerCase()
+            .indexOf(needle) > -1
+    );
 }
 
 function filterEvents(value, keycode) {
