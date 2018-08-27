@@ -31,7 +31,7 @@ env:
     # - push, for pushes
     - TYPE="$( test ${TRAVIS_EVENT_TYPE} = pull_request && echo review || echo push )"
     # Retrieve the version that this source bundle represents
-    - CURRENT_VERSION=$( cat package.json | grep "version" | sed 's/[^0-9\.]*//g' )
+    - CURRENT_VERSION=$( jq -r '.version' < package.json )
 
 before_install:
     # Retrieve the last known published version
