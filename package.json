@@ -1,0 +1,82 @@
+{
+  "name": "nepsnowplow",
+  "version": "0.1.0",
+  "description": "A local Snowplow Collector and GUI to inspect collected events",
+  "author": "Picnic Technologies",
+  "keywords": [
+    "snowplow",
+    "picnic",
+    "event",
+    "logger",
+    "inspector"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PicnicSupermarket/nepsnowplow"
+  },
+  "bugs": {
+    "url": "https://github.com/PicnicSupermarket/nepsnowplow/issues"
+  },
+  "licence": "MIT",
+  "scripts": {
+    "build": "electron-builder",
+    "compile": "sass app/css/sass/app.scss app/css/app.css",
+    "package": "electron-builder --dir",
+    "postinstall": "yarn compile",
+    "precommit": "pretty-quick --staged",
+    "start": "electron .",
+    "watch": "yarn compile --watch"
+  },
+  "main": "app.js",
+  "build": {
+    "appId": "com.picnic.nepsnowplow",
+    "productName": "NepSnowplow",
+    "copyright": "Copyright © 2017-2018 Picnic Technologies BV",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "app.js",
+      "app/**/*",
+      "server/**/*"
+    ],
+    "extraResources": [
+      "schemas/**/*",
+      "settings.json"
+    ],
+    "win": {
+      "target": [
+        "zip",
+        "nsis"
+      ]
+    },
+    "linux": {
+      "target": "tar.gz"
+    },
+    "mac": {
+      "category": "public.app-category.developer-tools",
+      "target": [
+        "tar.gz",
+        "dmg"
+      ]
+    }
+  },
+  "devDependencies": {
+    "electron": "^2.0.2",
+    "electron-builder": "^20.20.4",
+    "husky": "^0.14.3",
+    "prettier": "1.13.7",
+    "pretty-quick": "^1.6.0",
+    "sass": "^1.10.0"
+  },
+  "dependencies": {
+    "ajv": "^6.5.2",
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "handlebars": "^4.0.11",
+    "jsonfile": "^4.0.0",
+    "mark.js": "^8.11.1",
+    "renderjson": "^1.4.0",
+    "z-schema": "^3.22.0"
+  }
+}

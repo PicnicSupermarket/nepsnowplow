@@ -1,0 +1,25 @@
+.icon-color-positive {
+    color: #27cf45;
+
+    &.clickable:hover {
+        color: #1f772d;
+    }
+}
+
+.icon-color-warning,
+#validation-toggle:hover span {
+    color: #fcc32e;
+
+    &.clickable:hover {
+        color: #af7c26;
+    }
+}
+
+.icon-color-negative,
+#reset-button:hover span {
+    color: #f6645d;
+
+    &.clickable:hover {
+        color: #944246;
+    }
+}

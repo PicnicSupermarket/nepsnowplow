@@ -1,0 +1,35 @@
+pre,
+pre span {
+    cursor: text;
+    -webkit-user-select: text;
+    a {
+        cursor: pointer;
+    }
+}
+
+pre.renderjson {
+    background-color: rgba(0, 0, 0, 0.02);
+    padding: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+
+    & span.syntax {
+        color: #34495e;
+    }
+
+    & span.key {
+        color: #3498db;
+    }
+
+    & span.string {
+        color: #e67e22;
+    }
+
+    & span.boolean {
+        color: #e74c3c;
+        font-weight: bold;
+    }
+
+    & span.number {
+        color: #2c3e50;
+    }
+}

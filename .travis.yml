@@ -1,0 +1,56 @@
+matrix:
+  include:
+    - os: osx
+      osx_image: xcode9.4
+      language: node_js
+      node_js: "10"
+      env:
+        - ELECTRON_CACHE=$HOME/.cache/electron
+        - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
+      script:
+        # Build the release package, but only push to GitHub on Tag or Draft after succesful build.
+        - yarn build --publish ${DEPLOY_TYPE}
+    - os: linux
+      services: docker
+      language: generic
+      script:
+        # Build the release package, but only push to GitHub on Tag or Draft after succesful build.
+        - >
+          docker run --rm \
+            --env-file <(env | grep -iE 'DEBUG|NODE_|ELECTRON_|YARN_|NPM_|CI|CIRCLE|TRAVIS|APPVEYOR_|CSC_|_TOKEN|_KEY|AWS_|STRIP|BUILD_') \
+            -v ${PWD}:/project \
+            -v ~/.cache/electron:/root/.cache/electron \
+            -v ~/.cache/electron-builder:/root/.cache/electron-builder \
+            electronuserland/builder:wine \
+            /bin/bash -c "yarn build --linux --win --publish ${DEPLOY_TYPE}"
+
+env:
+  global:
+    # We distinguish two types of builds:
+    # - review, for pull request analysis/feedback
+    # - push, for pushes
+    - TYPE="$( test ${TRAVIS_EVENT_TYPE} = pull_request && echo review || echo push )"
+    # Retrieve the version that this source bundle represents
+    - CURRENT_VERSION=$( jq -r '.version' < package.json )
+
+before_install:
+    # Retrieve the last known published version.
+    - git fetch --tags
+    - export LAST_RELEASED_VERSION=$( git tag | tail -1 | sed 's/v//' )
+    # If this is a push to `master` and it is a new version, we need to publish to NPM.
+    - export DEPLOY_TYPE=$( test ${TRAVIS_BRANCH} = "master" && ( test ${TYPE} = "push" && ( test "${CURRENT_VERSION}" != "${LAST_RELEASED_VERSION}" && echo onTag ) ) || echo never )
+
+install:
+  # Install dependencies.
+  # Source compilation is triggered automatically after install.
+  - yarn --link-duplicates --pure-lockfile
+
+before_cache:
+  - rm -rf $HOME/.cache/electron-builder/wine
+
+cache:
+  yarn: true
+  directories:
+    - node_modules
+    - $HOME/.cache/electron
+    - $HOME/.cache/electron-builder

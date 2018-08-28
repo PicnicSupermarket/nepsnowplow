@@ -1,0 +1,16 @@
+// Import all vendor stylesheets
+@import "vendor/vendors.scss";
+
+// Import necessary vendor overwrites to keep originals clean
+@import "vendor/overwrites.scss";
+
+// Import all app component styles
+@import "app/buttons";
+@import "app/code";
+@import "app/forms";
+@import "app/icons";
+@import "app/messages";
+@import "app/panes";
+@import "app/toolbars";
+@import "app/validation";
+@import "app/filter";

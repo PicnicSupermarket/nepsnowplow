@@ -1,0 +1,19 @@
+header.toolbar {
+    -webkit-app-region: drag;
+}
+
+#window-actions {
+    position: fixed;
+    top: 2px;
+    right: 5px;
+
+    & span {
+        font-size: 16px;
+        margin: 0 3px;
+        float: right;
+        line-height: 1;
+    }
+}
+footer.toolbar {
+    text-align: center;
+}

@@ -1,0 +1,43 @@
+<div id="event-details">
+    <h3>Event</h3>
+    <h4>{{schemaName}}</h4>
+    {{#each errors}}
+        {{#if this.isValid eq="warning"}}
+        <div class="warning_msg validity">
+            <span class="icon icon-attention"></span>
+            <strong>{{this}}</strong>
+        </div>
+        {{else}}
+        <div class="error_msg validity">
+            <span class="icon icon-cancel-circled"></span>
+            <strong>{{this}}</strong>
+        </div>
+        {{/if}}
+    {{/each}}
+</div>
+
+<hr>
+
+<div id="event-contexts">
+    {{#each contexts}}
+        {{#if @index eq=0}}
+        <h3>Attached contexts</h3>
+        {{/if}}
+        <div class="event-context">
+            <h4>{{this.schemaName}}</h4>
+            {{#each this.errors}}
+                {{#if ../isValid eq="warning"}}
+                <div class="warning_msg validity">
+                    <span class="icon icon-attention"></span>
+                    <strong>{{this}}</strong>
+                </div>
+                {{else}}
+                <div class="error_msg validity">
+                    <span class="icon icon-cancel-circled"></span>
+                    <strong>{{this}}</strong>
+                </div>
+                {{/if}}
+            {{/each}}
+        </div>
+    {{/each}}
+</div>

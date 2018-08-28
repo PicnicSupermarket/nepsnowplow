@@ -1,0 +1,33 @@
+.filter {
+    display: inline-block;
+    position: relative;
+    margin-top: 3px;
+}
+.filter input {
+    line-height: 1;
+    font-size: 12px;
+    padding: 2px;
+    display: block;
+    color: #666;
+    border: 1px solid #c2c0c2;
+    border-radius: 10px;
+    padding-left: 20px;
+}
+.filter input:focus {
+    outline: none;
+    color: #333;
+    border-color: #555;
+    border-radius: 10px;
+}
+.filter .icon-search::before {
+    position: absolute;
+    left: 6px;
+    top: 3px;
+    color: #737475;
+}
+#clear-filter::before {
+    position: absolute;
+    right: 6px;
+    top: 3px;
+    color: #737475;
+}
