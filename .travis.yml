@@ -8,13 +8,15 @@ matrix:
         - ELECTRON_CACHE=$HOME/.cache/electron
         - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
       script:
-        # Build the release package, but only push to GitHub on Tag or Draft after succesful build.
+        # Build the release package
+        # Draft a new release when a new version was pushed to master
         - yarn build --publish ${DEPLOY_TYPE}
     - os: linux
       services: docker
       language: generic
       script:
-        # Build the release package, but only push to GitHub on Tag or Draft after succesful build.
+        # Build the release package
+        # Draft a new release when a new version was pushed to master
         - >
           docker run --rm \
             --env-file <(env | grep -iE 'DEBUG|NODE_|ELECTRON_|YARN_|NPM_|CI|CIRCLE|TRAVIS|APPVEYOR_|CSC_|_TOKEN|_KEY|AWS_|STRIP|BUILD_') \
@@ -31,14 +33,22 @@ env:
     # - push, for pushes
     - TYPE="$( test ${TRAVIS_EVENT_TYPE} = pull_request && echo review || echo push )"
     # Retrieve the version that this source bundle represents
-    - CURRENT_VERSION=$( jq -r '.version' < package.json )
+    # jq cannot be used as Travis' mac image doesn't have it pre-installed
+    - CURRENT_VERSION=$( cat package.json | grep 'version' | sed 's/[^0-9\.]*//g' )
 
 before_install:
     # Retrieve the last known published version.
-    - git fetch --tags
-    - export LAST_RELEASED_VERSION=$( git tag | tail -1 | sed 's/v//' )
+    - git fetch --tags --verbose
+    # Find the latest merged release tag on master
+    - export LAST_RELEASED_VERSION=$( git tag --list 'v*' --merged | tail -1 | sed 's/v//' )
     # If this is a push to `master` and it is a new version, we need to publish to NPM.
-    - export DEPLOY_TYPE=$( test ${TRAVIS_BRANCH} = "master" && ( test ${TYPE} = "push" && ( test "${CURRENT_VERSION}" != "${LAST_RELEASED_VERSION}" && echo onTag ) ) || echo never )
+    - export DEPLOY_TYPE=$( test ${TRAVIS_BRANCH} = "master" && ( test ${TYPE} = "push" && ( test "${CURRENT_VERSION}" != "${LAST_RELEASED_VERSION}" && echo always ) ) || echo never )
+
+    # Echo configuration
+    - echo "Current version '${CURRENT_VERSION}'"
+    - echo "Last released version '${LAST_RELEASED_VERSION}'"
+    - echo "Event type '${TRAVIS_EVENT_TYPE}' on branch '${TRAVIS_BRANCH}'"
+    - echo "Deploy type '${DEPLOY_TYPE}'"
 
 install:
   # Install dependencies.
