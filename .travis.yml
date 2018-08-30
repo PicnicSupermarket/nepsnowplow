@@ -7,9 +7,6 @@ matrix:
       env:
         - ELECTRON_CACHE=$HOME/.cache/electron
         - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
-      before_install:
-        # jq currently doesn't come pre-installed on osx, so install it.
-        - sudo apt-get update && sudo apt-get install -y jq
       script:
         # Build the release package.
         # Draft a new release when a new version was pushed to master.
@@ -35,14 +32,15 @@ env:
     # - review, for pull request analysis/feedback
     # - push, for pushes
     - TYPE="$( test ${TRAVIS_EVENT_TYPE} = pull_request && echo review || echo push )"
-    # Retrieve the version that this source bundle represents.
-    - CURRENT_VERSION=$( jq -r '.version' < package.json )
 
 before_install:
+    - if [ $TRAVIS_OS_NAME = osx ]; then brew install jq; fi
     # Retrieve the last known published version and list them.
     - git fetch --tags --verbose
     # Find the latest merged release tag on master.
     - export LAST_RELEASED_VERSION=$( git tag --list 'v*' --merged | tail -1 | sed 's/v//' )
+    # Retrieve the version that this source bundle represents.
+    - CURRENT_VERSION=$( jq -r '.version' < package.json )
     # If this is a push to `master` and it is a new version, we need to publish to GitHub.
     - export DEPLOY_TYPE=$( test ${TRAVIS_BRANCH} = "master" && ( test ${TYPE} = "push" && ( test "${CURRENT_VERSION}" != "${LAST_RELEASED_VERSION}" && echo always ) ) || echo never )
 
