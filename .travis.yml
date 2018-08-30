@@ -35,7 +35,7 @@ env:
 
 before_install:
     # jq doens't come pre-installed on osx, so install it.
-    - if [ $TRAVIS_OS_NAME = osx ]; then brew install jq; fi
+    - test "${TRAVIS_OS_NAME} != osx || brew install jq
     # Retrieve the last known published version and list them.
     - git fetch --tags --verbose
     # Find the latest merged release tag on master.
