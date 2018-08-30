@@ -7,6 +7,9 @@ matrix:
       env:
         - ELECTRON_CACHE=$HOME/.cache/electron
         - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
+      before_install:
+        # jq currently doesn't come pre-installed on osx, so install it.
+        - sudo apt-get update && sudo apt-get install -y jq
       script:
         # Build the release package.
         # Draft a new release when a new version was pushed to master.
@@ -33,9 +36,7 @@ env:
     # - push, for pushes
     - TYPE="$( test ${TRAVIS_EVENT_TYPE} = pull_request && echo review || echo push )"
     # Retrieve the version that this source bundle represents.
-    # jq cannot be used as Travis' mac image doesn't have it pre-installed,
-    # once fixed replace below with: CURRENT_VERSION=$( jq -r '.version' < package.json )
-    - CURRENT_VERSION=$( cat package.json | grep '"version":' | sed 's/[^0-9\.]*//g' )
+    - CURRENT_VERSION=$( jq -r '.version' < package.json )
 
 before_install:
     # Retrieve the last known published version and list them.
