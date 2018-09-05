@@ -23,7 +23,7 @@ function enableSearchListener() {
     });
 
     filterEventsInput.addEventListener("blur", (e) => {
-        if (e.target.value === "") {
+        if (e.currentTarget.value === "") {
             clearFilterButton.classList.remove("icon-cancel-circled", "clickable");
         }
     });
@@ -44,7 +44,7 @@ function enableSearchListener() {
     });
 
     clearFilterButton.addEventListener("click", (e) => {
-        e.target.classList.remove("icon-cancel-circled", "clickable");
+        e.currentTarget.classList.remove("icon-cancel-circled", "clickable");
         filterEventsInput.value = "";
         filter.clearFilter();
     });
@@ -72,10 +72,10 @@ function enableToolbarButtonListeners() {
 
         if (validationOn) {
             // was previously on
-            e.target.classList.remove("active");
+            e.currentTarget.classList.remove("active");
             document.body.classList.remove("show-validation");
         } else {
-            e.target.classList.add("active");
+            e.currentTarget.classList.add("active");
             document.body.classList.add("show-validation");
         }
         remote.getGlobal("options").showSchemaValidation = !validationOn;
