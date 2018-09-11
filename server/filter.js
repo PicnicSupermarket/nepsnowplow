@@ -55,12 +55,17 @@ function getSchemaName(event) {
 }
 
 function contains(haystack, needle) {
-    return (
-        haystack
-            .toString()
-            .toLowerCase()
-            .indexOf(needle) > -1
-    );
+    try {
+        return (
+            haystack
+                .toString()
+                .toLowerCase()
+                .indexOf(needle) > -1
+        );
+    } catch (err) {
+        console.log(err);
+        return false;
+    }
 }
 
 function filterEvents(value, keycode) {
