@@ -55,6 +55,13 @@ function readSchema(file) {
     }
 }
 
+function showStartupMessage(port) {
+    console.log("Listening for SnowPlow analytics on port " + port);
+    console.log("Please check you both of your devices are on the same network");
+    console.log("________________________________________________________________________________");
+    console.log("");
+}
+
 if (!!schemaDir) {
     // in production, remove app.asar from the path
     // cannot use process.resourcesPath in development,
@@ -82,9 +89,18 @@ server.post("*", function(req, res) {
 
 // Start server
 let port = remote.getGlobal("options").listeningPort;
-server.listen(port, function() {
-    console.log("Listening for SnowPlow analytics on port " + port);
-    console.log("Please check you both of your devices are on the same network");
-    console.log("________________________________________________________________________________");
-    console.log("");
-});
+server
+    .listen(port, function() {
+        showStartupMessage(port);
+    })
+    .on("error", (err) => {
+        if (err.errno === "EADDRINUSE") {
+            console.log("Port " + port + " in use, using random port");
+            let randPort = Math.floor(1000 + Math.random() * 9000);
+            server.listen(randPort, function() {
+                showStartupMessage(randPort);
+            });
+        } else {
+            console.log(err);
+        }
+    });
