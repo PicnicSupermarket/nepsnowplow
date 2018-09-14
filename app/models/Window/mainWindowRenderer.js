@@ -9,7 +9,7 @@ const appLogger = require("../../../server/appLogger");
 const filter = require("../../..//server/filter");
 const { Template } = require("../Template");
 const { PaneGroup, SidebarListPane, DetailsPane } = require("../Pane");
-const Server = require("../../../server/server");
+const Server = require("../../../server/Server");
 
 var server = new Server();
 var serverInst = server.start();
