@@ -12,7 +12,7 @@ chai.use(chaiAsPromised);
 describe("NepSnowplow", function() {
     this.timeout(10000);
 
-    beforeEach(function() {
+    before(function() {
         this.app = new Application({
             // use electron from our node_modules
             path: electronPath,
@@ -28,12 +28,6 @@ describe("NepSnowplow", function() {
         chaiAsPromised.transferPromiseness = this.app.transferPromiseness;
     });
 
-    afterEach(function() {
-        if (this.app && this.app.isRunning()) {
-            return this.app.stop();
-        }
-    });
-
     describe("application", function() {
         it("shows an initial window", function() {
             // prettier-ignore
@@ -47,8 +41,14 @@ describe("NepSnowplow", function() {
                 .waitUntilWindowLoaded()
                 .getRenderProcessLogs()
                 .then((logs) => {
-                    logs.filter((log) => log.level === "SEVERE").length.should.equal(0);
+                    logs.filter((log) => log.level === "SEVERE").should.have.lengthOf(0);
                 });
         });
+    });
+
+    after(function() {
+        if (this.app && this.app.isRunning()) {
+            return this.app.stop();
+        }
     });
 });

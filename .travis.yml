@@ -7,7 +7,7 @@ matrix:
           env:
               - ELECTRON_CACHE=$HOME/.cache/electron
               - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
-          script:
+          after_success:
               # Build the release package.
               # Draft a new release when a new version was pushed to master.
               - yarn build --publish ${DEPLOY_TYPE}
@@ -18,7 +18,7 @@ matrix:
               - "export DISPLAY=:99.0"
               - "sh -e /etc/init.d/xvfb start"
               - sleep 3 # give xvfb some time to start
-          script:
+          after_success:
               # Build the release package.
               # Draft a new release when a new version was pushed to master.
               - >
@@ -62,6 +62,10 @@ install:
     # Install dependencies.
     # Source compilation is triggered automatically after install.
     - yarn --link-duplicates --pure-lockfile
+
+script:
+    # Run spectron tests
+    - yarn test
 
 before_cache:
     - rm -rf $HOME/.cache/electron-builder/wine
