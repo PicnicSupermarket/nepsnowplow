@@ -2,17 +2,22 @@
 
 const { Application } = require("spectron");
 const electronPath = require("electron");
+const path = require("path");
+
 const chai = require("chai");
 const chaiAsPromised = require("chai-as-promised");
-const path = require("path");
+const chaiHttp = require("chai-http");
+
+const base64 = require("../server/base64");
 
 chai.should();
 chai.use(chaiAsPromised);
+chai.use(chaiHttp);
 
 describe("NepSnowplow", function() {
     this.timeout(10000);
 
-    before(function() {
+    beforeEach(function() {
         this.app = new Application({
             // use electron from our node_modules
             path: electronPath,
@@ -46,7 +51,49 @@ describe("NepSnowplow", function() {
         });
     });
 
-    after(function() {
+    describe("server", function() {
+        before(function() {
+            this.server = chai.request("http://localhost:3000");
+        });
+
+        it("is running", function() {
+            return this.server
+                .post("/")
+                .send("")
+                .then((response) => {
+                    response.should.not.have.status(404);
+                });
+        });
+
+        it("rejects non-Snowplow data", function() {
+            return this.server
+                .post("/")
+                .send("")
+                .then((response) => {
+                    response.should.not.have.status(204);
+                });
+        });
+
+        it("accepts Snowplow event", function() {
+            let snowplowObject = {
+                data: [
+                    {
+                        uid: "userid",
+                        ue_px: base64.encode('{"schema": "iglu:snowplow.sample_schema"}'),
+                        cx: base64.encode('[{"schema": "iglu:snowplow.sample_schema2"}]')
+                    }
+                ]
+            };
+            return this.server
+                .post("/")
+                .send(snowplowObject)
+                .then((response) => {
+                    response.should.have.status(204);
+                });
+        });
+    });
+
+    afterEach(function() {
         if (this.app && this.app.isRunning()) {
             return this.app.stop();
         }

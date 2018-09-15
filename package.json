@@ -71,6 +71,7 @@
     "devDependencies": {
         "chai": "*",
         "chai-as-promised": "^7.1.1",
+        "chai-http": "^4.2.0",
         "electron": "^2.0.10",
         "electron-builder": "^20.28.4",
         "husky": "^0.14.3",

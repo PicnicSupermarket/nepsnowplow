@@ -8,7 +8,7 @@ const bodyParser = require("body-parser");
 const path = require("path");
 const jsonfile = require("jsonfile");
 
-const base64Decode = require("./base64Decode");
+const base64 = require("./base64");
 const SnowplowEvent = require("./model/SnowplowEvent");
 const ValidationSchema = require("./model/ValidationSchema");
 const appLogger = require("./appLogger");
@@ -69,8 +69,8 @@ server.post("*", function(req, res) {
 
     let bundle = body.data.reverse();
     bundle.forEach(function(data) {
-        let context = JSON.parse(base64Decode(data.cx));
-        let payload = JSON.parse(base64Decode(data.ue_px));
+        let context = JSON.parse(base64.decode(data.cx));
+        let payload = JSON.parse(base64.decode(data.ue_px));
 
         let event = new SnowplowEvent(data.uid, payload, context);
         event.validate(schemas);
