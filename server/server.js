@@ -8,7 +8,6 @@ const bodyParser = require("body-parser");
 const path = require("path");
 const jsonfile = require("jsonfile");
 
-const networkInterfaces = require("./networkInterfaces");
 const base64Decode = require("./base64Decode");
 const SnowplowEvent = require("./model/SnowplowEvent");
 const ValidationSchema = require("./model/ValidationSchema");
@@ -84,11 +83,7 @@ server.post("*", function(req, res) {
 // Start server
 let port = remote.getGlobal("options").listeningPort;
 server.listen(port, function() {
-    let ifaces = networkInterfaces.getNetworkInterfacesIps();
-    console.log("Listening for SnowPlow analytics on");
-    ifaces.forEach(function(iface) {
-        console.log(" - %s:%s", iface, port);
-    });
+    console.log("Listening for SnowPlow analytics on port " + port);
     console.log("Please check you both of your devices are on the same network");
     console.log("________________________________________________________________________________");
     console.log("");

@@ -3,9 +3,9 @@
 const { remote, ipcRenderer } = require("electron");
 const os = require("os");
 const path = require("path");
+const network = require("network");
 
 const appLogger = require("../../../server/appLogger");
-const network = require("../../../server/networkInterfaces");
 const filter = require("../../..//server/filter");
 const { Template } = require("../Template");
 const { PaneGroup, SidebarListPane, DetailsPane } = require("../Pane");
@@ -138,16 +138,26 @@ function renderMain(target) {
     paneGroup.show();
 }
 
-function renderFooter(target) {
+function renderFooter(target, ip) {
     let tmpl = new Template({
         path: path.join(__dirname, "FooterToolbar.hbs"),
         parent: target
     });
+    let listeningPort = remote.getGlobal("options").listeningPort;
     let data = {
-        ipAddress: network.currentIpAddress(),
-        port: remote.getGlobal("options").listeningPort
+        ipAddress: ip || "...",
+        port: listeningPort
     };
     tmpl.render(data);
+}
+
+function updateFooter(target) {
+    network.get_active_interface((err, iface) => {
+        let footer = document.getElementById("footer");
+        footer.parentNode.removeChild(footer);
+
+        renderFooter(target, iface.ip_address);
+    });
 }
 
 function renderWindow() {
@@ -155,6 +165,7 @@ function renderWindow() {
     renderHeader(target);
     renderMain(target);
     renderFooter(target);
+    updateFooter(target);
     appLogger.displayEvents(remote.getGlobal("trackedEvents"));
 }
 
