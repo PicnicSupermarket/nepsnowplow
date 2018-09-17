@@ -1,7 +1,7 @@
 "use strict";
 
 const { Application } = require("spectron");
-const electronPath = require("electron");
+const electron = require("electron");
 const path = require("path");
 
 const chai = require("chai");
@@ -16,11 +16,26 @@ chai.use(chaiHttp);
 
 describe("NepSnowplow", function() {
     this.timeout(10000);
+    this.slow(200);
 
     beforeEach(function() {
+        this.snowplowObject = {
+            data: [
+                {
+                    uid: "userid",
+                    ue_px: base64.encode(
+                        '{"schema": "iglu:snowplow/event_schema/jsonschema/1-0-0"}'
+                    ),
+                    cx: base64.encode(
+                        '[{"schema": "iglu:snowplow/context_schema/jsonschema/1-0-0"}]'
+                    )
+                }
+            ]
+        };
+        this.server = chai.request("http://localhost:3000");
         this.app = new Application({
             // use electron from our node_modules
-            path: electronPath,
+            path: electron,
 
             // The following line tells spectron to start electron
             // from the parent folder.
@@ -45,22 +60,28 @@ describe("NepSnowplow", function() {
             return this.app.client
                 .waitUntilWindowLoaded()
                 .getRenderProcessLogs()
-                .then((logs) => {
+                .then(function(logs) {
                     logs.filter((log) => log.level === "SEVERE").should.have.lengthOf(0);
+                });
+        });
+
+        it("logs Snowplow event", function() {
+            let client = this.app.client;
+            return this.server
+                .post("/")
+                .send(this.snowplowObject)
+                .then(async function() {
+                    await client.waitForExist("#event-0").should.eventually.be.true;
                 });
         });
     });
 
     describe("server", function() {
-        before(function() {
-            this.server = chai.request("http://localhost:3000");
-        });
-
         it("is running", function() {
             return this.server
                 .post("/")
                 .send("")
-                .then((response) => {
+                .then(function(response) {
                     response.should.not.have.status(404);
                 });
         });
@@ -69,26 +90,27 @@ describe("NepSnowplow", function() {
             return this.server
                 .post("/")
                 .send("")
-                .then((response) => {
+                .then(function(response) {
                     response.should.not.have.status(204);
                 });
         });
 
         it("accepts Snowplow event", function() {
-            let snowplowObject = {
-                data: [
-                    {
-                        uid: "userid",
-                        ue_px: base64.encode('{"schema": "iglu:snowplow.sample_schema"}'),
-                        cx: base64.encode('[{"schema": "iglu:snowplow.sample_schema2"}]')
-                    }
-                ]
-            };
             return this.server
                 .post("/")
-                .send(snowplowObject)
-                .then((response) => {
+                .send(this.snowplowObject)
+                .then(function(response) {
                     response.should.have.status(204);
+                });
+        });
+
+        it("stores Snowplow event", function() {
+            let remote = this.app.electron.remote;
+            return this.server
+                .post("/")
+                .send(this.snowplowObject)
+                .then(async function() {
+                    await remote.getGlobal("trackedEvents").should.eventually.have.lengthOf(1);
                 });
         });
     });
