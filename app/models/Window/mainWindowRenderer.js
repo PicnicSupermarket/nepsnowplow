@@ -28,8 +28,8 @@ function enableSearchListener() {
         }
     });
 
-    filterEventsInput.addEventListener("keyup", function(e) {
-        let value = this.value;
+    filterEventsInput.addEventListener("keyup", (e) => {
+        let value = e.target.value;
         if (e.keyCode === 27) {
             // escape (27) was pressed
             filter.clearFilter();
@@ -101,6 +101,45 @@ function enableWindowButtonListeners() {
     });
 }
 
+function scrollIntoView(elem, relativeTo) {
+    let pos = elem.offsetTop;
+    let top = typeof relativeTo !== "undefined" ? relativeTo.scrollTop : elem.parentNode.scrollTop;
+    let bottom = top + relativeTo.offsetHeight;
+    if (pos > bottom) {
+        elem.scrollIntoView(false);
+    } else if (pos < top) {
+        elem.scrollIntoView(true);
+    }
+}
+
+function enableKeyListeners() {
+    document.addEventListener("keydown", (e) => {
+        if (
+            e.keyCode === 38 || // up
+            e.keyCode === 40 // down
+        ) {
+            // prevent regular scrolling behaviour
+            e.preventDefault();
+
+            let eventId = document.querySelector("#events-container li.selected").id;
+
+            // Get all events in view.
+            // Not the same as all stored events, because we might be filtering.
+            let events = Array.from(document.querySelectorAll("#events-container li")).filter(
+                (elem) => elem.style.display !== "none"
+            );
+            let index = events.findIndex((elem) => elem.id === eventId);
+            let targetIndex = e.keyCode === 38 ? index - 1 : index + 1;
+
+            if (targetIndex >= 0 && targetIndex < events.length) {
+                let event = events[targetIndex];
+                event.click();
+                scrollIntoView(event, event.parentNode.parentNode);
+            }
+        }
+    });
+}
+
 function renderHeader(target) {
     let isWindows = os.platform() === "win32";
     let validationOn = !!remote.getGlobal("options").showSchemaValidation;
@@ -122,6 +161,7 @@ function renderHeader(target) {
             }
             enableToolbarButtonListeners();
             enableSearchListener();
+            enableKeyListeners();
         },
         false
     );

@@ -21,11 +21,9 @@ class Event extends Payload {
     }
 
     showDetails(event) {
-        const eventListContainer = document.querySelectorAll(
-            "#events-container li.selected"
-        );
-        Array.from(eventListContainer).forEach(function(eventContainer) {
-            eventContainer.classList.remove("selected");
+        const selectedEvents = document.querySelectorAll("#events-container li.selected");
+        Array.from(selectedEvents).forEach((elem) => {
+            elem.classList.remove("selected");
         });
         event.currentTarget.classList.add("selected");
         this.renderDetails();
@@ -47,13 +45,9 @@ class Event extends Payload {
             let container = document.getElementById("details-container");
             container.parentNode.scrollTo(0, 0);
             container.innerHTML = html;
-            document
-                .getElementById("event-details")
-                .appendChild(this.getJson());
+            document.getElementById("event-details").appendChild(this.getJson());
 
-            let contexts = document.querySelectorAll(
-                "#event-contexts .event-context"
-            );
+            let contexts = document.querySelectorAll("#event-contexts .event-context");
             this.contexts.forEach((ctx, idx) => {
                 contexts[idx].appendChild(ctx.getJson());
             });
@@ -89,9 +83,7 @@ class Event extends Payload {
             // event items are hidden by default
             // if filter is set and events match the filter,
             // below will unhide the generated element
-            filter.filterItems(
-                document.querySelectorAll("#event-" + this.index)
-            );
+            filter.filterItems(document.querySelectorAll("#event-" + this.index));
         });
     }
 }
