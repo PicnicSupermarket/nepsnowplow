@@ -99,6 +99,22 @@ To test a package locally for distribution, use:
 yarn package
 ```
 
+### Debugging autoUpdater
+
+First, make sure the version in `package.json` is lower than the latest published version.
+
+Second, place `dev-app-update.yml` in the root folder, containing:
+
+```yaml
+owner: PicnicSupermarket
+repo: nepsnowplow
+provider: github
+```
+
+Finally, to make sure it works in production, you can execute `yarn build` and run
+`dist\<platform>-unpacked\NepSnowplow.exe`. Don't forget to set the version back to the right value
+before pushing any commits.
+
 ## Roadmap
 
 There are a few features that are on the roadmap to be developed so as to increase further
