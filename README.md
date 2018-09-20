@@ -71,6 +71,8 @@ Depending on your operating system, the settings and schemas can be found in the
 -   OS X: `~/Applications/NepSnowplow/Contents/Resources`.
 -   Linux: where you've extracted the `*.tar.gz` file.
 
+_If no events arrive, check if NepSnowplow is allowed by Windows Firewall_
+
 ## Development
 
 ### Style compilation
@@ -125,5 +127,5 @@ is deleted than added.)
 [prettier-badge]: https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square
 [prettier]: https://github.com/prettier/prettier
 [snowplow-analytics]: https://snowplowanalytics.com
-[travisci-badge]: https://travis-ci.org/PicnicSupermarket/nepsnowplow.svg?branch=master
-[travisci-builds]: https://travis-ci.org/PicnicSupermarket/nepsnowplow
+[travisci-badge]: https://travis-ci.com/PicnicSupermarket/nepsnowplow.svg?branch=master
+[travisci-builds]: https://travis-ci.com/PicnicSupermarket/nepsnowplow
