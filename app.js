@@ -87,6 +87,7 @@ function loadOptions() {
     let defaults = {
         showSchemaValidation: false,
         schemaDir: "schemas/",
+        repo: {},
         listeningPort: 3000
     };
     let userOptions = {};

@@ -58,6 +58,11 @@ Options can be set in `settings.json`, the defaults are:
 {
   "showSchemaValidation": false, // whether to turn validation on or off on startup
   "schemaDir": "schemas/",       // folder where Snowplow schemas are situated
+  "repo": {
+    "url": "",
+    "apikey": "",
+    "vendors": []
+  }
   "listeningPort": 3000          // port NepSnowplow listens to
 }
 ```
