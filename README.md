@@ -32,6 +32,13 @@ Model][canonical-event-model].
 
 ### Schemas
 
+NepSnowplow supporst both locally stored schemas as well as schemas in an iglu repository.
+
+Note: only one vendor, event, format and versiom combination should exist. If multiple are found,
+local schemas take precedence.
+
+#### Local schemas
+
 To validate events and contexts, you need to place their schemas in the `schemas` folder (or
 whichever folder you've [defined](#configure)). To get started, check out Snowplow's own set of
 schemas on [Iglu Central][iglu-central].
@@ -50,6 +57,12 @@ schemas
             └── 1-0-0
 ```
 
+#### Remote schemas
+
+Your schemas might live in an inglu repository, similar to [Iglu Central][iglu-central]. To make
+sure your events are always validated against the latest deployed schemas, you can
+[configure](#configure) the repository. Schemas will be pulled on every startup.
+
 ## Configure
 
 Options can be set in `settings.json`, the defaults are:
@@ -59,9 +72,9 @@ Options can be set in `settings.json`, the defaults are:
   "showSchemaValidation": false, // whether to turn validation on or off on startup
   "schemaDir": "schemas/",       // folder where Snowplow schemas are situated
   "repo": {
-    "url": "",
-    "apikey": "",
-    "vendors": []
+    "url": "",                   // url to the iglu repository
+    "apikey": "",                // apikey for authentication
+    "vendors": []                // the schema's vendors you wish to retrieve
   }
   "listeningPort": 3000          // port NepSnowplow listens to
 }
@@ -124,8 +137,6 @@ before pushing any commits.
 There are a few features that are on the roadmap to be developed so as to increase further
 usability:
 
--   [ ] Schema repository support: Sync schemas with a remote Iglu repository for event and context
-        validation.
 -   [ ] Multi-device support: create the ability to show events for a specific device.
 -   [ ] Tree-based event viewer: introduce the abiltiy to switch to a hierarchical tree based on
         event name.
