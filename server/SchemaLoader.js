@@ -13,20 +13,12 @@ class SchemaLoader extends EventEmitter {
     constructor() {
         super();
 
-        this.synced = this.syncSchemas();
-
         this.on("schemas-synced", function() {
-            this.synced = true;
             this.loadLocalSchemas();
         });
     }
 
     syncSchemas() {
-        if (this.synced) {
-            this.emit("schemas-synced");
-            return;
-        }
-
         let repo = remote.getGlobal("options").repo;
 
         if (!!repo && !!repo.url && !!repo.apikey && !!repo.vendors && repo.vendors.length > 0) {
@@ -44,8 +36,9 @@ class SchemaLoader extends EventEmitter {
                     this.emit("schemas-synced");
                 }
             }.bind(this);
+        } else {
+            this.emit("schemas-synced");
         }
-        return true;
     }
 
     storeSchemas(schemas) {
@@ -92,10 +85,10 @@ class SchemaLoader extends EventEmitter {
     }
 
     loadLocalSchemas() {
-        let schemaPath = this.getSchemasPath();
+        let schemasPath = this.getSchemasPath();
         let schemas = {};
-        if (!!schemaPath) {
-            schemas = this.readSchema(schemaPath, schemas);
+        if (!!schemasPath) {
+            schemas = this.readSchema(schemasPath, schemas);
         }
         this.emit("schemas-loaded", schemas);
     }
@@ -119,8 +112,7 @@ class SchemaLoader extends EventEmitter {
                 schemas[schemaName] = new ValidationSchema(schemaName, schema);
             } catch (err) {
                 // catch non-valid JSON schemas
-                console.log(file);
-                console.log(err);
+                console.log(file + ": " + err);
             }
         } else if (stats.isDirectory(file)) {
             let files = fs.readdirSync(file);

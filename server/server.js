@@ -41,3 +41,5 @@ server.listen(port, function() {
     console.log("________________________________________________________________________________");
     console.log("");
 });
+
+SchemaLoader.syncSchemas();
