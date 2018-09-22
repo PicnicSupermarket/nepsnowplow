@@ -59,7 +59,7 @@ schemas
 
 #### Remote schemas
 
-Your schemas might live in an inglu repository, similar to [Iglu Central][iglu-central]. To make
+Your schemas might live in an iglu repository provided by an [iglu server][iglu-server]. To make
 sure your events are always validated against the latest deployed schemas, you can
 [configure](#configure) the repository. Schemas will be pulled on every startup.
 
@@ -69,14 +69,14 @@ Options can be set in `settings.json`, the defaults are:
 
 ```js
 {
-  "showSchemaValidation": false, // whether to turn validation on or off on startup
-  "schemaDir": "schemas/",       // folder where Snowplow schemas are situated
-  "repo": {
-    "url": "",                   // url to the iglu repository
-    "apikey": "",                // apikey for authentication
-    "vendors": []                // the schema's vendors you wish to retrieve
-  }
-  "listeningPort": 3000          // port NepSnowplow listens to
+    "showSchemaValidation": false, // whether to turn validation on or off on startup
+    "schemaDir": "schemas/",       // folder where Snowplow schemas are situated
+    "repo": {
+        "url": "",                   // url to the iglu repository
+        "apikey": "",                // apikey for authentication
+        "vendors": []                // the schema's vendors you wish to retrieve
+    },
+    "listeningPort": 3000          // port NepSnowplow listens to
 }
 ```
 
@@ -153,6 +153,7 @@ is deleted than added.)
 [canonical-event-model]: https://github.com/snowplow/snowplow/wiki/canonical-event-model
 [electron-builder]: https://electron.build
 [iglu-central]: https://github.com/snowplow/iglu-central
+[iglu-server]: https://github.com/snowplow/iglu
 [new-issue]: https://github.com/PicnicSupermarket/nepsnowplow/issues/new
 [new-pr]: https://github.com/PicnicSupermarket/nepsnowplow/compare
 [prettier-badge]: https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square
