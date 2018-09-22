@@ -68,7 +68,7 @@ function enableToolbarButtonListeners() {
     });
 
     document.getElementById("validation-toggle").addEventListener("click", (e) => {
-        let validationOn = !!remote.getGlobal("options").showSchemaValidation;
+        let validationOn = !!remote.getGlobal("options").get("showSchemaValidation");
 
         if (validationOn) {
             // was previously on
@@ -78,7 +78,11 @@ function enableToolbarButtonListeners() {
             e.currentTarget.classList.add("active");
             document.body.classList.add("show-validation");
         }
-        remote.getGlobal("options").showSchemaValidation = !validationOn;
+        remote.getGlobal("options").set("showSchemaValidation", !validationOn);
+    });
+
+    document.getElementById("settings-button").addEventListener("click", (e) => {
+        remote.getGlobal("options").openInEditor();
     });
 }
 
@@ -142,7 +146,7 @@ function enableKeyListeners() {
 
 function renderHeader(target) {
     let isWindows = os.platform() === "win32";
-    let validationOn = !!remote.getGlobal("options").showSchemaValidation;
+    let validationOn = !!remote.getGlobal("options").get("showSchemaValidation");
 
     let tmpl = new Template({
         path: path.join(__dirname, "HeaderToolbar.hbs"),
@@ -183,7 +187,7 @@ function renderFooter(target, ip) {
         path: path.join(__dirname, "FooterToolbar.hbs"),
         parent: target
     });
-    let listeningPort = remote.getGlobal("options").listeningPort;
+    let listeningPort = remote.getGlobal("options").get("listeningPort");
     let data = {
         ipAddress: ip || "...",
         port: listeningPort

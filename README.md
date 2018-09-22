@@ -58,18 +58,15 @@ Options can be set in `settings.json`, the defaults are:
 ```js
 {
   "showSchemaValidation": false, // whether to turn validation on or off on startup
-  "schemaDir": "schemas/",       // folder where Snowplow schemas are situated
   "listeningPort": 3000          // port NepSnowplow listens to
 }
 ```
 
 Depending on your operating system, the settings and schemas can be found in the following location:
 
--   Windows:
-    -   Installed version (exe): `C:\Users\<username>\AppData\Local\Programs\nepsnowplow\Resources`.
-    -   Portable version (zip): where you've extracted the `*.zip` file.
--   OS X: `~/Applications/NepSnowplow/Contents/Resources`.
--   Linux: where you've extracted the `*.tar.gz` file.
+-   Windows: `%APPDATA%\Roaming\nepsnowplow`.
+-   OS X: `~/Library/Application Support/nepsnowplow`.
+-   Linux: `~/.config/nepsnowplow`.
 
 _If no events arrive, check if NepSnowplow is allowed by Windows Firewall_
 

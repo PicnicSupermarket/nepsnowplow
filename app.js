@@ -1,11 +1,11 @@
 "use strict";
 
-const logger = require("electron-log");
 const { app, ipcMain, BrowserWindow, Menu } = require("electron");
 const { autoUpdater } = require("electron-updater");
-const os = require("os");
-const fs = require("fs");
+const Store = require("electron-store");
+const logger = require("electron-log");
 const path = require("path");
+const os = require("os");
 
 // Enable logging.
 autoUpdater.logger = logger;
@@ -14,7 +14,7 @@ logger.info("App starting...");
 
 // Define globals.
 global.trackedEvents = [];
-global.options = loadOptions();
+global.options = loadStore();
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -83,27 +83,17 @@ app.on("ready", function() {
     autoUpdater.checkForUpdates();
 });
 
-function loadOptions() {
+function loadStore() {
     let defaults = {
         showSchemaValidation: false,
-        schemaDir: "schemas/",
         listeningPort: 3000
     };
-    let userOptions = {};
-    try {
-        // in production, remove app.asar from the path
-        // cannot use process.resourcesPath in development,
-        // as that will point to electron/dist in node_modules
-        let resourcesPath = app.getAppPath().replace("app.asar", "");
-        userOptions = JSON.parse(
-            fs.readFileSync(path.resolve(resourcesPath, "settings.json"), "utf-8")
-        );
-    } catch (err) {
-        // catch in case the file could not be resolved,
-        // e.g. when somebody deleted the settings file
-        logger.info(err);
-    }
-    return Object.assign(defaults, userOptions);
+    let store = new Store({
+        name: "settings",
+        defaults: defaults
+    });
+    logger.info("Using settings defined in: " + store.path);
+    return store;
 }
 
 function createMainWindow() {

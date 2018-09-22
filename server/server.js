@@ -2,15 +2,16 @@
 "use strict";
 
 const { remote } = require("electron");
-const fs = require("fs");
-const express = require("express");
 const bodyParser = require("body-parser");
-const path = require("path");
 const jsonfile = require("jsonfile");
+const express = require("express");
+const mkdirp = require("mkdirp");
+const path = require("path");
+const fs = require("fs");
 
-const base64Decode = require("./base64Decode");
-const SnowplowEvent = require("./model/SnowplowEvent");
 const ValidationSchema = require("./model/ValidationSchema");
+const SnowplowEvent = require("./model/SnowplowEvent");
+const base64Decode = require("./base64Decode");
 const appLogger = require("./appLogger");
 
 var server = express();
@@ -18,7 +19,6 @@ server.use(bodyParser.json()); // to parse application/json
 server.use(bodyParser.urlencoded({ extended: true })); // to parse application/x-www-form-urlencoded
 
 var schemas = {};
-var schemaDir = remote.getGlobal("options").schemaDir;
 
 function readSchema(file) {
     let stats;
@@ -55,13 +55,15 @@ function readSchema(file) {
     }
 }
 
-if (!!schemaDir) {
-    // in production, remove app.asar from the path
-    // cannot use process.resourcesPath in development,
-    // as that will point to electron/dist in node_modules
-    let resourcesPath = remote.app.getAppPath().replace("app.asar", "");
-    readSchema(path.join(resourcesPath, schemaDir));
-}
+// Create schemas folder if it doesn't exist,
+// then read all containing schemas
+let schemaDir = path.join(remote.app.getPath("userData"), "schemas");
+mkdirp(schemaDir, (mkdirErr) => {
+    if (mkdirErr) {
+        return console.log(mkdirErr);
+    }
+    readSchema(schemaDir);
+});
 
 // Capturing every post events to this server
 server.post("*", function(req, res) {
@@ -81,7 +83,7 @@ server.post("*", function(req, res) {
 });
 
 // Start server
-let port = remote.getGlobal("options").listeningPort;
+let port = remote.getGlobal("options").get("listeningPort");
 server.listen(port, function() {
     console.log("Listening for SnowPlow analytics on port " + port);
     console.log("Please check you both of your devices are on the same network");
