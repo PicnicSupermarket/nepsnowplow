@@ -48,34 +48,6 @@ describe("NepSnowplow", function() {
         chaiAsPromised.transferPromiseness = this.app.transferPromiseness;
     });
 
-    describe("application", function() {
-        it("shows an initial window", function() {
-            // prettier-ignore
-            return this.app.client
-                .browserWindow.isMinimized().should.eventually.be.false
-                .browserWindow.isVisible().should.eventually.be.true;
-        });
-
-        it("starts without errors", function() {
-            return this.app.client
-                .waitUntilWindowLoaded()
-                .getRenderProcessLogs()
-                .then(function(logs) {
-                    logs.filter((log) => log.level === "SEVERE").should.have.lengthOf(0);
-                });
-        });
-
-        it("logs Snowplow event", function() {
-            let client = this.app.client;
-            return this.server
-                .post("/")
-                .send(this.snowplowObject)
-                .then(async function() {
-                    await client.waitForExist("#event-0").should.eventually.be.true;
-                });
-        });
-    });
-
     describe("server", function() {
         it("is running", function() {
             return this.server
@@ -111,6 +83,34 @@ describe("NepSnowplow", function() {
                 .send(this.snowplowObject)
                 .then(async function() {
                     await remote.getGlobal("trackedEvents").should.eventually.have.lengthOf(1);
+                });
+        });
+    });
+
+    describe("application", function() {
+        it("shows an initial window", function() {
+            // prettier-ignore
+            return this.app.client
+                .browserWindow.isMinimized().should.eventually.be.false
+                .browserWindow.isVisible().should.eventually.be.true;
+        });
+
+        it("starts without errors", function() {
+            return this.app.client
+                .waitUntilWindowLoaded()
+                .getRenderProcessLogs()
+                .then(function(logs) {
+                    logs.filter((log) => log.level === "SEVERE").should.have.lengthOf(0);
+                });
+        });
+
+        it("logs Snowplow event", function() {
+            let client = this.app.client;
+            return this.server
+                .post("/")
+                .send(this.snowplowObject)
+                .then(async function() {
+                    await client.waitForExist("#event-0").should.eventually.be.true;
                 });
         });
     });
