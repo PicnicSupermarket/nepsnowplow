@@ -1,11 +1,11 @@
 "use strict";
 
-const { app, ipcMain, BrowserWindow, Menu } = require("electron");
+const { app, ipcMain } = require("electron");
 const { autoUpdater } = require("electron-updater");
 const Store = require("electron-store");
 const logger = require("electron-log");
-const path = require("path");
-const os = require("os");
+
+const { MainWindow } = require("./app/models/Window");
 
 // Enable logging.
 autoUpdater.logger = logger;
@@ -32,11 +32,7 @@ ipcMain.on("clear-events", () => {
 // Register window listeners.
 app.on("window-all-closed", () => {
     // Quit when all windows are closed.
-    // On OS X it is common for applications and their menu bar
-    // to stay active until the user quits explicitly with Cmd + Q
-    // if (process.platform != 'darwin') {
     app.quit();
-    // }
 });
 
 app.on("activate", function() {
@@ -97,51 +93,7 @@ function loadStore() {
 }
 
 function createMainWindow() {
-    let isWindows = os.platform() === "win32";
-    // Create the browser window.
-    mainWindow = new BrowserWindow({
-        width: 1024,
-        height: 768,
-        minWidth: 1024,
-        minHeight: 768,
-        acceptFirstMouse: true,
-        title: "NepSnowplow",
-        titleBarStyle: "hidden",
-        frame: !isWindows
-    });
-
-    // and load the index.html of the app.
-    mainWindow.loadFile(path.join(__dirname, "app", "index.html"));
-
-    let template = [
-        {
-            label: "NepSnowplow",
-            submenu: [
-                {
-                    label: "Quit",
-                    accelerator: "Command+Q",
-                    click: function() {
-                        app.quit();
-                    }
-                }
-            ]
-        },
-        {
-            label: "Debug",
-            submenu: [
-                {
-                    label: "Open debug panel",
-                    accelerator: "CmdOrCtrl+D",
-                    click: function() {
-                        mainWindow.openDevTools();
-                    }
-                }
-            ]
-        }
-    ];
-
-    const menu = Menu.buildFromTemplate(template);
-    Menu.setApplicationMenu(menu);
+    mainWindow = new MainWindow();
 
     // Emitted when the window is closed.
     mainWindow.on("closed", function() {

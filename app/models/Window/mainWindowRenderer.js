@@ -5,10 +5,11 @@ const os = require("os");
 const path = require("path");
 const network = require("network");
 
+const { PaneGroup, SidebarListPane, DetailsPane } = require("../Pane");
 const appLogger = require("../../../server/appLogger");
 const filter = require("../../..//server/filter");
 const { Template } = require("../Template");
-const { PaneGroup, SidebarListPane, DetailsPane } = require("../Pane");
+const OptionWindow = require("./OptionWindow");
 
 function startServer() {
     require("../../../server/server");
@@ -82,7 +83,8 @@ function enableToolbarButtonListeners() {
     });
 
     document.getElementById("settings-button").addEventListener("click", (e) => {
-        remote.getGlobal("options").openInEditor();
+        // remote.getGlobal("options").openInEditor();
+        new OptionWindow();
     });
 }
 
