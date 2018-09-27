@@ -8,6 +8,9 @@ matrix:
               - ELECTRON_CACHE=$HOME/.cache/electron
               - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
           script:
+              # Run mocha tests.
+              - yarn test
+          after_success:
               # Build the release package.
               # Draft a new release when a new version was pushed to master.
               - yarn build --publish ${DEPLOY_TYPE}
@@ -15,6 +18,9 @@ matrix:
           services: docker
           language: generic
           script:
+              # Run mocha tests using a virtual screen.
+              - xvfb-run yarn test
+          after_success:
               # Build the release package.
               # Draft a new release when a new version was pushed to master.
               - >

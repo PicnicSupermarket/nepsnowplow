@@ -44,11 +44,11 @@ class ValidatedSnowplowObject {
     }
 
     getSchemaName() {
-        return this.obj.schema.split("/")[1];
+        return typeof this.obj.schema !== "undefined" ? this.obj.schema.split("/")[1] : "";
     }
 
     getSchemaVersion() {
-        return this.obj.schema.split("/")[3];
+        return typeof this.obj.schema !== "undefined" ? this.obj.schema.split("/")[3] : "";
     }
 }
 

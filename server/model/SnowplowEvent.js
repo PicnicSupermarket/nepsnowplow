@@ -11,12 +11,14 @@ class SnowplowEvent {
     }
 
     validate(schemas) {
-        this.payload.validate(
-            schemas[this.payload.get().schema.replace("iglu:", "")]
-        );
-        this.contexts.forEach((ctx) => {
-            ctx.validate(schemas[ctx.get().schema.replace("iglu:", "")]);
-        });
+        try {
+            this.payload.validate(schemas[this.payload.get().schema.replace("iglu:", "")]);
+            this.contexts.forEach((ctx) => {
+                ctx.validate(schemas[ctx.get().schema.replace("iglu:", "")]);
+            });
+        } catch (err) {
+            console.log(err);
+        }
     }
 
     toString() {
