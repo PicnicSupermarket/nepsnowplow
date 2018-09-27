@@ -71,11 +71,13 @@ Options can be set in `settings.json`, the defaults are:
 {
     "showSchemaValidation": false, // whether to turn validation on or off on startup
     "schemaDir": "schemas/",       // folder where Snowplow schemas are situated
-    "repo": {
-        "url": "",                   // url to the iglu repository
-        "apikey": "",                // apikey for authentication
-        "vendors": []                // the schema's vendors you wish to retrieve
-    },
+    "repos": [
+        {
+            "url": "",                   // url to the iglu repository
+            "apikey": "",                // apikey for authentication
+            "vendors": []                // the schema's vendors you wish to retrieve
+        }
+    ],
     "listeningPort": 3000          // port NepSnowplow listens to
 }
 ```

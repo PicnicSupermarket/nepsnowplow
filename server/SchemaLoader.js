@@ -1,7 +1,7 @@
 "use strict";
-
 const EventEmitter = require("events");
 const { remote } = require("electron");
+const logger = require("electron-log");
 const jsonfile = require("jsonfile");
 const mkdirp = require("mkdirp");
 const path = require("path");
@@ -19,36 +19,40 @@ class SchemaLoader extends EventEmitter {
     }
 
     syncSchemas() {
-        let repo = remote.getGlobal("options").repo;
+        let repos = remote.getGlobal("options").repos;
 
-        if (!!repo && !!repo.url && !!repo.apikey && !!repo.vendors && repo.vendors.length > 0) {
-            let endpoint = "/api/schemas/" + repo.vendors.join("%2C");
+        if (!!repos) {
+            repos.forEach((repo) => {
+                if (!!repo.url && !!repo.apikey && !!repo.vendors && repo.vendors.length > 0) {
+                    logger.info("Syncing " + repo.vendors + " schemas from " + repo.url);
 
-            const req = new XMLHttpRequest();
-            req.open("GET", repo.url + endpoint);
-            req.setRequestHeader("apikey", repo.apikey);
-            req.onreadystatechange = function() {
-                if (req.readyState === XMLHttpRequest.DONE) {
-                    // Request was sent, response is downloaded and operation is complete.
-                    if (req.status === 200) {
-                        this.storeSchemas(JSON.parse(req.responseText));
-                    } else if (req.status > 0) {
-                        // Could load the url, but found unexpected status
-                        console.error(
-                            "Could not fetch schemas: " +
-                                repo.url +
-                                endpoint +
-                                " returned status " +
-                                req.status
-                        );
-                    }
-                    this.emit("schemas-synced");
+                    const req = new XMLHttpRequest();
+                    let endpoint = "/api/schemas/" + repo.vendors.join("%2C");
+                    req.open("GET", repo.url + endpoint);
+                    req.setRequestHeader("apikey", repo.apikey);
+                    req.onreadystatechange = function() {
+                        if (req.readyState === XMLHttpRequest.DONE) {
+                            // Request was sent, response is downloaded and operation is complete.
+                            if (req.status === 200) {
+                                this.storeSchemas(JSON.parse(req.responseText));
+                            } else if (req.status > 0) {
+                                // Could load the url, but found unexpected status
+                                console.error(
+                                    "Could not fetch schemas: " +
+                                        repo.url +
+                                        endpoint +
+                                        " returned status " +
+                                        req.status
+                                );
+                            }
+                        }
+                    }.bind(this);
+                    req.send();
                 }
-            }.bind(this);
-            req.send();
-        } else {
-            this.emit("schemas-synced");
+            });
         }
+        logger.info("Schema syncing done");
+        this.emit("schemas-synced");
     }
 
     storeSchemas(schemas) {
