@@ -15,7 +15,7 @@ server.use(bodyParser.json()); // to parse application/json
 server.use(bodyParser.urlencoded({ extended: true })); // to parse application/x-www-form-urlencoded
 
 SchemaLoader.on("schemas-loaded", (schemas) => {
-    // Capturing every post events to this server
+    // Capturing every post event to this server.
     server.post("*", function(req, res) {
         let body = req.body;
 
@@ -33,7 +33,7 @@ SchemaLoader.on("schemas-loaded", (schemas) => {
     });
 });
 
-// Start server
+// Start server.
 let port = remote.getGlobal("options").listeningPort;
 server.listen(port, function() {
     console.log("Listening for SnowPlow analytics on port " + port);

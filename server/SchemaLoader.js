@@ -27,15 +27,25 @@ class SchemaLoader extends EventEmitter {
             const req = new XMLHttpRequest();
             req.open("GET", repo.url + endpoint);
             req.setRequestHeader("apikey", repo.apikey);
-            req.send();
-
             req.onreadystatechange = function() {
-                if (req.readyState === 4 && req.status === 200) {
-                    //done loading
-                    this.storeSchemas(JSON.parse(req.responseText));
+                if (req.readyState === XMLHttpRequest.DONE) {
+                    // Request was sent, response is downloaded and operation is complete.
+                    if (req.status === 200) {
+                        this.storeSchemas(JSON.parse(req.responseText));
+                    } else if (req.status > 0) {
+                        // Could load the url, but found unexpected status
+                        console.error(
+                            "Could not fetch schemas: " +
+                                repo.url +
+                                endpoint +
+                                " returned status " +
+                                req.status
+                        );
+                    }
                     this.emit("schemas-synced");
                 }
             }.bind(this);
+            req.send();
         } else {
             this.emit("schemas-synced");
         }
@@ -46,14 +56,15 @@ class SchemaLoader extends EventEmitter {
             let content = JSON.stringify(schema);
             let schemaPath = path.join(this.getSchemasPath(), this.getNameFromSchema(schema));
 
-            // create path (folders) if they don't exist
+            // Create folders recursively, if they don't already exist.
             mkdirp(path.dirname(schemaPath), function(mkdirError) {
                 if (mkdirError) {
                     return console.log(mkdirError);
                 }
 
-                // save schemas to disk, only if it doesn't exist already
+                // Save schemas to disk, only if it doesn't exist already.
                 fs.writeFile(schemaPath, content, { flag: "wx" }, function(writeError) {
+                    // Skip error logging when file already exists.
                     if (writeError && writeError.code !== "EEXIST") {
                         return console.log(writeError);
                     }

@@ -32,9 +32,9 @@ Model][canonical-event-model].
 
 ### Schemas
 
-NepSnowplow supporst both locally stored schemas as well as schemas in an iglu repository.
+NepSnowplow supports both locally stored schemas as well as schemas in an iglu repository.
 
-Note: only one vendor, event, format and versiom combination should exist. If multiple are found,
+Note: only one vendor, event, format and version combination should exist. If multiple are found,
 local schemas take precedence.
 
 #### Local schemas
