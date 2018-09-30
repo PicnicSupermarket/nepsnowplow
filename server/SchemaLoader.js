@@ -55,22 +55,32 @@ class SchemaLoader extends EventEmitter {
         this.retrieveSchemas(repo.url, endpoint, repo.apikey);
     }
 
-    retrieveSchemas(url, endpoint, apikey) {
-        // Also retrieve metadata information, such as
-        // create and update timestamp.
-        let params = "?metadata=1";
+    retrieveSchemas(baseUrl, endpoint, apikey) {
+        let url;
+        try {
+            url = new URL(endpoint, baseUrl);
+        } catch (err) {
+            logger.warn(baseUrl + ": invalid url");
+            return;
+        }
+
+        // Enforce https irrespective of the protocol set in the config of particular repo.
+        url.protocol = "https";
+
+        // Also retrieve metadata information, such as create and update timestamp.
+        url.search = "metadata=1";
 
         const req = new XMLHttpRequest();
-        req.open("GET", url + endpoint + params);
+        req.open("GET", url);
 
-        if (typeof apikey !== undefined) {
+        if (typeof apikey !== "undefined") {
             req.setRequestHeader("apikey", apikey);
         }
 
         req.onreadystatechange = function() {
             if (req.readyState === XMLHttpRequest.DONE) {
                 // Request was sent, response is downloaded and operation is complete.
-                if ((req.status >= 200 && req.status <= 300) || req.status === 304) {
+                if (req.status >= 200 && req.status < 300) {
                     this.storeSchemas(JSON.parse(req.responseText));
                 } else if (req.status > 0) {
                     // Could load the url, but found unexpected status.
