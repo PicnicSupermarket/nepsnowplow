@@ -23,40 +23,73 @@ class SchemaLoader extends EventEmitter {
 
         (repos || [])
             .filter((repo) => {
-                return !!repo.url && !!repo.apikey && !!repo.vendors && repo.vendors.length > 0;
+                return !!repo.url;
             })
             .forEach((repo) => {
-                logger.info("Syncing " + repo.vendors + " schemas from " + repo.url);
-
-                const req = new XMLHttpRequest();
-                let endpoint = "/api/schemas/" + repo.vendors.join("%2C");
-                req.open("GET", repo.url + endpoint);
-                req.setRequestHeader("apikey", repo.apikey);
-                req.onreadystatechange = function() {
-                    if (req.readyState === XMLHttpRequest.DONE) {
-                        // Request was sent, response is downloaded and operation is complete.
-                        if ((req.status >= 200 && req.status <= 300) || req.status === 304) {
-                            this.storeSchemas(JSON.parse(req.responseText));
-                        } else if (req.status > 0) {
-                            // Could load the url, but found unexpected status.
-                            console.error(
-                                "Could not fetch schemas: " +
-                                    repo.url +
-                                    endpoint +
-                                    " returned status " +
-                                    req.status
-                            );
-                        }
-                    }
-                }.bind(this);
-                req.send();
+                this.syncPublicSchemas(repo);
+                this.syncPrivateSchemas(repo);
             });
         logger.info("Schema syncing done");
         this.emit("schemas-synced");
     }
 
+    syncPublicSchemas(repo) {
+        logger.info(repo.url + ": syncing all public schemas");
+        let endpoint = "/api/schemas/public";
+        this.retrieveSchemas(repo.url, endpoint);
+    }
+
+    syncPrivateSchemas(repo) {
+        if (!repo.apikey) {
+            logger.warn(repo.url + ": missing apikey");
+            return;
+        }
+
+        if (!repo.vendors || !Array.isArray(repo.vendors) || repo.vendors.length === 0) {
+            logger.warn(repo.url + ": vendors not (properly) set");
+            return;
+        }
+
+        logger.info(repo.url + ": syncing " + repo.vendors + " private schemas");
+        let endpoint = "/api/schemas/" + repo.vendors.join(",");
+        this.retrieveSchemas(repo.url, endpoint, repo.apikey);
+    }
+
+    retrieveSchemas(url, endpoint, apikey) {
+        // Also retrieve metadata information, such as
+        // create and update timestamp.
+        let params = "?metadata=1";
+
+        const req = new XMLHttpRequest();
+        req.open("GET", url + endpoint + params);
+
+        if (typeof apikey !== undefined) {
+            req.setRequestHeader("apikey", apikey);
+        }
+
+        req.onreadystatechange = function() {
+            if (req.readyState === XMLHttpRequest.DONE) {
+                // Request was sent, response is downloaded and operation is complete.
+                if ((req.status >= 200 && req.status <= 300) || req.status === 304) {
+                    this.storeSchemas(JSON.parse(req.responseText));
+                } else if (req.status > 0) {
+                    // Could load the url, but found unexpected status.
+                    console.error(
+                        "Could not fetch schemas: " +
+                            url +
+                            endpoint +
+                            " returned status " +
+                            req.status
+                    );
+                }
+            }
+        }.bind(this);
+        req.send();
+    }
+
     storeSchemas(schemas) {
-        schemas.forEach((schema) => {
+        // Potentially it's only one schema, if so convert to array
+        ((Array.isArray(schemas) && schemas) || [schemas]).forEach((schema) => {
             let content = JSON.stringify(schema);
             let schemaPath = path.join(this.getSchemasPath(), this.getNameFromSchema(schema));
 
@@ -67,10 +100,9 @@ class SchemaLoader extends EventEmitter {
                     return;
                 }
 
-                // Save schemas to disk, only if it doesn't exist already.
-                fs.writeFile(schemaPath, content, { flag: "wx" }, function(writeError) {
-                    // Skip error logging when file already exists.
-                    if (writeError && writeError.code !== "EEXIST") {
+                // Save schemas to disk. Always update, schemas might've been updated.
+                fs.writeFile(schemaPath, content, function(writeError) {
+                    if (writeError) {
                         console.log(writeError);
                         return;
                     }

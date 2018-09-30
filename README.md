@@ -73,9 +73,9 @@ Options can be set in `settings.json`, the defaults are:
     "schemaDir": "schemas/",       // folder where Snowplow schemas are situated
     "repos": [
         {
-            "url": "",                   // url to the iglu repository
-            "apikey": "",                // apikey for authentication
-            "vendors": []                // the schema's vendors you wish to retrieve
+            "url": "",                   // url of the iglu server
+            "apikey": "",                // Optional: apikey to sync non-public schemas
+            "vendors": []                // Optional: the non-public schema vendors you wish to retrieve
         }
     ],
     "listeningPort": 3000          // port NepSnowplow listens to
