@@ -140,7 +140,7 @@ There are a few features that are on the roadmap to be developed so as to increa
 usability:
 
 -   [ ] Multi-device support: create the ability to show events for a specific device.
--   [ ] Tree-based event viewer: introduce the abiltiy to switch to a hierarchical tree based on
+-   [ ] Tree-based event viewer: introduce the ability to switch to a hierarchical tree based on
         event name.
 
 ## Contributing
