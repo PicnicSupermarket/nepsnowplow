@@ -142,12 +142,12 @@ class SchemaLoader extends EventEmitter {
 
     loadLocalSchemas() {
         let schemasPath = this.getSchemasPath();
-        let schemas = this.readSchema(schemasPath, {});
+        let schemas = this.readSchema(schemasPath);
         logger.info("Schemas loaded from disk");
         this.emit("schemas-loaded", schemas);
     }
 
-    readSchema(file, schemas) {
+    readSchema(file) {
         let stats;
         try {
             stats = fs.lstatSync(file);
@@ -155,7 +155,7 @@ class SchemaLoader extends EventEmitter {
             // catch in case the file or directory could not be resolved,
             // when e.g. somebody deleted the schemas folder
             console.log(err);
-            return schemas;
+            return {};
         }
 
         if (stats.isFile() && (path.extname(file) === "" || path.extname(file) === ".json")) {
@@ -163,18 +163,23 @@ class SchemaLoader extends EventEmitter {
             try {
                 let schema = jsonfile.readFileSync(file);
                 let schemaName = this.getNameFromSchema(schema);
-                schemas[schemaName] = new ValidationSchema(schemaName, schema);
+                return {
+                    [schemaName]: new ValidationSchema(schemaName, schema)
+                };
             } catch (err) {
                 // catch non-valid JSON schemas
                 console.log(file + ": " + err);
+                return {};
             }
         } else if (stats.isDirectory(file)) {
             let files = fs.readdirSync(file);
+
+            let schemas = {};
             files.forEach(function(f) {
-                schemas = this.readSchema(path.join(file, f), schemas);
+                schemas = Object.assign(schemas, this.readSchema(path.join(file, f)));
             }, this);
+            return schemas;
         }
-        return schemas;
     }
 }
 
