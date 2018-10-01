@@ -180,6 +180,7 @@ class SchemaLoader extends EventEmitter {
             }, this);
             return schemas;
         }
+        return {};
     }
 }
 
