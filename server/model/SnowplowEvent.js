@@ -11,14 +11,19 @@ class SnowplowEvent {
     }
 
     validate(schemas) {
-        try {
-            this.payload.validate(schemas[this.payload.get().schema.replace("iglu:", "")]);
-            this.contexts.forEach((ctx) => {
-                ctx.validate(schemas[ctx.get().schema.replace("iglu:", "")]);
-            });
-        } catch (err) {
-            console.log(err);
+        function validateSnowplowObject(obj, schemas) {
+            try {
+                obj.validate(schemas[obj.get().schema.replace("iglu:", "")]);
+            } catch (err) {
+                console.log("Unable to validate Snowplow Object", obj, "using schemas", schemas);
+                console.log(err);
+            }
         }
+
+        validateSnowplowObject(this.payload, schemas);
+        this.contexts.forEach((ctx) => {
+            validateSnowplowObject(ctx, schemas);
+        });
     }
 
     toString() {

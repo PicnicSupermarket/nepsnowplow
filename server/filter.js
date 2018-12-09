@@ -63,12 +63,13 @@ function contains(haystack, needle) {
                 .indexOf(needle) > -1
         );
     } catch (err) {
+        console.log("Unable to parse haystack, assume needle", needle, "not in haystack", haystack);
         console.log(err);
         return false;
     }
 }
 
-function filterEvents(value, keycode) {
+function filterEvents(value, key) {
     // go easy on the processing when user types fast,
     // only execute 100ms after last keyup
     clearTimeout(filterTimer);
@@ -82,7 +83,7 @@ function filterEvents(value, keycode) {
 
             // when not tapping backspace,
             // we can narrow the search
-            if (keycode !== 8) {
+            if (key !== "Backspace") {
                 // faster than Array.from()
                 eventItems = Array.prototype.slice
                     .call(eventItems)

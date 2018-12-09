@@ -30,16 +30,14 @@ function enableSearchListener() {
 
     filterEventsInput.addEventListener("keyup", (e) => {
         let value = e.target.value;
-        if (e.keyCode === 27) {
-            // escape (27) was pressed
+        if (e.key === "Escape") {
             filter.clearFilter();
-            this.blur();
-        } else if (e.keyCode === 13) {
-            // enter(13) was pressed
+            e.currentTarget.blur();
+        } else if (e.key === "Enter") {
             e.preventDefault();
-            this.blur();
+            e.currentTarget.blur();
         } else {
-            filter.filterEvents(value, e.keyCode);
+            filter.filterEvents(value, e.key);
         }
     });
 
@@ -114,10 +112,7 @@ function scrollIntoView(elem, relativeTo) {
 
 function enableKeyListeners() {
     document.addEventListener("keydown", (e) => {
-        if (
-            e.keyCode === 38 || // up
-            e.keyCode === 40 // down
-        ) {
+        if (e.key === "ArrowUp" || e.key === "ArrowDown") {
             // prevent regular scrolling behaviour
             e.preventDefault();
 
@@ -129,7 +124,7 @@ function enableKeyListeners() {
                 (elem) => elem.style.display !== "none"
             );
             let index = events.findIndex((elem) => elem.id === eventId);
-            let targetIndex = e.keyCode === 38 ? index - 1 : index + 1;
+            let targetIndex = e.key === "ArrowUp" ? index - 1 : index + 1;
 
             if (targetIndex >= 0 && targetIndex < events.length) {
                 let event = events[targetIndex];

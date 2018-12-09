@@ -73,7 +73,7 @@ autoUpdater.on("download-progress", (progressObj) => {
 
 autoUpdater.on("update-downloaded", () => {
     // Update will be installed silently after quitting NepSnowplow
-    logger.info("Update downloaded");
+    logger.info("Update downloaded. Restart the app to install.");
 });
 
 // This method will be called when Electron has finished
