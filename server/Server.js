@@ -97,13 +97,16 @@ class Server {
     handleStartup(port) {
         this.instance.emit("ready", port);
         console.log("Listening for SnowPlow analytics on port " + port);
-	    console.log("Please check you both of your devices are on the same network");
-	    console.log("________________________________________________________________________________");
-	    console.log("");
+        console.log("Please check you both of your devices are on the same network");
+        console.log(
+            "________________________________________________________________________________"
+        );
+        console.log("");
     }
 
     captureEvents() {
         // Capturing every post events to this server
+        let schemas = this.schemas;
         this.instance.post("*", function(req, res) {
             let body = req.body;
 

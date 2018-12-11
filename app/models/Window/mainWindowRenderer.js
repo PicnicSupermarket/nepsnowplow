@@ -180,20 +180,20 @@ function renderFooter(target, ip, port) {
     });
     let data = {
         ipAddress: ip || "...",
-        port: port | "..."
+        port: port || "..."
     };
     tmpl.render(data);
 }
 
 function updateFooter(target) {
-	serverInst.on("ready", (port) => {
-		network.get_active_interface((err, iface) => {
-	        let footer = document.getElementById("footer");
-	        footer.parentNode.removeChild(footer);
+    serverInst.on("ready", (port) => {
+        network.get_active_interface((err, iface) => {
+            let footer = document.getElementById("footer");
+            footer.parentNode.removeChild(footer);
 
-	        renderFooter(target, iface.ip_address, port);
-	    });
-	}
+            renderFooter(target, iface.ip_address, port);
+        });
+    });
 }
 
 function renderWindow() {
