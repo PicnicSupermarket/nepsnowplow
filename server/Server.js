@@ -25,7 +25,7 @@ class Server {
     start() {
         this.readSchemas();
         this.captureEvents();
-        this.listen();
+        this.listen(remote.getGlobal("options").listeningPort);
 
         return this.instance;
     }
@@ -75,8 +75,8 @@ class Server {
         }
     }
 
-    listen() {
-        let port = remote.getGlobal("options").listeningPort;
+    listen(port) {
+        let server = this;
         this.instance
             .listen(port, () => {
                 this.handleStartup(port);
@@ -85,9 +85,7 @@ class Server {
                 if (err.errno === "EADDRINUSE") {
                     console.log("Port " + port + " in use, using random port");
                     let randPort = Math.floor(1000 + Math.random() * 9000);
-                    this.instance.listen(randPort, () => {
-                        this.handleStartup(randPort);
-                    });
+                    server.listen(randPort);
                 } else {
                     console.log(err);
                 }
