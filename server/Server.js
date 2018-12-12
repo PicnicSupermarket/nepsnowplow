@@ -77,15 +77,14 @@ class Server {
 
     listen(port) {
         let server = this;
-        this.instance
+        let listener = this.instance
             .listen(port, () => {
-                this.handleStartup(port);
+                this.handleStartup(listener.address().port);
             })
             .on("error", (err) => {
                 if (err.errno === "EADDRINUSE") {
-                    console.log("Port " + port + " in use, using random port");
-                    let randPort = Math.floor(1000 + Math.random() * 9000);
-                    server.listen(randPort);
+                    console.log("Port " + port + " in use, using random available port");
+                    server.listen(0);
                 } else {
                     console.log(err);
                 }
