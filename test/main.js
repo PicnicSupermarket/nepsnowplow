@@ -43,7 +43,8 @@ describe("NepSnowplow", function() {
                 }
             ]
         };
-        this.server = chai.request("http://localhost:3000");
+        this.listeningPort = 3000; // TODO: refactor such that we read from the default app options
+        this.server = chai.request(`http://localhost:${this.listeningPort}`);
         this.app = createApplication();
         return this.app.start();
     });
@@ -99,6 +100,17 @@ describe("NepSnowplow", function() {
                 .browserWindow.isVisible().should.eventually.be.true;
         });
 
+        it("uses the default port", function() {
+            let remote = this.app.electron.remote;
+            let defaultPort = this.listeningPort;
+            return this.app.client.waitUntilWindowLoaded().then(function() {
+                return remote
+                    .getGlobal("options")
+                    .should.eventually.have.property("listeningPort")
+                    .that.is.equal(defaultPort);
+            });
+        });
+
         it("starts without errors", function() {
             return this.app.client
                 .waitUntilWindowLoaded()
@@ -115,6 +127,17 @@ describe("NepSnowplow", function() {
             beforeEach(function() {
                 this.secondApp = createApplication();
                 return this.secondApp.start();
+            });
+
+            it("uses a different port", function() {
+                let secondRemote = this.secondApp.electron.remote;
+                let defaultPort = this.listeningPort;
+                return this.secondApp.client.waitUntilWindowLoaded().then(function() {
+                    return secondRemote
+                        .getGlobal("options")
+                        .should.eventually.have.property("listeningPort")
+                        .that.is.not.equal(defaultPort);
+                });
             });
 
             it("starts without errors", function() {

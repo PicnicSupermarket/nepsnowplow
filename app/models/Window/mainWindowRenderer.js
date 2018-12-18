@@ -12,7 +12,7 @@ const { PaneGroup, SidebarListPane, DetailsPane } = require("../Pane");
 const Server = require("../../../server/Server");
 
 var server = new Server();
-var serverInst = server.start();
+server.start();
 
 function enableSearchListener() {
     const filterEventsInput = document.getElementById("filter-events");
@@ -186,7 +186,7 @@ function renderFooter(target, ip, port) {
 }
 
 function updateFooter(target) {
-    serverInst.on("ready", (port) => {
+    server.getInstance().on("ready", (port) => {
         network.get_active_interface((err, iface) => {
             let footer = document.getElementById("footer");
             footer.parentNode.removeChild(footer);

@@ -17,6 +17,7 @@ class Server {
     constructor() {
         this.schemas = {};
         this.schemaDir = remote.getGlobal("options").schemaDir;
+
         this.instance = express();
         this.instance.use(bodyParser.json()); // to parse application/json
         this.instance.use(bodyParser.urlencoded({ extended: true })); // to parse application/x-www-form-urlencoded
@@ -27,6 +28,18 @@ class Server {
         this.captureEvents();
         this.listen(remote.getGlobal("options").listeningPort);
 
+        return this.instance;
+    }
+
+    getListeningPort() {
+        return remote.getGlobal("options").listeningPort;
+    }
+
+    setListeningPort(port) {
+        remote.getGlobal("options").listeningPort = port;
+    }
+
+    getInstance() {
         return this.instance;
     }
 
@@ -75,15 +88,17 @@ class Server {
         }
     }
 
-    listen(port) {
+    listen(proposedPort) {
         let server = this;
         let listener = this.instance
-            .listen(port, () => {
-                this.handleStartup(listener.address().port);
+            .listen(proposedPort, () => {
+                let actualPort = listener.address().port;
+                this.setListeningPort(actualPort);
+                this.handleStartup(actualPort);
             })
             .on("error", (err) => {
                 if (err.errno === "EADDRINUSE") {
-                    console.log("Port " + port + " in use, using random available port");
+                    console.log(`Port ${proposedPort} in use, using random available port`);
                     server.listen(0);
                 } else {
                     console.log(err);
