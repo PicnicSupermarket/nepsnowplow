@@ -21,9 +21,8 @@ yarn start
 
 ## Usage
 
-Point your device or webpage to your local machine and to send Snowplow events to be collected. Your
-IP address and listening port is listed at the bottom of the app. Events should appear within
-seconds.
+Point a device or webpage to your local machine to collect their Snowplow events. Your IP address
+and listening port is listed at the bottom of the app. Events should appear within seconds.
 
 ### Events
 
