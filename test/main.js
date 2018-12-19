@@ -14,6 +14,17 @@ chai.should();
 chai.use(chaiAsPromised);
 chai.use(chaiHttp);
 
+function createApplication() {
+    return new Application({
+        // use electron from our node_modules
+        path: electron,
+
+        // The following line tells spectron to start electron
+        // from the parent folder.
+        args: [path.join(__dirname, "..")]
+    });
+}
+
 describe("NepSnowplow", function() {
     this.timeout(10000);
     this.slow(200);
@@ -32,15 +43,9 @@ describe("NepSnowplow", function() {
                 }
             ]
         };
-        this.server = chai.request("http://localhost:3000");
-        this.app = new Application({
-            // use electron from our node_modules
-            path: electron,
-
-            // The following line tells spectron to start electron
-            // from the parent folder.
-            args: [path.join(__dirname, "..")]
-        });
+        this.listeningPort = 3000; // TODO: refactor such that we read from the default app options
+        this.server = chai.request(`http://localhost:${this.listeningPort}`);
+        this.app = createApplication();
         return this.app.start();
     });
 
@@ -95,6 +100,17 @@ describe("NepSnowplow", function() {
                 .browserWindow.isVisible().should.eventually.be.true;
         });
 
+        it("uses the default port", function() {
+            let remote = this.app.electron.remote;
+            let defaultPort = this.listeningPort;
+            return this.app.client.waitUntilWindowLoaded().then(function() {
+                return remote
+                    .getGlobal("options")
+                    .should.eventually.have.property("listeningPort")
+                    .that.is.equal(defaultPort);
+            });
+        });
+
         it("starts without errors", function() {
             return this.app.client
                 .waitUntilWindowLoaded()
@@ -102,6 +118,42 @@ describe("NepSnowplow", function() {
                 .then(function(logs) {
                     logs.filter((log) => log.level === "SEVERE").should.have.lengthOf(0);
                 });
+        });
+
+        describe("second instance", function() {
+            // double the timeout as we're launching a second app
+            this.timeout(20000);
+
+            beforeEach(function() {
+                this.secondApp = createApplication();
+                return this.secondApp.start();
+            });
+
+            it("uses a different port", function() {
+                let secondRemote = this.secondApp.electron.remote;
+                let defaultPort = this.listeningPort;
+                return this.secondApp.client.waitUntilWindowLoaded().then(function() {
+                    return secondRemote
+                        .getGlobal("options")
+                        .should.eventually.have.property("listeningPort")
+                        .that.is.not.equal(defaultPort);
+                });
+            });
+
+            it("starts without errors", function() {
+                return this.secondApp.client
+                    .waitUntilWindowLoaded()
+                    .getRenderProcessLogs()
+                    .then(function(logs) {
+                        logs.filter((log) => log.level === "SEVERE").should.have.lengthOf(0);
+                    });
+            });
+
+            afterEach(function() {
+                if (this.secondApp && this.secondApp.isRunning()) {
+                    return this.secondApp.stop();
+                }
+            });
         });
 
         it("logs Snowplow event", function() {

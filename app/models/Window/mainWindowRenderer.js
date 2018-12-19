@@ -9,10 +9,10 @@ const appLogger = require("../../../server/appLogger");
 const filter = require("../../..//server/filter");
 const { Template } = require("../Template");
 const { PaneGroup, SidebarListPane, DetailsPane } = require("../Pane");
+const Server = require("../../../server/Server");
 
-function startServer() {
-    require("../../../server/server");
-}
+var server = new Server();
+server.start();
 
 function enableSearchListener() {
     const filterEventsInput = document.getElementById("filter-events");
@@ -173,25 +173,26 @@ function renderMain(target) {
     paneGroup.show();
 }
 
-function renderFooter(target, ip) {
+function renderFooter(target, ip, port) {
     let tmpl = new Template({
         path: path.join(__dirname, "FooterToolbar.hbs"),
         parent: target
     });
-    let listeningPort = remote.getGlobal("options").listeningPort;
     let data = {
         ipAddress: ip || "...",
-        port: listeningPort
+        port: port || "..."
     };
     tmpl.render(data);
 }
 
 function updateFooter(target) {
-    network.get_active_interface((err, iface) => {
-        let footer = document.getElementById("footer");
-        footer.parentNode.removeChild(footer);
+    server.getInstance().on("ready", (port) => {
+        network.get_active_interface((err, iface) => {
+            let footer = document.getElementById("footer");
+            footer.parentNode.removeChild(footer);
 
-        renderFooter(target, iface.ip_address);
+            renderFooter(target, iface.ip_address, port);
+        });
     });
 }
 
@@ -205,7 +206,6 @@ function renderWindow() {
 }
 
 function mainWindowRenderer() {
-    startServer();
     renderWindow();
 }
 
