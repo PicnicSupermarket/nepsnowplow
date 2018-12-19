@@ -1,15 +1,18 @@
 "use strict";
 
-// Include app.js directory in node path
-process.env.NODE_PATH = __dirname;
-require("module").Module._initPaths();
-require("module").globalPaths.push(__dirname);
-
+const logger = require("electron-log");
 const { app, ipcMain, BrowserWindow, Menu } = require("electron");
+const { autoUpdater } = require("electron-updater");
 const os = require("os");
 const fs = require("fs");
 const path = require("path");
 
+// Enable logging.
+autoUpdater.logger = logger;
+autoUpdater.logger.transports.file.level = "info";
+logger.info("App starting...");
+
+// Define globals.
 global.trackedEvents = [];
 global.options = loadOptions();
 
@@ -17,6 +20,7 @@ global.options = loadOptions();
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow = null;
 
+// Register custom event listeners.
 ipcMain.on("add-event", (event, spEvent) => {
     global.trackedEvents.push(spEvent);
 });
@@ -25,8 +29,9 @@ ipcMain.on("clear-events", () => {
     global.trackedEvents = [];
 });
 
-// Quit when all windows are closed.
+// Register window listeners.
 app.on("window-all-closed", () => {
+    // Quit when all windows are closed.
     // On OS X it is common for applications and their menu bar
     // to stay active until the user quits explicitly with Cmd + Q
     // if (process.platform != 'darwin') {
@@ -42,9 +47,41 @@ app.on("activate", function() {
     }
 });
 
+// Register updater listeners.
+autoUpdater.on("checking-for-update", () => {
+    logger.info("Checking for update...");
+});
+
+autoUpdater.on("update-available", () => {
+    logger.info("Update available.");
+});
+
+autoUpdater.on("update-not-available", () => {
+    logger.info("Update not available.");
+});
+
+autoUpdater.on("error", (err) => {
+    logger.info("Error in auto-updater. " + err);
+});
+
+autoUpdater.on("download-progress", (progressObj) => {
+    let msg = `Download speed: ${progressObj.bytesPerSecond}`;
+    msg += ` - Downloaded ${progressObj.percent}%`;
+    msg += ` (${progressObj.transferred}/${progressObj.total})`;
+    logger.info(msg);
+});
+
+autoUpdater.on("update-downloaded", () => {
+    // Update will be installed silently after quitting NepSnowplow
+    logger.info("Update downloaded. Restart the app to install.");
+});
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
-app.on("ready", createMainWindow);
+app.on("ready", function() {
+    createMainWindow();
+    autoUpdater.checkForUpdates();
+});
 
 function loadOptions() {
     let defaults = {
@@ -64,7 +101,7 @@ function loadOptions() {
     } catch (err) {
         // catch in case the file could not be resolved,
         // e.g. when somebody deleted the settings file
-        console.log(err);
+        logger.info(err);
     }
     return Object.assign(defaults, userOptions);
 }

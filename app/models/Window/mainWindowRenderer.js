@@ -3,16 +3,16 @@
 const { remote, ipcRenderer } = require("electron");
 const os = require("os");
 const path = require("path");
+const network = require("network");
 
 const appLogger = require("../../../server/appLogger");
-const network = require("../../../server/networkInterfaces");
 const filter = require("../../..//server/filter");
 const { Template } = require("../Template");
 const { PaneGroup, SidebarListPane, DetailsPane } = require("../Pane");
+const Server = require("../../../server/Server");
 
-function startServer() {
-    require("../../../server/server");
-}
+var server = new Server();
+server.start();
 
 function enableSearchListener() {
     const filterEventsInput = document.getElementById("filter-events");
@@ -23,28 +23,26 @@ function enableSearchListener() {
     });
 
     filterEventsInput.addEventListener("blur", (e) => {
-        if (e.target.value === "") {
+        if (e.currentTarget.value === "") {
             clearFilterButton.classList.remove("icon-cancel-circled", "clickable");
         }
     });
 
-    filterEventsInput.addEventListener("keyup", function(e) {
-        let value = this.value;
-        if (e.keyCode === 27) {
-            // escape (27) was pressed
+    filterEventsInput.addEventListener("keyup", (e) => {
+        let value = e.target.value;
+        if (e.key === "Escape") {
             filter.clearFilter();
-            this.blur();
-        } else if (e.keyCode === 13) {
-            // enter(13) was pressed
+            e.currentTarget.blur();
+        } else if (e.key === "Enter") {
             e.preventDefault();
-            this.blur();
+            e.currentTarget.blur();
         } else {
-            filter.filterEvents(value, e.keyCode);
+            filter.filterEvents(value, e.key);
         }
     });
 
     clearFilterButton.addEventListener("click", (e) => {
-        e.target.classList.remove("icon-cancel-circled", "clickable");
+        e.currentTarget.classList.remove("icon-cancel-circled", "clickable");
         filterEventsInput.value = "";
         filter.clearFilter();
     });
@@ -72,10 +70,10 @@ function enableToolbarButtonListeners() {
 
         if (validationOn) {
             // was previously on
-            e.target.classList.remove("active");
+            e.currentTarget.classList.remove("active");
             document.body.classList.remove("show-validation");
         } else {
-            e.target.classList.add("active");
+            e.currentTarget.classList.add("active");
             document.body.classList.add("show-validation");
         }
         remote.getGlobal("options").showSchemaValidation = !validationOn;
@@ -101,6 +99,42 @@ function enableWindowButtonListeners() {
     });
 }
 
+function scrollIntoView(elem, relativeTo) {
+    let pos = elem.offsetTop;
+    let top = typeof relativeTo !== "undefined" ? relativeTo.scrollTop : elem.parentNode.scrollTop;
+    let bottom = top + relativeTo.offsetHeight;
+    if (pos > bottom) {
+        elem.scrollIntoView(false);
+    } else if (pos < top) {
+        elem.scrollIntoView(true);
+    }
+}
+
+function enableKeyListeners() {
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+            // prevent regular scrolling behaviour
+            e.preventDefault();
+
+            let eventId = document.querySelector("#events-container li.selected").id;
+
+            // Get all events in view.
+            // Not the same as all stored events, because we might be filtering.
+            let events = Array.from(document.querySelectorAll("#events-container li")).filter(
+                (elem) => elem.style.display !== "none"
+            );
+            let index = events.findIndex((elem) => elem.id === eventId);
+            let targetIndex = e.key === "ArrowUp" ? index - 1 : index + 1;
+
+            if (targetIndex >= 0 && targetIndex < events.length) {
+                let event = events[targetIndex];
+                event.click();
+                scrollIntoView(event, event.parentNode.parentNode);
+            }
+        }
+    });
+}
+
 function renderHeader(target) {
     let isWindows = os.platform() === "win32";
     let validationOn = !!remote.getGlobal("options").showSchemaValidation;
@@ -122,6 +156,7 @@ function renderHeader(target) {
             }
             enableToolbarButtonListeners();
             enableSearchListener();
+            enableKeyListeners();
         },
         false
     );
@@ -138,16 +173,27 @@ function renderMain(target) {
     paneGroup.show();
 }
 
-function renderFooter(target) {
+function renderFooter(target, ip, port) {
     let tmpl = new Template({
         path: path.join(__dirname, "FooterToolbar.hbs"),
         parent: target
     });
     let data = {
-        ipAddress: network.currentIpAddress(),
-        port: remote.getGlobal("options").listeningPort
+        ipAddress: ip || "...",
+        port: port || "..."
     };
     tmpl.render(data);
+}
+
+function updateFooter(target) {
+    server.getInstance().on("ready", (port) => {
+        network.get_active_interface((err, iface) => {
+            let footer = document.getElementById("footer");
+            footer.parentNode.removeChild(footer);
+
+            renderFooter(target, iface.ip_address, port);
+        });
+    });
 }
 
 function renderWindow() {
@@ -155,11 +201,11 @@ function renderWindow() {
     renderHeader(target);
     renderMain(target);
     renderFooter(target);
+    updateFooter(target);
     appLogger.displayEvents(remote.getGlobal("trackedEvents"));
 }
 
 function mainWindowRenderer() {
-    startServer();
     renderWindow();
 }
 

@@ -1,41 +1,51 @@
 matrix:
-  include:
-    - os: osx
-      osx_image: xcode9.4
-      language: node_js
-      node_js: "10"
-      env:
-        - ELECTRON_CACHE=$HOME/.cache/electron
-        - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
-      script:
-        # Build the release package.
-        # Draft a new release when a new version was pushed to master.
-        - yarn build --publish ${DEPLOY_TYPE}
-    - os: linux
-      services: docker
-      language: generic
-      script:
-        # Build the release package.
-        # Draft a new release when a new version was pushed to master.
-        - >
-          docker run --rm \
-            --env-file <(env | grep -iE 'DEBUG|NODE_|ELECTRON_|YARN_|NPM_|CI|CIRCLE|TRAVIS|APPVEYOR_|CSC_|_TOKEN|_KEY|AWS_|STRIP|BUILD_') \
-            -v ${PWD}:/project \
-            -v ~/.cache/electron:/root/.cache/electron \
-            -v ~/.cache/electron-builder:/root/.cache/electron-builder \
-            electronuserland/builder:wine \
-            /bin/bash -c "yarn build --linux --win --publish ${DEPLOY_TYPE}"
+    include:
+        - os: osx
+          osx_image: xcode9.4
+          language: node_js
+          node_js: "10"
+          env:
+              - ELECTRON_CACHE=$HOME/.cache/electron
+              - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
+          script:
+              # Run mocha tests.
+              - yarn test
+          after_success:
+              # Build the release package.
+              # Draft a new release when a new version was pushed to master.
+              - yarn build --publish ${DEPLOY_TYPE}
+        - os: linux
+          services: docker
+          language: generic
+          script:
+              # Run mocha tests using a virtual screen.
+              - xvfb-run yarn test
+          after_success:
+              # Build the release package.
+              # Draft a new release when a new version was pushed to master.
+
+              # prettier-ignore
+              - >
+                  docker run --rm \
+                    --env-file <(env | grep -iE 'DEBUG|NODE_|ELECTRON_|YARN_|NPM_|CI|CIRCLE|TRAVIS|APPVEYOR_|CSC_|_TOKEN|_KEY|AWS_|STRIP|BUILD_') \
+                    -v "${PWD}:/project" \
+                    -v ~/.cache/electron:/root/.cache/electron \
+                    -v ~/.cache/electron-builder:/root/.cache/electron-builder \
+                    electronuserland/builder:wine \
+                    /bin/bash -c "yarn build --linux --win --publish ${DEPLOY_TYPE}"
+
+
 
 env:
-  global:
-    # We distinguish two types of builds:
-    # - review, for pull request analysis/feedback
-    # - push, for pushes
-    - TYPE="$( test ${TRAVIS_EVENT_TYPE} = pull_request && echo review || echo push )"
+    global:
+        # We distinguish two types of builds:
+        # - review, for pull request analysis/feedback
+        # - push, for pushes
+        - TYPE="$( test ${TRAVIS_EVENT_TYPE} = pull_request && echo review || echo push )"
 
 before_install:
     # jq doens't come pre-installed on osx, so install it.
-    - test "${TRAVIS_OS_NAME}" != osx || brew install jq
+    - test "${TRAVIS_OS_NAME}" != osx || HOMEBREW_NO_AUTO_UPDATE=1 brew install jq
     # Retrieve the last known published version and list them.
     - git fetch --tags --verbose
     # Find the latest merged release tag on master.
@@ -43,7 +53,8 @@ before_install:
     # Retrieve the version that this source bundle represents.
     - CURRENT_VERSION=$( jq -r '.version' < package.json )
     # If this is a push to `master` and it is a new version, we need to publish to GitHub.
-    - export DEPLOY_TYPE=$( test ${TRAVIS_BRANCH} = "master" && ( test ${TYPE} = "push" && ( test "${CURRENT_VERSION}" != "${LAST_RELEASED_VERSION}" && echo always ) ) || echo never )
+    - export DEPLOY_TYPE=$( test ${TRAVIS_BRANCH} = "master" && ( test ${TYPE} = "push" && ( test
+      "${CURRENT_VERSION}" != "${LAST_RELEASED_VERSION}" && echo always ) ) || echo never )
 
     # Echo configuration
     - echo "Current version '${CURRENT_VERSION}'"
@@ -52,16 +63,16 @@ before_install:
     - echo "Deploy type '${DEPLOY_TYPE}'"
 
 install:
-  # Install dependencies.
-  # Source compilation is triggered automatically after install.
-  - yarn --link-duplicates --pure-lockfile
+    # Install dependencies.
+    # Source compilation is triggered automatically after install.
+    - yarn --link-duplicates --pure-lockfile
 
 before_cache:
-  - rm -rf $HOME/.cache/electron-builder/wine
+    - rm -rf $HOME/.cache/electron-builder/wine
 
 cache:
-  yarn: true
-  directories:
-    - node_modules
-    - $HOME/.cache/electron
-    - $HOME/.cache/electron-builder
+    yarn: true
+    directories:
+        - node_modules
+        - $HOME/.cache/electron
+        - $HOME/.cache/electron-builder

@@ -1,6 +1,6 @@
 {
     "name": "nepsnowplow",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "A local Snowplow Collector and GUI to inspect collected events",
     "author": "Picnic Technologies",
     "keywords": [
@@ -25,6 +25,7 @@
         "postinstall": "yarn compile",
         "precommit": "pretty-quick --staged",
         "start": "electron .",
+        "test": "mocha",
         "watch": "yarn compile --watch"
     },
     "main": "app.js",
@@ -68,20 +69,28 @@
         "releaseType": "draft"
     },
     "devDependencies": {
-        "electron": "^2.0.2",
-        "electron-builder": "^20.20.4",
+        "chai": "*",
+        "chai-as-promised": "^7.1.1",
+        "chai-http": "^4.2.0",
+        "electron": "^2.0.10",
+        "electron-builder": "^20.28.4",
         "husky": "^0.14.3",
-        "prettier": "1.13.7",
+        "mocha": "*",
+        "prettier": "^1.14.2",
         "pretty-quick": "^1.6.0",
-        "sass": "^1.10.0"
+        "sass": "^1.10.0",
+        "spectron": "^4.0.0"
     },
     "dependencies": {
         "ajv": "^6.5.2",
         "body-parser": "^1.15.2",
+        "electron-log": "^2.2.17",
+        "electron-updater": "^3.1.2",
         "express": "^4.14.0",
         "handlebars": "^4.0.11",
         "jsonfile": "^4.0.0",
         "mark.js": "^8.11.1",
+        "network": "^0.4.1",
         "renderjson": "^1.4.0",
         "z-schema": "^3.22.0"
     }
