@@ -85,10 +85,10 @@ app.on("ready", function() {
 
 function loadOptions() {
     let defaults = {
+        listeningPort: 3000,
+        repos: [],
         showSchemaValidation: false,
-        schemaDir: "schemas/",
-        repo: {},
-        listeningPort: 3000
+        schemaDir: "schemas/"
     };
     let userOptions = {};
     try {
