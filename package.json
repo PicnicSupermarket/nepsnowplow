@@ -1,6 +1,6 @@
 {
     "name": "nepsnowplow",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "description": "A local Snowplow Collector and GUI to inspect collected events",
     "author": "Picnic Technologies",
     "keywords": [
