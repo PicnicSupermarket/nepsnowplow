@@ -1,5 +1,12 @@
 {
-  "showSchemaValidation": false,
-  "schemaDir": "schemas/",
-  "listeningPort": 3000
+    "showSchemaValidation": false,
+    "schemaDir": "schemas/",
+    "repos": [
+        {
+            "url": "",
+            "apikey": "",
+            "vendors": []
+        }
+    ],
+    "listeningPort": 3000
 }

@@ -35,8 +35,6 @@ matrix:
                     /bin/bash -c "yarn build --linux --win --publish ${DEPLOY_TYPE}"
 
 
-
-
 env:
     global:
         # We distinguish two types of builds:

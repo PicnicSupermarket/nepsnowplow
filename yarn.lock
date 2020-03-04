@@ -3328,10 +3328,10 @@ negotiator@0.6.1:
   resolved "https://registry.yarnpkg.com/negotiator/-/negotiator-0.6.1.tgz#2b327184e8992101177b28563fb5e7102acd0ca9"
   integrity sha1-KzJxhOiZIQEXeyhWP7XnECrNDKk=
 
-network@^0.4.1:
-  version "0.4.1"
-  resolved "https://registry.yarnpkg.com/network/-/network-0.4.1.tgz#30bb4d41b624072a4da990431f77513612c45cc0"
-  integrity sha1-MLtNQbYkBypNqZBDH3dRNhLEXMA=
+network@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/network/-/network-0.5.0.tgz#4fca12ffe80877035a859f655618ee30b48238da"
+  integrity sha512-pH4/Qg6/z0itY09yqVAZcHO64yvkqvGn6Qo8dKdg8mkx6eYZnVE1Qlzk8Bl2lb5wtJLVDKQJr5eU2b6i5M35Gw==
   dependencies:
     async "^1.5.2"
     commander "2.9.0"
