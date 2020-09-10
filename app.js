@@ -117,7 +117,10 @@ function createMainWindow() {
         acceptFirstMouse: true,
         title: "NepSnowplow",
         titleBarStyle: "hidden",
-        frame: !isWindows
+        frame: !isWindows,
+        webPreferences: {
+            nodeIntegration: true
+        }
     });
 
     // and load the index.html of the app.

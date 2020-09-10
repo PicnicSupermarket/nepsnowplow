@@ -1,6 +1,6 @@
 {
     "name": "nepsnowplow",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "description": "A local Snowplow Collector and GUI to inspect collected events",
     "author": "Picnic Technologies",
     "keywords": [
@@ -71,27 +71,27 @@
     "devDependencies": {
         "chai": "*",
         "chai-as-promised": "^7.1.1",
-        "chai-http": "^4.2.0",
-        "electron": "^2.0.10",
-        "electron-builder": "^20.28.4",
-        "husky": "^0.14.3",
+        "chai-http": "^4.3.0",
+        "electron": "^9.3.0",
+        "electron-builder": "^22.8.0",
+        "husky": "^4.3.0",
         "mocha": "*",
-        "prettier": "^1.14.2",
-        "pretty-quick": "^1.6.0",
-        "sass": "^1.10.0",
-        "spectron": "^4.0.0"
+        "prettier": "^2.1.1",
+        "pretty-quick": "^3.0.0",
+        "sass": "^1.26.10",
+        "spectron": "^11.1.0"
     },
     "dependencies": {
-        "ajv": "^6.5.2",
-        "body-parser": "^1.15.2",
-        "electron-log": "^2.2.17",
-        "electron-updater": "^3.1.2",
-        "express": "^4.14.0",
-        "handlebars": "^4.0.11",
-        "jsonfile": "^4.0.0",
+        "ajv": "^6.12.4",
+        "body-parser": "^1.19.0",
+        "electron-log": "^4.2.4",
+        "electron-updater": "^4.3.4",
+        "express": "^4.17.1",
+        "handlebars": "^4.7.6",
+        "jsonfile": "^6.0.1",
         "mark.js": "^8.11.1",
-        "network": "^0.4.1",
+        "network": "^0.5.0",
         "renderjson": "^1.4.0",
-        "z-schema": "^3.22.0"
+        "z-schema": "^4.2.3"
     }
 }
