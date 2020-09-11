@@ -1,9 +1,10 @@
 matrix:
     include:
         - os: osx
-          osx_image: xcode9.4
+          osx_image: xcode10.2
           language: node_js
-          node_js: "14"
+          node_js:
+            - 14
           env:
               - ELECTRON_CACHE=$HOME/.cache/electron
               - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
@@ -16,7 +17,9 @@ matrix:
               - yarn build --publish ${DEPLOY_TYPE}
         - os: linux
           services: docker
-          language: generic
+          language: node_js
+          node_js:
+            - 14
           script:
               # Run mocha tests using a virtual screen.
               - xvfb-run yarn test
