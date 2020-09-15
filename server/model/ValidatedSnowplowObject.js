@@ -3,7 +3,7 @@ const Validator = require("z-schema");
 
 const validator = new Validator({
     ignoreUnresolvableReferences: true,
-    breakOnFirstError: false
+    breakOnFirstError: false,
 });
 
 class ValidatedSnowplowObject {
@@ -29,7 +29,7 @@ class ValidatedSnowplowObject {
         if (typeof validationSchema !== "undefined") {
             // Allow events with no validation schemas
             let validationResult = validator.validate(this.obj.data, validationSchema.getSchema());
-            this.errors = (validator.getLastErrors() || []).map(function(obj) {
+            this.errors = (validator.getLastErrors() || []).map(function (obj) {
                 return obj.message;
             });
             this.isValid = validationResult;

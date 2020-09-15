@@ -37,8 +37,8 @@ class Event extends Payload {
             contexts: this.contexts.map((ctx) => ({
                 schemaName: ctx.getSchemaName(),
                 isValid: ctx.getSchemaValidity(),
-                errors: ctx.errors
-            }))
+                errors: ctx.errors,
+            })),
         };
 
         tmpl.render(data, (html) => {
@@ -66,8 +66,8 @@ class Event extends Payload {
             contexts: this.contexts.map((ctx) => ({
                 schemaName: ctx.getSchemaName(),
                 schemaVersion: ctx.getSchemaVersion(),
-                isValid: ctx.getSchemaValidity()
-            }))
+                isValid: ctx.getSchemaValidity(),
+            })),
         };
 
         tmpl.render(data, (html) => {

@@ -39,7 +39,7 @@ app.on("window-all-closed", () => {
     // }
 });
 
-app.on("activate", function() {
+app.on("activate", function () {
     // On OS X it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (mainWindow === null) {
@@ -78,7 +78,7 @@ autoUpdater.on("update-downloaded", () => {
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
-app.on("ready", function() {
+app.on("ready", function () {
     createMainWindow();
     autoUpdater.checkForUpdates();
 });
@@ -87,7 +87,7 @@ function loadOptions() {
     let defaults = {
         showSchemaValidation: false,
         schemaDir: "schemas/",
-        listeningPort: 3000
+        listeningPort: 3000,
     };
     let userOptions = {};
     try {
@@ -119,8 +119,8 @@ function createMainWindow() {
         titleBarStyle: "hidden",
         frame: !isWindows,
         webPreferences: {
-            nodeIntegration: true
-        }
+            nodeIntegration: true,
+        },
     });
 
     // and load the index.html of the app.
@@ -133,11 +133,11 @@ function createMainWindow() {
                 {
                     label: "Quit",
                     accelerator: "Command+Q",
-                    click: function() {
+                    click: function () {
                         app.quit();
-                    }
-                }
-            ]
+                    },
+                },
+            ],
         },
         {
             label: "Debug",
@@ -145,19 +145,19 @@ function createMainWindow() {
                 {
                     label: "Open debug panel",
                     accelerator: "CmdOrCtrl+D",
-                    click: function() {
+                    click: function () {
                         mainWindow.openDevTools();
-                    }
-                }
-            ]
-        }
+                    },
+                },
+            ],
+        },
     ];
 
     const menu = Menu.buildFromTemplate(template);
     Menu.setApplicationMenu(menu);
 
     // Emitted when the window is closed.
-    mainWindow.on("closed", function() {
+    mainWindow.on("closed", function () {
         // Dereference the window object, usually you would store windows
         // in an array if your app supports multi windows, this is the time
         // when you should delete the corresponding element.

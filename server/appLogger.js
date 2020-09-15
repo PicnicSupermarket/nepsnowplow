@@ -29,5 +29,5 @@ function logEvent(event) {
 module.exports = {
     logEvent: logEvent,
     displayEvent: displayEvent,
-    displayEvents: displayEvents
+    displayEvents: displayEvents,
 };

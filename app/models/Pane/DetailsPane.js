@@ -12,7 +12,7 @@ class DetailsPane {
     show() {
         let tmpl = new Template({
             path: path.join(__dirname, "DetailsPane.hbs"),
-            parent: this.parent
+            parent: this.parent,
         });
         tmpl.render();
     }
@@ -30,33 +30,27 @@ class DetailsPane {
     highlightDetails(value) {
         let container = this.getRoot();
         let codeContainer = container.querySelectorAll("pre");
-        if (
-            typeof container !== "undefined" &&
-            typeof codeContainer !== "undefined"
-        ) {
+        if (typeof container !== "undefined" && typeof codeContainer !== "undefined") {
             let markInst = new Mark(codeContainer);
             markInst.unmark({
-                done: function() {
+                done: function () {
                     if (typeof value !== "undefined" && value !== "") {
                         markInst.mark(value, {
                             separateWordSearch: false,
                             exclude: [".key"],
-                            noMatch: function() {
+                            noMatch: function () {
                                 container.style.display = "none";
                             },
-                            done: function() {
-                                if (
-                                    container.getElementsByTagName("mark")
-                                        .length > 0
-                                ) {
+                            done: function () {
+                                if (container.getElementsByTagName("mark").length > 0) {
                                     container.style.display = "";
                                 }
-                            }
+                            },
                         });
                     } else {
                         container.style.display = "";
                     }
-                }
+                },
             });
         }
     }

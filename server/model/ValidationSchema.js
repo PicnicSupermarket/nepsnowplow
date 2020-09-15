@@ -8,10 +8,7 @@ class ValidationSchema {
     }
 
     cleanSchema() {
-        if (
-            this.schema.required !== undefined &&
-            this.schema.required.length === 0
-        ) {
+        if (this.schema.required !== undefined && this.schema.required.length === 0) {
             delete this.schema.required;
         }
     }

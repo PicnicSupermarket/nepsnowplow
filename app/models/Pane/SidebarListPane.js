@@ -12,7 +12,7 @@ class SidebarListPane {
     show() {
         let tmpl = new Template({
             path: path.join(__dirname, "SidebarListPane.hbs"),
-            parent: this.parent
+            parent: this.parent,
         });
         tmpl.render();
     }
@@ -26,10 +26,10 @@ class SidebarListPane {
     highlightEvents(value) {
         let markInst = new Mark(document.querySelectorAll("#events-container .schema-name"));
         markInst.unmark({
-            done: function() {
+            done: function () {
                 if (typeof value !== "undefined" && value !== "") {
                     markInst.mark(value, {
-                        separateWordSearch: false
+                        separateWordSearch: false,
                     });
                 } else {
                     let eventItems = document.querySelectorAll(
@@ -40,7 +40,7 @@ class SidebarListPane {
                         eventEl.style.display = "";
                     });
                 }
-            }
+            },
         });
     }
 }
