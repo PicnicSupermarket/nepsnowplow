@@ -141,12 +141,12 @@ function renderHeader(target) {
 
     let tmpl = new Template({
         path: path.join(__dirname, "HeaderToolbar.hbs"),
-        parent: target
+        parent: target,
     });
     let data = {
         title: "NepSnowplow",
         isWindows: isWindows,
-        validationOn: validationOn
+        validationOn: validationOn,
     };
     tmpl.render(
         data,
@@ -176,11 +176,11 @@ function renderMain(target) {
 function renderFooter(target, ip, port) {
     let tmpl = new Template({
         path: path.join(__dirname, "FooterToolbar.hbs"),
-        parent: target
+        parent: target,
     });
     let data = {
         ipAddress: ip || "...",
-        port: port || "..."
+        port: port || "...",
     };
     tmpl.render(data);
 }

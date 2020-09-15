@@ -1,6 +1,6 @@
 var Handlebars = require("handlebars");
 
-Handlebars.registerHelper("if", function(conditional, options) {
+Handlebars.registerHelper("if", function (conditional, options) {
     if (
         options.hash.eq === conditional ||
         (typeof options.hash.eq === "undefined" && conditional)

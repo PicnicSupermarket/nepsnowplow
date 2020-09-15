@@ -1,4 +1,4 @@
-module.exports = function(grunt) {
+module.exports = function (grunt) {
     "use strict";
 
     // Force use of Unix newlines
@@ -10,36 +10,30 @@ module.exports = function(grunt) {
 
         prettier: {
             files: {
-                src: [
-                    "**.js",
-                    "**.json",
-                    "**.css",
-                    "**.scss",
-                    "!app/css/sass/vendor/**.scss"
-                ]
-            }
+                src: ["**.js", "**.json", "**.css", "**.scss", "!app/css/sass/vendor/**.scss"],
+            },
         },
 
         sass: {
             dist: {
                 options: {
                     style: "compressed",
-                    unixNewlines: true
+                    unixNewlines: true,
                 },
                 files: {
-                    "app/css/app.css": "app/css/sass/app.scss"
-                }
+                    "app/css/app.css": "app/css/sass/app.scss",
+                },
             },
             dev: {
                 options: {
                     sourcemap: "auto",
                     style: "expanded",
-                    unixNewlines: true
+                    unixNewlines: true,
                 },
                 files: {
-                    "app/css/app.css": "app/css/sass/app.scss"
-                }
-            }
+                    "app/css/app.css": "app/css/sass/app.scss",
+                },
+            },
         },
 
         watch: {
@@ -47,10 +41,10 @@ module.exports = function(grunt) {
                 files: "app/css/sass/**/*.scss",
                 tasks: ["sass:dev"],
                 options: {
-                    atBegin: true // execute sass compilation on watch
-                }
-            }
-        }
+                    atBegin: true, // execute sass compilation on watch
+                },
+            },
+        },
     });
 
     // Load the plugins

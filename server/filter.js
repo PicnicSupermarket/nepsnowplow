@@ -56,12 +56,7 @@ function getSchemaName(event) {
 
 function contains(haystack, needle) {
     try {
-        return (
-            haystack
-                .toString()
-                .toLowerCase()
-                .indexOf(needle) > -1
-        );
+        return haystack.toString().toLowerCase().indexOf(needle) > -1;
     } catch (err) {
         console.log("Unable to parse haystack, assume needle", needle, "not in haystack", haystack);
         console.log(err);
@@ -78,7 +73,7 @@ function filterEvents(value, key) {
         clearFilter();
     } else {
         filterState = true;
-        filterTimer = setTimeout(function() {
+        filterTimer = setTimeout(function () {
             let eventItems = document.querySelectorAll("#events-container .list-group-item");
 
             // when not tapping backspace,
@@ -102,7 +97,7 @@ function clearFilter() {
 function highlight(value) {
     document.dispatchEvent(
         new CustomEvent("highlight", {
-            detail: value
+            detail: value,
         })
     );
 }
@@ -111,5 +106,5 @@ module.exports = {
     filterItems: filterItems,
     filterEvents: filterEvents,
     highlight: highlight,
-    clearFilter: clearFilter
+    clearFilter: clearFilter,
 };
