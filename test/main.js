@@ -121,7 +121,7 @@ describe("NepSnowplow", function() {
              });
         });
 
-        describe("second instance", function() {
+        describe.skip("second instance", function() {
             // double the timeout as we're launching a second app
             this.timeout(20000);
 
