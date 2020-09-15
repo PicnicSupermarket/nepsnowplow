@@ -49,11 +49,7 @@
         $color-from 0%,
         $color-to 100%
     ); // Chrome10+, Safari5.1+
-    background-image: linear-gradient(
-        to bottom,
-        $color-from 0%,
-        $color-to 100%
-    ); // W3C
+    background-image: linear-gradient(to bottom, $color-from 0%, $color-to 100%); // W3C
 }
 
 // From left to right
@@ -71,11 +67,7 @@
         $color-from 50%,
         $color-to 50%
     ); // Chrome10+, Safari5.1+
-    background-image: linear-gradient(
-        to right,
-        $color-from 50%,
-        $color-to 50%
-    ); // W3C
+    background-image: linear-gradient(to right, $color-from 50%, $color-to 50%); // W3C
 }
 
 // From bottom left to top right
@@ -93,14 +85,6 @@
         $color-from 0%,
         $color-to 100%
     ); // Chrome10+, Safari5.1+
-    background-image: -moz-linear-gradient(
-        $deg,
-        $color-from 0%,
-        $color-to 100%
-    ); // FF3.6+
-    background-image: linear-gradient(
-        $deg,
-        $color-from 0%,
-        $color-to 100%
-    ); // W3C
+    background-image: -moz-linear-gradient($deg, $color-from 0%, $color-to 100%); // FF3.6+
+    background-image: linear-gradient($deg, $color-from 0%, $color-to 100%); // W3C
 }

@@ -11,5 +11,5 @@ function base64Encode(decoded) {
 
 module.exports = {
     encode: base64Encode,
-    decode: base64Decode
+    decode: base64Decode,
 };

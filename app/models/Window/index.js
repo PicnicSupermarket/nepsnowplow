@@ -1,3 +1,3 @@
 module.exports = {
-    mainWindowRenderer: require("./mainWindowRenderer")
+    mainWindowRenderer: require("./mainWindowRenderer"),
 };

@@ -72,7 +72,7 @@ class Server {
                     schema.self.vendor,
                     schema.self.name,
                     schema.self.format,
-                    schema.self.version
+                    schema.self.version,
                 ].join("/");
                 this.schemas[schemaName] = new ValidationSchema(schemaName, schema);
             } catch (err) {
@@ -119,11 +119,11 @@ class Server {
     captureEvents() {
         // Capturing every post event sent to this server
         let schemas = this.schemas;
-        this.instance.post("*", function(req, res) {
+        this.instance.post("*", function (req, res) {
             let body = req.body;
 
             let bundle = body.data.reverse();
-            bundle.forEach(function(data) {
+            bundle.forEach(function (data) {
                 let context = JSON.parse(base64.decode(data.cx));
                 let payload = JSON.parse(base64.decode(data.ue_px));
 
