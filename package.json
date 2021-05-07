@@ -87,7 +87,7 @@
         "electron-log": "^4.2.4",
         "electron-updater": "^4.3.4",
         "express": "^4.17.1",
-        "handlebars": "^4.7.6",
+        "handlebars": "^4.7.7",
         "jsonfile": "^6.0.1",
         "mark.js": "^8.11.1",
         "network": "^0.5.0",
