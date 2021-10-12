@@ -72,7 +72,7 @@
         "chai": "*",
         "chai-as-promised": "^7.1.1",
         "chai-http": "^4.3.0",
-        "electron": "^9.3.0",
+        "electron": "^11.5.0",
         "electron-builder": "^22.8.0",
         "husky": "^4.3.0",
         "mocha": "*",
