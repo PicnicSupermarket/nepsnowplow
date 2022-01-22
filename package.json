@@ -90,7 +90,7 @@
         "handlebars": "^4.7.6",
         "jsonfile": "^6.0.1",
         "mark.js": "^8.11.1",
-        "network": "^0.5.0",
+        "network": "^0.6.1",
         "renderjson": "^1.4.0",
         "z-schema": "^4.2.3"
     }
