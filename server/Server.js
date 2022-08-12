@@ -133,20 +133,25 @@ class Server {
         response.sendStatus(204);
     }
 
-    getPayload(event) {
-        let payload = {};
-        if (event.ue_pr !== undefined) {
-            payload = JSON.parse(event.ue_px);
-        } else if (event.ue_px !== undefined) {
-            payload = JSON.parse(base64.decode(event.ue_px));
-        } else if (event.se_ca !== undefined && event.se_ac !== undefined) {
-            payload = {
-                category: event.se_ca,
-                action: event.se_ac,
+    getPayload(data) {
+        return this.getUnstructuredPayload(data) || this.getStructuredPayload(data) || {};
+    }
+
+    getUnstructuredPayload(data) {
+        if (data.ue_pr !== undefined) {
+            return JSON.parse(data.ue_pr);
+        } else if (data.ue_px !== undefined) {
+            return JSON.parse(base64.decode(data.ue_px));
+        }
+    }
+
+    getStructuredPayload(data) {
+        if (data.se_ca !== undefined && data.se_ac !== undefined) {
+            return {
+                category: data.se_ca,
+                action: data.se_ac,
             };
         }
-
-        return payload;
     }
 
     captureEvents() {
