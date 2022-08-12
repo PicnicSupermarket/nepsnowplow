@@ -13,11 +13,19 @@ class Payload {
     }
 
     getSchemaName() {
-        return this.data.schema.split("/")[1];
+        if (this.data.schema !== undefined) {
+            return this.data.schema.split("/")[1];
+        } else if (this.data.action !== undefined) {
+            return this.data.action;
+        }
     }
 
     getSchemaVersion() {
-        return this.data.schema.split("/")[3];
+        if (this.data.schema !== undefined) {
+            return this.data.schema.split("/")[3];
+        }
+
+        return 'n/a'
     }
 
     getSchemaValidity() {

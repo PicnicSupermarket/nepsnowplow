@@ -119,11 +119,13 @@ class Server {
     handleEvent(request, response, schemas) {
         let body = request.body;
 
+        let that = this;
+
         let bundle = body.data.reverse();
         bundle.forEach(function (data) {
             let context = JSON.parse(base64.decode(data.cx));
 
-            let payload = this.getPayload(data);
+            let payload = that.getPayload(data);
 
             let event = new SnowplowEvent(data.uid, payload, context);
             event.validate(schemas);
