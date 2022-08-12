@@ -116,24 +116,43 @@ class Server {
         console.log("");
     }
 
+    handleEvent(request, response, schemas) {
+        let body = request.body;
+
+        let bundle = body.data.reverse();
+        bundle.forEach(function (data) {
+            let context = JSON.parse(base64.decode(data.cx));
+
+            let payload = this.getPayload(data);
+
+            let event = new SnowplowEvent(data.uid, payload, context);
+            event.validate(schemas);
+
+            appLogger.logEvent(event);
+        });
+        response.sendStatus(204);
+    }
+
+    getPayload(event) {
+        let payload = {};
+        if (event.ue_pr !== undefined) {
+            payload = JSON.parse(event.ue_px);
+        } else if (event.ue_px !== undefined) {
+            payload = JSON.parse(base64.decode(event.ue_px));
+        } else if (event.se_ca !== undefined && event.se_ac !== undefined) {
+            payload = {
+                category: event.se_ca,
+                action: event.se_ac,
+            };
+        }
+
+        return payload;
+    }
+
     captureEvents() {
         // Capturing every post event sent to this server
         let schemas = this.schemas;
-        this.instance.post("*", function (req, res) {
-            let body = req.body;
-
-            let bundle = body.data.reverse();
-            bundle.forEach(function (data) {
-                let context = JSON.parse(base64.decode(data.cx));
-                let payload = JSON.parse(base64.decode(data.ue_px));
-
-                let event = new SnowplowEvent(data.uid, payload, context);
-                event.validate(schemas);
-
-                appLogger.logEvent(event);
-            });
-            res.sendStatus(204);
-        });
+        this.instance.post("*", (req, res) => this.handleEvent(req, res, schemas));
     }
 }
 
