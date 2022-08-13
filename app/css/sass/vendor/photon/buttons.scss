@@ -76,10 +76,7 @@
 .btn-positive {
     border-color: darken($positive-color, 10%);
     border-bottom-color: darken($positive-color, 15%);
-    @include linear-gradient(
-        lighten($positive-color, 10%),
-        darken($positive-color, 10%)
-    );
+    @include linear-gradient(lighten($positive-color, 10%), darken($positive-color, 10%));
 
     &:active {
         @include linear-gradient($positive-color, darken($positive-color, 15%));
@@ -90,10 +87,7 @@
 .btn-negative {
     border-color: darken($negative-color, 10%);
     border-bottom-color: darken($negative-color, 15%);
-    @include linear-gradient(
-        lighten($negative-color, 10%),
-        darken($negative-color, 10%)
-    );
+    @include linear-gradient(lighten($negative-color, 10%), darken($negative-color, 10%));
 
     &:active {
         @include linear-gradient($negative-color, darken($negative-color, 15%));
@@ -104,10 +98,7 @@
 .btn-warning {
     border-color: darken($warning-color, 10%);
     border-bottom-color: darken($warning-color, 15%);
-    @include linear-gradient(
-        lighten($warning-color, 10%),
-        darken($warning-color, 10%)
-    );
+    @include linear-gradient(lighten($warning-color, 10%), darken($warning-color, 10%));
 
     &:active {
         @include linear-gradient($warning-color, darken($warning-color, 15%));

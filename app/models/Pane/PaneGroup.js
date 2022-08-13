@@ -11,7 +11,7 @@ class PaneGroup {
     show() {
         let tmpl = new Template({
             path: path.join(__dirname, "PaneGroup.hbs"),
-            parent: this.parent
+            parent: this.parent,
         });
         tmpl.render({}, () => {
             this.children.forEach((pane) => {

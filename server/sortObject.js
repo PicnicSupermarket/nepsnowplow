@@ -2,7 +2,7 @@ function sortObject(object) {
     var sortedObj = {},
         keys = Object.keys(object);
 
-    keys.sort(function(key1, key2) {
+    keys.sort(function (key1, key2) {
         key1 = key1.toLowerCase();
         key2 = key2.toLowerCase();
         if (key1 < key2) return -1;

@@ -79,7 +79,7 @@ class Server {
             let body = req.body;
 
             let bundle = body.data.reverse();
-            bundle.forEach(function(data) {
+            bundle.forEach(function (data) {
                 let context = JSON.parse(base64.decode(data.cx));
                 let payload = JSON.parse(base64.decode(data.ue_px));
 
