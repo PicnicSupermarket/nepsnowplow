@@ -148,12 +148,23 @@ class Server {
     }
 
     getStructuredPayload(data) {
-        if (data.se_ca !== undefined && data.se_ac !== undefined) {
-            return {
-                category: data.se_ca,
-                action: data.se_ac,
-            };
-        }
+        let payload = {};
+        let values = {
+            se_ca: "category",
+            se_ac: "action",
+            se_pr: "property",
+            se_la: "label",
+            se_va: "value",
+        };
+
+        Object.entries(values).forEach((entry) => {
+            const [key, value] = entry;
+            if (data.hasOwnProperty(key) && data[key] !== undefined) {
+                payload[value] = data[key];
+            }
+        });
+
+        return payload;
     }
 
     captureEvents() {
