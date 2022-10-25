@@ -1,7 +1,6 @@
-#!/usr/bin/node
 "use strict";
 
-const { remote } = require("electron");
+const remote = require("@electron/remote");
 const fs = require("fs");
 const express = require("express");
 const bodyParser = require("body-parser");

@@ -1,6 +1,7 @@
 "use strict";
 
-const { remote, ipcRenderer } = require("electron");
+const { ipcRenderer } = require("electron");
+const remote = require("@electron/remote");
 const os = require("os");
 const path = require("path");
 const network = require("network");
