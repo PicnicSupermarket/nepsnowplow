@@ -1,5 +1,5 @@
 "use strict";
-const { remote } = require("electron");
+const remote = require("@electron/remote");
 const filter = require("../../../server/filter");
 const Payload = require("./Payload");
 const Context = require("./Context");

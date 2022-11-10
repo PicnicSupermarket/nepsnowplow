@@ -1,5 +1,11 @@
 "use strict";
 
+try {
+    require("electron-reloader")(module);
+} catch (_) {}
+
+require("@electron/remote/main").initialize();
+
 const logger = require("electron-log");
 const { app, ipcMain, BrowserWindow, Menu } = require("electron");
 const { autoUpdater } = require("electron-updater");
@@ -120,11 +126,14 @@ function createMainWindow() {
         frame: !isWindows,
         webPreferences: {
             nodeIntegration: true,
+            contextIsolation: false,
         },
     });
 
     // and load the index.html of the app.
     mainWindow.loadFile(path.join(__dirname, "app", "index.html"));
+
+    require("@electron/remote/main").enable(mainWindow.webContents);
 
     let template = [
         {

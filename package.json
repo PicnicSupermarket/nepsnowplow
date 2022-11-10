@@ -25,7 +25,7 @@
         "postinstall": "yarn compile",
         "precommit": "pretty-quick --staged",
         "start": "electron .",
-        "test": "mocha",
+        "test": "yarn playwright test",
         "watch": "yarn compile --watch"
     },
     "main": "app.js",
@@ -69,19 +69,21 @@
         "releaseType": "draft"
     },
     "devDependencies": {
+        "@playwright/test": "^1.27.1",
         "chai": "*",
         "chai-as-promised": "^7.1.1",
         "chai-http": "^4.3.0",
-        "electron": "^9.3.0",
-        "electron-builder": "^22.8.0",
+        "electron": "^20.3.3",
+        "electron-builder": "^23.6.0",
+        "electron-reloader": "^1.2.3",
         "husky": "^4.3.0",
-        "mocha": "*",
+        "playwright": "^1.27.1",
         "prettier": "^2.1.1",
         "pretty-quick": "^3.0.0",
-        "sass": "^1.26.10",
-        "spectron": "^11.1.0"
+        "sass": "^1.26.10"
     },
     "dependencies": {
+        "@electron/remote": "^2.0.8",
         "ajv": "^6.12.4",
         "body-parser": "^1.19.0",
         "electron-log": "^4.2.4",
