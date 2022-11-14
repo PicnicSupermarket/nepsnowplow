@@ -33,6 +33,7 @@ class Event extends Payload {
         let tmpl = new Template(path.join(__dirname, "EventDetails.hbs"));
         let data = {
             schemaName: this.getSchemaName(),
+            validationStatus: this.getValidationStatus(),
             errors: this.errors,
             contexts: this.contexts.map((ctx) => ({
                 schemaName: ctx.getSchemaName(),

@@ -2,7 +2,7 @@
     <h3>Event</h3>
     <h4>{{schemaName}}</h4>
     {{#each errors}}
-        {{#if this.validationStatus eq="unknown"}}
+        {{#if ../validationStatus eq="unknown"}}
         <div class="warning_msg validity">
             <span class="icon icon-attention"></span>
             <strong>{{this}}</strong>
