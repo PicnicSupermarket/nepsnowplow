@@ -25,6 +25,7 @@ class SnowplowMicroServer {
         command.stderr.on("data", (data) => {
             const match = data.toString()?.match(/:(\d*).?/i);
             if (match && match[1]) {
+                console.log(`Snowplow Micro is running on port: ${match[1]}`);
                 this.port = match[1] ?? this.port;
             }
         });
@@ -49,6 +50,13 @@ class SnowplowMicroServer {
         return axios({
             method: "get",
             url: `http://localhost:${this.port}/micro/good`,
+        });
+    }
+
+    resetEvents() {
+        return axios({
+            method: "get",
+            url: `http://localhost:${this.port}/micro/reset`,
         });
     }
 }

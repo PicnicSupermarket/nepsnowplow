@@ -53,6 +53,7 @@ function enableToolbarButtonListeners() {
     document.getElementById("reset-button").addEventListener("click", () => {
         // remove events from memory
         ipcRenderer.send("clear-events");
+        server.resetEvents();
 
         // clear events from window
         const eventsContainer = document.getElementById("events-container");

@@ -25,6 +25,10 @@ class Server {
         return this.instance;
     }
 
+    resetEvents() {
+        this.snowplowMicroServer.resetEvents();
+    }
+
     getListeningPort() {
         return remote.getGlobal("options").listeningPort;
     }
