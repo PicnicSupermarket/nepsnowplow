@@ -5,7 +5,7 @@ class Payload {
     constructor(data) {
         this.data = data.obj;
         this.errors = data.errors;
-        this.isValid = data.isValid;
+        this.validationStatus = data.validationStatus;
     }
 
     getJson() {
@@ -20,13 +20,8 @@ class Payload {
         return this.data.schema.split("/")[3];
     }
 
-    getSchemaValidity() {
-        if (this.isValid === true) {
-            return "positive";
-        } else if (this.isValid === false) {
-            return "negative";
-        }
-        return "warning";
+    getValidationStatus() {
+        return this.validationStatus;
     }
 }
 

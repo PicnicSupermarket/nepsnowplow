@@ -43,6 +43,6 @@ node_modules
 bower_components
 example-components
 
-#
-schemas/*
-!schemas/*.md
+
+# Config
+snowplow_micro_config/*

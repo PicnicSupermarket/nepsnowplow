@@ -91,8 +91,6 @@ app.on("ready", function () {
 
 function loadOptions() {
     let defaults = {
-        showSchemaValidation: false,
-        schemaDir: "schemas/",
         listeningPort: 3000,
     };
     let userOptions = {};

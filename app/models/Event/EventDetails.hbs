@@ -2,7 +2,7 @@
     <h3>Event</h3>
     <h4>{{schemaName}}</h4>
     {{#each errors}}
-        {{#if this.isValid eq="warning"}}
+        {{#if ../validationStatus eq="unknown"}}
         <div class="warning_msg validity">
             <span class="icon icon-attention"></span>
             <strong>{{this}}</strong>
@@ -26,7 +26,7 @@
         <div class="event-context">
             <h4>{{this.schemaName}}</h4>
             {{#each this.errors}}
-                {{#if ../isValid eq="warning"}}
+                {{#if ../validationStatus eq="unknown"}}
                 <div class="warning_msg validity">
                     <span class="icon icon-attention"></span>
                     <strong>{{this}}</strong>
