@@ -30,25 +30,9 @@ For each event, NepSnowplow will list the event details and all associated conte
 information about Snowplow events, check out the docs on the [Snowplow Canonical Event
 Model][canonical-event-model].
 
-### Schemas
+### Validation using Snowplow Micro
 
-To validate events and contexts, you need to place their schemas in the `schemas` folder (or
-whichever folder you've [defined](#configure)). To get started, check out Snowplow's own set of
-schemas on [Iglu Central][iglu-central].
-
-Make sure each schema is a separate file with either no extension or `.json`. The recommended
-structure is `<vendor>/<event_or_context>/jsonschema/<schema_version>`. For example:
-
-```
-schemas
-└── com.snowplowanalytics.snowplow
-    ├── screen_view
-    │   └── jsonschema
-    │       └── 1-0-0
-    └── link_click
-        └── jsonschema
-            └── 1-0-0
-```
+TODO
 
 ## Configure
 
@@ -56,13 +40,11 @@ Options can be set in `settings.json`, the defaults are:
 
 ```js
 {
-  "showSchemaValidation": false, // whether to turn validation on or off on startup
-  "schemaDir": "schemas/",       // folder where Snowplow schemas are situated
   "listeningPort": 3000          // port NepSnowplow listens to
 }
 ```
 
-Depending on your operating system, the settings and schemas can be found in the following location:
+Depending on your operating system, the settings can be found in the following location:
 
 -   Windows:
     -   Installed version (exe): `C:\Users\<username>\AppData\Local\Programs\nepsnowplow\Resources`.
@@ -119,8 +101,6 @@ before pushing any commits.
 There are a few features that are on the roadmap to be developed so as to increase further
 usability:
 
--   [ ] Schema repository support: Sync schemas with a remote Iglu repository for event and context
-        validation.
 -   [ ] Multi-device support: create the ability to show events for a specific device.
 -   [ ] Tree-based event viewer: introduce the abiltiy to switch to a hierarchical tree based on
         event name.

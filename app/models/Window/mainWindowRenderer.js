@@ -65,20 +65,6 @@ function enableToolbarButtonListeners() {
             detailsContainer.removeChild(detailsContainer.firstChild);
         }
     });
-
-    document.getElementById("validation-toggle").addEventListener("click", (e) => {
-        let validationOn = !!remote.getGlobal("options").showSchemaValidation;
-
-        if (validationOn) {
-            // was previously on
-            e.currentTarget.classList.remove("active");
-            document.body.classList.remove("show-validation");
-        } else {
-            e.currentTarget.classList.add("active");
-            document.body.classList.add("show-validation");
-        }
-        remote.getGlobal("options").showSchemaValidation = !validationOn;
-    });
 }
 
 function enableWindowButtonListeners() {
@@ -138,7 +124,6 @@ function enableKeyListeners() {
 
 function renderHeader(target) {
     let isWindows = os.platform() === "win32";
-    let validationOn = !!remote.getGlobal("options").showSchemaValidation;
 
     let tmpl = new Template({
         path: path.join(__dirname, "HeaderToolbar.hbs"),
@@ -147,7 +132,7 @@ function renderHeader(target) {
     let data = {
         title: "NepSnowplow",
         isWindows: isWindows,
-        validationOn: validationOn,
+        validationOn: true,
     };
     tmpl.render(
         data,
@@ -162,9 +147,7 @@ function renderHeader(target) {
         false
     );
 
-    if (validationOn) {
-        document.body.classList.add("show-validation");
-    }
+    document.body.classList.add("show-validation");
 }
 
 function renderMain(target) {

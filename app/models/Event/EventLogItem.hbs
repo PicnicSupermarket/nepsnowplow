@@ -2,9 +2,9 @@
     <div class="media-body">
         <p>
             <strong>
-                {{#if isValid eq="positive"}}
+                {{#if validationStatus eq="valid"}}
                 <span class="validity icon icon-check icon-color-positive"></span>
-                {{else if isValid eq='negative'}}
+                {{else if validationStatus eq="invalid"}}
                 <span class="validity icon icon-cancel icon-color-negative"></span>
                 {{else}}
                 <span class="validity icon icon-attention icon-color-warning"></span>
@@ -15,9 +15,9 @@
         </p>
         {{#each contexts}}
         <p>
-            {{#if this.isValid eq="positive"}}
+            {{#if validationStatus eq="valid"}}
             <span class="validity icon icon-check icon-color-positive"></span>
-            {{else if this.isValid eq='negative'}}
+            {{else if validationStatus eq="invalid"}}
             <span class="validity icon icon-cancel icon-color-negative"></span>
             {{else}}
             <span class="validity icon icon-attention icon-color-warning"></span>

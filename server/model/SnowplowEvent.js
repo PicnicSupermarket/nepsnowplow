@@ -10,20 +10,36 @@ class SnowplowEvent {
         });
     }
 
-    validate(schemas) {
-        function validateSnowplowObject(obj, schemas) {
-            try {
-                obj.validate(schemas[obj.get().schema.replace("iglu:", "")]);
-            } catch (err) {
-                console.log("Unable to validate Snowplow Object", obj, "using schemas", schemas);
-                console.log(err);
-            }
-        }
+    setValidationResult(badEvent, goodEvent) {
+        const error =
+            badEvent && badEvent.errors && badEvent.errors[1] && JSON.parse(badEvent.errors[1]);
 
-        validateSnowplowObject(this.payload, schemas);
-        this.contexts.forEach((ctx) => {
-            validateSnowplowObject(ctx, schemas);
-        });
+        const messages = error?.data?.failure?.messages ?? [];
+        const errorMap = messages.reduce((prev, current) => {
+            switch (current.error.error) {
+                case "ResolutionError":
+                    return { ...prev, [current.schemaKey]: ["Unable to resolve schema"] };
+                default:
+                    const validationMessages = current?.error?.dataReports.map(
+                        (report) => report.message
+                    );
+                    return { ...prev, [current.schemaKey]: validationMessages };
+            }
+        }, {});
+
+        const updateSnowplowItemValidation = (item) => {
+            const schema = item.obj.schema;
+            if (!goodEvent && !badEvent) {
+                item.updateValidation("unknown", ["Snowplow Micro is not running"]);
+            } else if (schema in errorMap) {
+                item.updateValidation("invalid", errorMap[schema]);
+            } else {
+                item.updateValidation("valid", undefined);
+            }
+        };
+
+        updateSnowplowItemValidation(this.payload);
+        this.contexts.forEach(updateSnowplowItemValidation);
     }
 
     toString() {

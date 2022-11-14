@@ -1,15 +1,9 @@
 "use strict";
-const Validator = require("z-schema");
-
-const validator = new Validator({
-    ignoreUnresolvableReferences: true,
-    breakOnFirstError: false,
-});
 
 class ValidatedSnowplowObject {
     constructor(obj) {
         this.obj = obj;
-        this.isValid = undefined;
+        this.validationStatus = undefined;
         this.errors = undefined;
     }
 
@@ -17,26 +11,17 @@ class ValidatedSnowplowObject {
         return this.obj;
     }
 
-    isValid() {
-        return this.isValid;
+    getValidationStatus() {
+        return this.validationStatus;
     }
 
     getErrors() {
         return this.errors;
     }
 
-    validate(validationSchema) {
-        if (typeof validationSchema !== "undefined") {
-            // Allow events with no validation schemas
-            let validationResult = validator.validate(this.obj.data, validationSchema.getSchema());
-            this.errors = (validator.getLastErrors() || []).map(function (obj) {
-                return obj.message;
-            });
-            this.isValid = validationResult;
-        } else {
-            this.isValid = undefined;
-            this.errors = ["Unknown schema"];
-        }
+    updateValidation(validationStatus, errors) {
+        this.validationStatus = validationStatus;
+        this.errors = validationStatus === "valid" ? undefined : errors;
     }
 
     toString() {

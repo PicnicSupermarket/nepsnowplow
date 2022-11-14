@@ -36,7 +36,7 @@ class Event extends Payload {
             errors: this.errors,
             contexts: this.contexts.map((ctx) => ({
                 schemaName: ctx.getSchemaName(),
-                isValid: ctx.getSchemaValidity(),
+                validationStatus: ctx.getValidationStatus(),
                 errors: ctx.errors,
             })),
         };
@@ -62,11 +62,11 @@ class Event extends Payload {
             index: this.index,
             schemaName: this.getSchemaName(),
             schemaVersion: this.getSchemaVersion(),
-            isValid: this.getSchemaValidity(),
+            validationStatus: this.getValidationStatus(),
             contexts: this.contexts.map((ctx) => ({
                 schemaName: ctx.getSchemaName(),
                 schemaVersion: ctx.getSchemaVersion(),
-                isValid: ctx.getSchemaValidity(),
+                validationStatus: ctx.getValidationStatus(),
             })),
         };
 
