@@ -69,48 +69,80 @@ class Server {
         console.log("");
     }
 
+    async handleEvent(request, response) {
+        const body = request.body;
+        const bundle = body.data.reverse();
+
+        var badEvents = [];
+        var goodEvents = [];
+
+        try {
+            await this.snowplowMicroServer.validateEvent(body);
+            const [badEventResponse, goodEventResponse] = await Promise.all([
+                this.snowplowMicroServer.retrieveBadEvents(),
+                this.snowplowMicroServer.retrieveGoodEvents(),
+            ]);
+
+            badEvents = badEventResponse.data;
+            goodEvents = goodEventResponse.data;
+        } catch (error) {
+            console.error(error);
+        }
+
+        const that = this;
+        bundle.forEach(function (data) {
+            const context = JSON.parse(base64.decode(data.cx));
+
+            const payload = that.getPayload(data);
+
+            const event = new SnowplowEvent(data.uid, payload, context);
+
+            const badEvent = badEvents.find((e) => e.rawEvent.parameters.eid === data.eid);
+            const goodEvent = goodEvents.find((e) => e.rawEvent.parameters.eid === data.eid);
+
+            event.setValidationResult(badEvent, goodEvent);
+
+            appLogger.logEvent(event);
+        });
+        response.sendStatus(204);
+    }
+
+    getPayload(data) {
+        return this.getUnstructuredPayload(data) || this.getStructuredPayload(data) || {};
+    }
+
+    getUnstructuredPayload(data) {
+        if (data.ue_pr !== undefined) {
+            return JSON.parse(data.ue_pr);
+        } else if (data.ue_px !== undefined) {
+            return JSON.parse(base64.decode(data.ue_px));
+        }
+    }
+
+    getStructuredPayload(data) {
+        let payload = {};
+        let values = {
+            se_ca: "category",
+            se_ac: "action",
+            se_pr: "property",
+            se_la: "label",
+            se_va: "value",
+        };
+
+        Object.entries(values).forEach((entry) => {
+            const [key, value] = entry;
+            if (data.hasOwnProperty(key) && data[key] !== undefined) {
+                payload[value] = data[key];
+            }
+        });
+
+        return payload;
+    }
+
     captureEvents() {
         // Capturing every post event sent to this server
-        const snowplowMicroServer = this.snowplowMicroServer;
-        this.instance.post("*", async function (req, res) {
-            var badEvents = [];
-            var goodEvents = [];
-
-            try {
-                await snowplowMicroServer.validateEvent(req.body);
-                const [badEventResponse, goodEventResponse] = await Promise.all([
-                    snowplowMicroServer.retrieveBadEvents(),
-                    snowplowMicroServer.retrieveGoodEvents(),
-                ]);
-
-                badEvents = badEventResponse.data;
-                goodEvents = goodEventResponse.data;
-            } catch {}
-
-            let body = req.body;
-
-            let bundle = body.data.reverse();
-            bundle.forEach(function (data) {
-                const context = JSON.parse(base64.decode(data.cx));
-                const payload = JSON.parse(base64.decode(data.ue_px));
-
-                const event = new SnowplowEvent(data.uid, payload, context);
-
-                const badEvent = badEvents.find(
-                    (event) => event.rawEvent.parameters.eid === data.eid
-                );
-
-                const goodEvent = goodEvents.find(
-                    (event) => event.rawEvent.parameters.eid === data.eid
-                );
-
-                event.setValidationResult(badEvent, goodEvent);
-
-                appLogger.logEvent(event);
-            });
-
-            res.sendStatus(204);
-        });
+        let schemas = this.schemas;
+        this.instance.post("*", (req, res) => this.handleEvent(req, res, schemas));
     }
 }
 
