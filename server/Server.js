@@ -1,33 +1,32 @@
 "use strict";
 
 const remote = require("@electron/remote");
-const fs = require("fs");
 const express = require("express");
 const bodyParser = require("body-parser");
-const path = require("path");
-const jsonfile = require("jsonfile");
 
 const base64 = require("./base64");
 const SnowplowEvent = require("./model/SnowplowEvent");
-const ValidationSchema = require("./model/ValidationSchema");
 const appLogger = require("./appLogger");
+const SnowplowMicroServer = require("./SnowplowMicroServer");
 
 class Server {
     constructor() {
-        this.schemas = {};
-        this.schemaDir = remote.getGlobal("options").schemaDir;
-
+        this.snowplowMicroServer = new SnowplowMicroServer(remote.app.getAppPath());
         this.instance = express();
         this.instance.use(bodyParser.json()); // to parse application/json
         this.instance.use(bodyParser.urlencoded({ extended: true })); // to parse application/x-www-form-urlencoded
     }
 
     start() {
-        this.readSchemas();
+        this.snowplowMicroServer.start();
         this.captureEvents();
         this.listen(remote.getGlobal("options").listeningPort);
 
         return this.instance;
+    }
+
+    resetEvents() {
+        this.snowplowMicroServer.resetEvents();
     }
 
     getListeningPort() {
@@ -42,51 +41,6 @@ class Server {
         return this.instance;
     }
 
-    readSchemas() {
-        if (!!this.schemaDir) {
-            // in production, remove app.asar from the path
-            // cannot use process.resourcesPath in development,
-            // as that will point to electron/dist in node_modules
-            let resourcesPath = remote.app.getAppPath().replace("app.asar", "");
-            this.readSchema(path.join(resourcesPath, this.schemaDir));
-        }
-    }
-
-    readSchema(file) {
-        let stats;
-        try {
-            stats = fs.lstatSync(file);
-        } catch (err) {
-            // catch in case the file or directory could not be resolved,
-            // when e.g. somebody deleted the schemas folder
-            console.log(err);
-            return;
-        }
-
-        if (stats.isFile() && (path.extname(file) === "" || path.extname(file) === ".json")) {
-            // only accept .json or no extension
-            try {
-                let schema = jsonfile.readFileSync(file);
-                let schemaName = [
-                    schema.self.vendor,
-                    schema.self.name,
-                    schema.self.format,
-                    schema.self.version,
-                ].join("/");
-                this.schemas[schemaName] = new ValidationSchema(schemaName, schema);
-            } catch (err) {
-                // catch non-valid JSON schemas
-                console.log(file);
-                console.log(err);
-            }
-        } else if (stats.isDirectory(file)) {
-            let files = fs.readdirSync(file);
-            files.forEach((f) => {
-                this.readSchema(path.join(file, f));
-            }, this);
-        }
-    }
-
     listen(proposedPort) {
         let server = this;
         let listener = this.instance
@@ -96,7 +50,7 @@ class Server {
                 this.handleStartup(actualPort);
             })
             .on("error", (err) => {
-                if (err.errno === "EADDRINUSE") {
+                if (err.code === "EADDRINUSE") {
                     console.log(`Port ${proposedPort} in use, using random available port`);
                     server.listen(0);
                 } else {
@@ -107,7 +61,7 @@ class Server {
 
     handleStartup(port) {
         this.instance.emit("ready", port);
-        console.log("Listening for SnowPlow analytics on port " + port);
+        console.log("Listening for Snowplow analytics on port " + port);
         console.log("Please check that both of your devices are on the same network");
         console.log(
             "________________________________________________________________________________"
@@ -117,20 +71,44 @@ class Server {
 
     captureEvents() {
         // Capturing every post event sent to this server
-        let schemas = this.schemas;
-        this.instance.post("*", function (req, res) {
+        const snowplowMicroServer = this.snowplowMicroServer;
+        this.instance.post("*", async function (req, res) {
+            var badEvents = [];
+            var goodEvents = [];
+
+            try {
+                await snowplowMicroServer.validateEvent(req.body);
+                const [badEventResponse, goodEventResponse] = await Promise.all([
+                    snowplowMicroServer.retrieveBadEvents(),
+                    snowplowMicroServer.retrieveGoodEvents(),
+                ]);
+
+                badEvents = badEventResponse.data;
+                goodEvents = goodEventResponse.data;
+            } catch {}
+
             let body = req.body;
 
             let bundle = body.data.reverse();
             bundle.forEach(function (data) {
-                let context = JSON.parse(base64.decode(data.cx));
-                let payload = JSON.parse(base64.decode(data.ue_px));
+                const context = JSON.parse(base64.decode(data.cx));
+                const payload = JSON.parse(base64.decode(data.ue_px));
 
-                let event = new SnowplowEvent(data.uid, payload, context);
-                event.validate(schemas);
+                const event = new SnowplowEvent(data.uid, payload, context);
+
+                const badEvent = badEvents.find(
+                    (event) => event.rawEvent.parameters.eid === data.eid
+                );
+
+                const goodEvent = goodEvents.find(
+                    (event) => event.rawEvent.parameters.eid === data.eid
+                );
+
+                event.setValidationResult(badEvent, goodEvent);
 
                 appLogger.logEvent(event);
             });
+
             res.sendStatus(204);
         });
     }
