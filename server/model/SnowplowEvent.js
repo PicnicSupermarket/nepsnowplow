@@ -30,7 +30,7 @@ class SnowplowEvent {
         const updateSnowplowItemValidation = (item) => {
             const schema = item.obj.schema;
             if (!goodEvent && !badEvent) {
-                item.updateValidation("unknown", ["Snowplow Micro is not running"]);
+                item.updateValidation("unknown", ["Event not validated using Snowplow Micro"]);
             } else if (schema in errorMap) {
                 item.updateValidation("invalid", errorMap[schema]);
             } else {
