@@ -133,7 +133,6 @@ function renderHeader(target) {
     let data = {
         title: "NepSnowplow",
         isWindows: isWindows,
-        validationOn: true,
     };
     tmpl.render(
         data,
