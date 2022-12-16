@@ -1,62 +1,62 @@
 "use strict";
 const remote = require("@electron/remote");
+const { debounce } = require("./utils");
+var filterQuery = "",
+    filterValidEvents = false;
 
-var filterTimer,
-    filterState = false;
+var update = debounce(filterItems, 50);
 
-function filterItems(items, value) {
-    if (typeof value === "undefined") {
-        value = document.getElementById("filter-events").value;
-    }
-    if (value === "") {
-        clearFilter();
-    }
-    // we're filtering case insensitive
-    value = value.toLowerCase();
+function filterItems() {
+    const eventItems = document.querySelectorAll("#events-container .list-group-item");
+    const events = remote.getGlobal("trackedEvents");
 
-    let events = remote.getGlobal("trackedEvents");
-    Array.from(items).forEach((eventEl) => {
-        let index = eventEl.id.substring("events-".length - 1);
-        let event = events[index];
-        let match = !filterState; // when not filtering, assume matched
+    Array.from(eventItems).forEach((eventEl) => {
+        const index = eventEl.id.substring("events-".length - 1);
+        const event = events[index];
+        var match = !filterQuery; // when not filtering, assume matched
 
         // match events through the order of importance:
         // 1. event schema name
         // 2. context schema names
         // 3. event and context payload data
         try {
-            match = match || contains(getSchemaName(event.payload), value);
+            match = match || contains(getSchemaName(event.payload), filterQuery);
             for (let i = event.contexts.length - 1; !match && i >= 0; i--) {
-                match = match || contains(getSchemaName(event.contexts[i]), value);
+                match = match || contains(getSchemaName(event.contexts[i]), filterQuery);
             }
             if (!match) {
                 // check contents of both event as well as the contexts
-                let payloads = [event.payload].concat(event.contexts);
+                const payloads = [event.payload].concat(event.contexts);
                 for (let j = payloads.length - 1; !match && j >= 0; j--) {
-                    let payload = payloads[j].obj.data;
+                    const payload = payloads[j].obj.data;
                     for (let prop in payload) {
-                        if (payload.hasOwnProperty(prop) && contains(payload[prop], value)) {
+                        if (payload.hasOwnProperty(prop) && contains(payload[prop], filterQuery)) {
                             match = true;
                             break;
                         }
                     }
                 }
             }
-            eventEl.style.display = match ? "" : "none";
+
+            if (filterValidEvents) {
+                match = match && !event.isValid;
+            }
+
+            eventEl.style.display = match ? "block" : "none";
         } catch (err) {
             console.log(err);
         }
     });
-    highlight(value);
+    highlight(filterQuery);
 }
 
 function getSchemaName(event) {
-    return event.obj.schema.split("/")[1];
+    return event.obj.schema?.split("/")[1];
 }
 
 function contains(haystack, needle) {
     try {
-        return haystack.toString().toLowerCase().indexOf(needle) > -1;
+        return haystack?.toString().toLowerCase().indexOf(needle) > -1;
     } catch (err) {
         console.log("Unable to parse haystack, assume needle", needle, "not in haystack", haystack);
         console.log(err);
@@ -64,34 +64,19 @@ function contains(haystack, needle) {
     }
 }
 
-function filterEvents(value, key) {
-    // go easy on the processing when user types fast,
-    // only execute 100ms after last keyup
-    clearTimeout(filterTimer);
-
-    if (value === "" || typeof value === "undefined") {
-        clearFilter();
-    } else {
-        filterState = true;
-        filterTimer = setTimeout(function () {
-            let eventItems = document.querySelectorAll("#events-container .list-group-item");
-
-            // when not tapping backspace,
-            // we can narrow the search
-            if (key !== "Backspace") {
-                // faster than Array.from()
-                eventItems = Array.prototype.slice
-                    .call(eventItems)
-                    .filter((item) => item.style.display === "");
-            }
-            filterItems(eventItems, value);
-        }, 100);
-    }
+function setFilterValidEvents(filterEvents) {
+    filterValidEvents = filterEvents;
+    update();
 }
 
-function clearFilter() {
-    filterState = false;
-    highlight("");
+function setSearchQuery(query) {
+    filterQuery = query.toLowerCase();
+    update();
+}
+
+function clearSearchQuery() {
+    filterQuery = "";
+    update();
 }
 
 function highlight(value) {
@@ -103,8 +88,8 @@ function highlight(value) {
 }
 
 module.exports = {
-    filterItems: filterItems,
-    filterEvents: filterEvents,
-    highlight: highlight,
-    clearFilter: clearFilter,
+    update: update,
+    setSearchQuery: setSearchQuery,
+    setFilterValidEvents: setFilterValidEvents,
+    clearSearchQuery: clearSearchQuery,
 };

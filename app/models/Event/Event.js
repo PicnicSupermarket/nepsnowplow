@@ -52,8 +52,6 @@ class Event extends Payload {
             this.contexts.forEach((ctx, idx) => {
                 contexts[idx].appendChild(ctx.getJson());
             });
-
-            filter.highlight(document.getElementById("filter-events").value);
         });
     }
 
@@ -84,7 +82,7 @@ class Event extends Payload {
             // event items are hidden by default
             // if filter is set and events match the filter,
             // below will unhide the generated element
-            filter.filterItems(document.querySelectorAll("#event-" + this.index));
+            filter.update();
         });
     }
 }
