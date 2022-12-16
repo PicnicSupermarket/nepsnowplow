@@ -15,6 +15,9 @@
             <button class="btn btn-default" id="reset-button" title="Remove all events">
                 <span class="icon icon-trash"></span>
             </button>
+            <button class="btn btn-default {{#if filterValidEvents}}active{{/if}}" id="validation-filter" title="Filter valid events">
+                <span class="icon icon-cancel-circled"></span>
+            </button>
         </div>
         <div class="filter pull-right">
             <span class="icon icon-search"></span>

@@ -40,6 +40,7 @@ class SnowplowEvent {
 
         updateSnowplowItemValidation(this.payload);
         this.contexts.forEach(updateSnowplowItemValidation);
+        this.isValid = this.isValidEvent();
     }
 
     toString() {
@@ -48,6 +49,13 @@ class SnowplowEvent {
 
     getSchemaName() {
         return this.payload.getSchemaName();
+    }
+
+    isValidEvent() {
+        return (
+            this.payload.getValidationStatus() === "valid" &&
+            this.contexts.every((ctx) => ctx.getValidationStatus() === "valid")
+        );
     }
 }
 
