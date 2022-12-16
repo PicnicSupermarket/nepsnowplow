@@ -23,7 +23,7 @@ class SnowplowMicroServer {
 
         // Figure out on which port Snowplow Micro is running
         command.stderr.on("data", (data) => {
-            const match = data.toString()?.match(/:(\d*).?/i);
+            const match = data.toString()?.match(/.*:(\d*).?/i);
             if (match && match[1]) {
                 console.log(`Snowplow Micro is running on port: ${match[1]}`);
                 this.port = match[1] ?? this.port;
