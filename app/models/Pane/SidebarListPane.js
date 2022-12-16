@@ -31,14 +31,6 @@ class SidebarListPane {
                     markInst.mark(value, {
                         separateWordSearch: false,
                     });
-                } else {
-                    let eventItems = document.querySelectorAll(
-                        "#events-container .list-group-item"
-                    );
-
-                    eventItems.forEach((eventEl) => {
-                        eventEl.style.display = "";
-                    });
                 }
             },
         });

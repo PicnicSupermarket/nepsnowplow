@@ -32,20 +32,20 @@ function enableSearchListener() {
     filterEventsInput.addEventListener("keyup", (e) => {
         let value = e.target.value;
         if (e.key === "Escape") {
-            filter.clearFilter();
+            filter.clearSearchQuery();
             e.currentTarget.blur();
         } else if (e.key === "Enter") {
             e.preventDefault();
             e.currentTarget.blur();
         } else {
-            filter.filterEvents(value, e.key);
+            filter.setSearchQuery(value);
         }
     });
 
     clearFilterButton.addEventListener("click", (e) => {
         e.currentTarget.classList.remove("icon-cancel-circled", "clickable");
         filterEventsInput.value = "";
-        filter.clearFilter();
+        filter.clearSearchQuery();
     });
 }
 
@@ -65,6 +65,19 @@ function enableToolbarButtonListeners() {
         while (detailsContainer.firstChild) {
             detailsContainer.removeChild(detailsContainer.firstChild);
         }
+    });
+
+    document.getElementById("validation-filter").addEventListener("click", (e) => {
+        const filterValidEvents = !remote.getGlobal("options").filterValidEvents ?? true;
+
+        if (filterValidEvents) {
+            e.currentTarget.classList.add("active");
+        } else {
+            e.currentTarget.classList.remove("active");
+        }
+
+        remote.getGlobal("options").filterValidEvents = filterValidEvents;
+        filter.setFilterValidEvents(filterValidEvents);
     });
 }
 
@@ -124,15 +137,17 @@ function enableKeyListeners() {
 }
 
 function renderHeader(target) {
-    let isWindows = os.platform() === "win32";
+    const isWindows = os.platform() === "win32";
+    const filterValidEvents = !!remote.getGlobal("options").filterValidEvents;
 
-    let tmpl = new Template({
+    const tmpl = new Template({
         path: path.join(__dirname, "HeaderToolbar.hbs"),
         parent: target,
     });
-    let data = {
+    const data = {
         title: "NepSnowplow",
         isWindows: isWindows,
+        filterValidEvents: filterValidEvents,
     };
     tmpl.render(
         data,

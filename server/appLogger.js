@@ -8,7 +8,7 @@ renderjson.set_show_to_level("all");
 renderjson.set_icons("+", "-");
 
 function displayEvent(event, index) {
-    let eventItem = new Event(event, index);
+    const eventItem = new Event(event, index);
     eventItem.logItem();
 }
 
@@ -19,10 +19,11 @@ function displayEvents(events) {
 }
 
 function logEvent(event) {
-    let ipcRenderer = require("electron").ipcRenderer;
+    const ipcRenderer = require("electron").ipcRenderer;
     ipcRenderer.send("add-event", event);
 
-    let index = remote.getGlobal("trackedEvents").length - 1;
+    const index = remote.getGlobal("trackedEvents").length - 1;
+
     displayEvent(event, index);
 }
 
