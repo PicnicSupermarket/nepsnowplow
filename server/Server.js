@@ -97,8 +97,8 @@ class Server {
 
             const event = new SnowplowEvent(data.uid, payload, context);
 
-            const badEvent = badEvents.find((e) => e.rawEvent.parameters.eid === data.eid);
-            const goodEvent = goodEvents.find((e) => e.rawEvent.parameters.eid === data.eid);
+            const badEvent = badEvents.find((e) => e.rawEvent?.parameters.eid === data.eid);
+            const goodEvent = goodEvents.find((e) => e.rawEvent?.parameters.eid === data.eid);
 
             event.setValidationResult(badEvent, goodEvent);
 
