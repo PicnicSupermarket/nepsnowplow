@@ -32,7 +32,10 @@ Model][canonical-event-model].
 
 ### Validation using Snowplow Micro
 
-TODO
+To validate events using Snowplow Micro, please make sure to add the required configuration files
+(`micro.conf` and `iglu.json`) in the `snowplow_micro_config/` folder. For more info about the
+Snowplow Micro configuration, see:
+https://github.com/snowplow-incubator/snowplow-micro#configuring-micro
 
 ## Configure
 
