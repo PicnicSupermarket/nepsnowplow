@@ -52,20 +52,27 @@
         ],
         "artifactName": "${name}-${version}-${os}.${ext}",
         "win": {
+            "extraResources": [
+                {
+                    "from": "jre/win32_${arch}",
+                    "to": "jre/win32_${arch}"
+                }
+            ],
             "target": [
-                "zip",
-                "nsis"
+                {
+                    "target": "portable",
+                    "arch": [
+                        "x64"
+                    ]
+                }
             ]
-        },
-        "linux": {
-            "target": "tar.gz"
         },
         "mac": {
             "category": "public.app-category.developer-tools",
             "extraResources": [
                 {
-                    "from": "jre/${platform}_${arch}",
-                    "to": "jre/${platform}_${arch}"
+                    "from": "jre/darwin_${arch}",
+                    "to": "jre/darwin_${arch}"
                 }
             ],
             "target": [
