@@ -1,3 +1,4 @@
+const os = require("os");
 const axios = require("axios");
 const path = require("path");
 const { spawn } = require("child_process");
@@ -10,9 +11,10 @@ class SnowplowMicroServer {
     start() {
         const appPath = this.appPath.replace("app.asar", "");
         const jarPath = path.join(appPath, "jars", "snowplow-micro-1.3.4.jar");
+        const jrePath = path.join(appPath, `jre/${os.platform()}_${os.arch()}/bin/java`);
         const microConfPath = path.join(appPath, "snowplow_micro_config", "micro.conf");
         const igluPath = path.join(appPath, "snowplow_micro_config", "iglu.json");
-        const command = spawn("java", [
+        const command = spawn(jrePath, [
             "-jar",
             jarPath,
             "--collector-config",

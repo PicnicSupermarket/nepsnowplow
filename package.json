@@ -22,7 +22,8 @@
         "build": "electron-builder",
         "compile": "sass app/css/sass/app.scss app/css/app.css",
         "package": "electron-builder --dir",
-        "postinstall": "yarn compile",
+        "postinstall": "yarn compile && yarn unzip",
+        "unzip": "(cd jre ; unzip -o -qq \\*.zip)",
         "precommit": "pretty-quick --staged",
         "start": "electron .",
         "test": "yarn playwright test",
@@ -35,6 +36,9 @@
         "copyright": "Copyright © 2017-2018 Picnic Technologies BV",
         "directories": {
             "output": "dist"
+        },
+        "dmg": {
+            "writeUpdateInfo": false
         },
         "files": [
             "app.js",
@@ -58,9 +62,20 @@
         },
         "mac": {
             "category": "public.app-category.developer-tools",
+            "extraResources": [
+                {
+                    "from": "jre/${platform}_${arch}",
+                    "to": "jre/${platform}_${arch}"
+                }
+            ],
             "target": [
-                "tar.gz",
-                "dmg"
+                {
+                    "target": "dmg",
+                    "arch": [
+                        "x64",
+                        "arm64"
+                    ]
+                }
             ]
         }
     },

@@ -42,7 +42,7 @@ dist
 node_modules
 bower_components
 example-components
-
+jre
 
 # Config
 snowplow_micro_config/*
