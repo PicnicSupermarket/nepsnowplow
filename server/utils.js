@@ -1,11 +1,12 @@
 function debounce(func, wait, immediate) {
-    var timeout;
+    let timeout;
 
     return function executedFunction() {
         const context = this;
+        // eslint-disable-next-line prefer-rest-params
         const args = arguments;
 
-        const later = function () {
+        const later = () => {
             timeout = null;
             if (!immediate) func.apply(context, args);
         };
@@ -17,6 +18,19 @@ function debounce(func, wait, immediate) {
     };
 }
 
+class Logger {
+    static info(message) {
+        // eslint-disable-next-line no-console
+        console.log(message);
+    }
+
+    static error(message) {
+        // eslint-disable-next-line no-console
+        console.error(message);
+    }
+}
+
 module.exports = {
-    debounce: debounce,
+    debounce,
+    Logger,
 };

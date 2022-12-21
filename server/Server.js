@@ -1,5 +1,3 @@
-"use strict";
-
 const remote = require("@electron/remote");
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -8,6 +6,7 @@ const base64 = require("./base64");
 const SnowplowEvent = require("./model/SnowplowEvent");
 const appLogger = require("./appLogger");
 const SnowplowMicroServer = require("./SnowplowMicroServer");
+const { Logger } = require("./utils");
 
 class Server {
     constructor() {
@@ -42,39 +41,39 @@ class Server {
     }
 
     listen(proposedPort) {
-        let server = this;
-        let listener = this.instance
+        const server = this;
+        const listener = this.instance
             .listen(proposedPort, () => {
-                let actualPort = listener.address().port;
+                const actualPort = listener.address().port;
                 this.setListeningPort(actualPort);
                 this.handleStartup(actualPort);
             })
             .on("error", (err) => {
                 if (err.code === "EADDRINUSE") {
-                    console.log(`Port ${proposedPort} in use, using random available port`);
+                    Logger.info(`Port ${proposedPort} in use, using random available port`);
                     server.listen(0);
                 } else {
-                    console.log(err);
+                    Logger.info(err);
                 }
             });
     }
 
     handleStartup(port) {
         this.instance.emit("ready", port);
-        console.log("Listening for Snowplow analytics on port " + port);
-        console.log("Please check that both of your devices are on the same network");
-        console.log(
+        Logger.info(`Listening for Snowplow analytics on port ${port}`);
+        Logger.info("Please check that both of your devices are on the same network");
+        Logger.info(
             "________________________________________________________________________________"
         );
-        console.log("");
+        Logger.info("");
     }
 
     async handleEvent(request, response) {
-        const body = request.body;
+        const { body } = request;
         const bundle = body.data.reverse();
 
-        var badEvents = [];
-        var goodEvents = [];
+        let badEvents = [];
+        let goodEvents = [];
 
         try {
             await this.snowplowMicroServer.validateEvent(body);
@@ -86,11 +85,11 @@ class Server {
             badEvents = badEventResponse.data;
             goodEvents = goodEventResponse.data;
         } catch (error) {
-            console.error(error);
+            Logger.error(error);
         }
 
         const that = this;
-        bundle.forEach(function (data) {
+        bundle.forEach((data) => {
             const context = JSON.parse(base64.decode(data.cx));
 
             const payload = that.getPayload(data);
@@ -114,14 +113,16 @@ class Server {
     getUnstructuredPayload(data) {
         if (data.ue_pr !== undefined) {
             return JSON.parse(data.ue_pr);
-        } else if (data.ue_px !== undefined) {
+        }
+        if (data.ue_px !== undefined) {
             return JSON.parse(base64.decode(data.ue_px));
         }
+        return undefined;
     }
 
     getStructuredPayload(data) {
-        let payload = {};
-        let values = {
+        const payload = {};
+        const values = {
             se_ca: "category",
             se_ac: "action",
             se_pr: "property",
@@ -131,7 +132,7 @@ class Server {
 
         Object.entries(values).forEach((entry) => {
             const [key, value] = entry;
-            if (data.hasOwnProperty(key) && data[key] !== undefined) {
+            if (Object.prototype.hasOwnProperty.call(data, key) && data[key] !== undefined) {
                 payload[value] = data[key];
             }
         });
@@ -141,7 +142,7 @@ class Server {
 
     captureEvents() {
         // Capturing every post event sent to this server
-        let schemas = this.schemas;
+        const { schemas } = this;
         this.instance.post("*", (req, res) => this.handleEvent(req, res, schemas));
     }
 }

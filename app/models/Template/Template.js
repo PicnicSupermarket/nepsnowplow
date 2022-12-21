@@ -1,9 +1,8 @@
-"use strict";
 const fs = require("fs");
 const path = require("path");
 const Handlebars = require("./Handlebars");
 
-let compiledTemplates = {};
+const compiledTemplates = {};
 
 class Template {
     constructor(options) {
@@ -21,7 +20,7 @@ class Template {
         if (this.path in compiledTemplates) {
             template = compiledTemplates[this.path];
         } else {
-            let tmpl = fs.readFileSync(this.path, "utf-8");
+            const tmpl = fs.readFileSync(this.path, "utf-8");
             template = Handlebars.compile(tmpl.toString());
         }
         this.readFileCallback(template, data, callback);
@@ -30,9 +29,9 @@ class Template {
     readFileCallback(compiledTemplate, data, callback) {
         compiledTemplates[this.path] = compiledTemplate;
 
-        let html = compiledTemplate(data);
+        const html = compiledTemplate(data);
         if (typeof this.parent !== "undefined") {
-            let item = document.createElement("item");
+            const item = document.createElement("item");
             this.parent.appendChild(item);
             item.outerHTML = html;
         }

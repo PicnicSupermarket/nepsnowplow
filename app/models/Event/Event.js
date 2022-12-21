@@ -1,18 +1,15 @@
-"use strict";
 const remote = require("@electron/remote");
+const path = require("path");
 const filter = require("../../../server/filter");
 const Payload = require("./Payload");
 const Context = require("./Context");
 const { Template } = require("../Template");
-const path = require("path");
 
 class Event extends Payload {
     constructor(data, index) {
         super(data.payload);
 
-        this.contexts = data.contexts.map((ctx) => {
-            return new Context(ctx);
-        });
+        this.contexts = data.contexts.map((ctx) => new Context(ctx));
 
         this.index = index;
         if (typeof index === "undefined") {
@@ -30,8 +27,8 @@ class Event extends Payload {
     }
 
     renderDetails() {
-        let tmpl = new Template(path.join(__dirname, "EventDetails.hbs"));
-        let data = {
+        const tmpl = new Template(path.join(__dirname, "EventDetails.hbs"));
+        const data = {
             schemaName: this.getSchemaName(),
             validationStatus: this.getValidationStatus(),
             errors: this.errors,
@@ -43,12 +40,12 @@ class Event extends Payload {
         };
 
         tmpl.render(data, (html) => {
-            let container = document.getElementById("details-container");
+            const container = document.getElementById("details-container");
             container.parentNode.scrollTo(0, 0);
             container.innerHTML = html;
             document.getElementById("event-details").appendChild(this.getJson());
 
-            let contexts = document.querySelectorAll("#event-contexts .event-context");
+            const contexts = document.querySelectorAll("#event-contexts .event-context");
             this.contexts.forEach((ctx, idx) => {
                 contexts[idx].appendChild(ctx.getJson());
             });
@@ -56,8 +53,8 @@ class Event extends Payload {
     }
 
     logItem() {
-        let tmpl = new Template(path.join(__dirname, "EventLogItem.hbs"));
-        let data = {
+        const tmpl = new Template(path.join(__dirname, "EventLogItem.hbs"));
+        const data = {
             index: this.index,
             schemaName: this.getSchemaName(),
             schemaVersion: this.getSchemaVersion(),
@@ -70,13 +67,13 @@ class Event extends Payload {
         };
 
         tmpl.render(data, (html) => {
-            let container = document.getElementById("events-container");
-            let item = document.createElement("li");
+            const container = document.getElementById("events-container");
+            const item = document.createElement("li");
             container.appendChild(item);
             item.outerHTML = html;
 
             document
-                .getElementById("event-" + this.index)
+                .getElementById(`event-${this.index}`)
                 .addEventListener("click", this.showDetails.bind(this));
 
             // event items are hidden by default

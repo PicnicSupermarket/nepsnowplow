@@ -1,5 +1,3 @@
-"use strict";
-
 // Decode a base64 encoded string
 function base64Decode(encoded) {
     return Buffer.from(encoded, "base64").toString();
