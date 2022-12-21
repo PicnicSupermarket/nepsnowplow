@@ -1,0 +1,19 @@
+name: PR checks
+on: [push]
+jobs:
+    run-ci:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Run checkout
+              uses: actions/checkout@v3
+            - name: Use Node.js 12.x
+              uses: actions/setup-node@v3
+              with:
+                  node-version: "12.x"
+                  cache: "yarn"
+            - name: Install dependencies
+              run: yarn install --check-cache
+            - name: Format
+              run: yarn format:ci
+            - name: Lint
+              run: yarn lint:ci
