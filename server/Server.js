@@ -70,6 +70,12 @@ class Server {
 
     async handleEvent(request, response) {
         const { body } = request;
+
+        if (!body || !body.data) {
+            response.sendStatus(400);
+            return;
+        }
+
         const bundle = body.data.reverse();
 
         let badEvents = [];
