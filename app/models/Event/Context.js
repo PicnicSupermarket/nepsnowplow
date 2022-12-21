@@ -1,10 +1,5 @@
-"use strict";
 const Payload = require("./Payload");
 
-class Context extends Payload {
-    constructor(data) {
-        super(data);
-    }
-}
+class Context extends Payload {}
 
 module.exports = Context;

@@ -1,7 +1,6 @@
-"use strict";
-const { Template } = require("../Template");
 const Mark = require("mark.js");
 const path = require("path");
+const { Template } = require("../Template");
 
 class SidebarListPane {
     constructor(parent) {
@@ -10,7 +9,7 @@ class SidebarListPane {
     }
 
     show() {
-        let tmpl = new Template({
+        const tmpl = new Template({
             path: path.join(__dirname, "SidebarListPane.hbs"),
             parent: this.parent,
         });
@@ -24,9 +23,9 @@ class SidebarListPane {
     }
 
     highlightEvents(value) {
-        let markInst = new Mark(document.querySelectorAll("#events-container .schema-name"));
+        const markInst = new Mark(document.querySelectorAll("#events-container .schema-name"));
         markInst.unmark({
-            done: function () {
+            done() {
                 if (typeof value !== "undefined" && value !== "") {
                     markInst.mark(value, {
                         separateWordSearch: false,

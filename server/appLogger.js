@@ -1,9 +1,7 @@
-"use strict";
-
 const remote = require("@electron/remote");
+const renderjson = require("renderjson");
 const { Event } = require("../app/models/Event");
 
-const renderjson = require("renderjson");
 renderjson.set_show_to_level("all");
 renderjson.set_icons("+", "-");
 
@@ -19,7 +17,7 @@ function displayEvents(events) {
 }
 
 function logEvent(event) {
-    const ipcRenderer = require("electron").ipcRenderer;
+    const { ipcRenderer } = require("electron");
     ipcRenderer.send("add-event", event);
 
     const index = remote.getGlobal("trackedEvents").length - 1;
@@ -28,7 +26,7 @@ function logEvent(event) {
 }
 
 module.exports = {
-    logEvent: logEvent,
-    displayEvent: displayEvent,
-    displayEvents: displayEvents,
+    logEvent,
+    displayEvent,
+    displayEvents,
 };

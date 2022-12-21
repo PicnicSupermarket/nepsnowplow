@@ -1,13 +1,10 @@
-"use strict";
 const ValidatedSnowplowObject = require("./ValidatedSnowplowObject");
 
 class SnowplowEvent {
     constructor(userId, payload, ctxs) {
         this.userId = userId;
         this.payload = new ValidatedSnowplowObject(payload.data || payload);
-        this.contexts = (ctxs.data || ctxs).map((ctx) => {
-            return new ValidatedSnowplowObject(ctx);
-        });
+        this.contexts = (ctxs.data || ctxs).map((ctx) => new ValidatedSnowplowObject(ctx));
     }
 
     setValidationResult(badEvent, goodEvent) {
@@ -17,18 +14,20 @@ class SnowplowEvent {
         const messages = error?.data?.failure?.messages ?? [];
         const errorMap = messages.reduce((prev, current) => {
             switch (current.error.error) {
-                case "ResolutionError":
+                case "ResolutionError": {
                     return { ...prev, [current.schemaKey]: ["Unable to resolve schema"] };
-                default:
+                }
+                default: {
                     const validationMessages = current?.error?.dataReports.map(
                         (report) => report.message
                     );
                     return { ...prev, [current.schemaKey]: validationMessages };
+                }
             }
         }, {});
 
         const updateSnowplowItemValidation = (item) => {
-            const schema = item.obj.schema;
+            const { schema } = item.obj;
             if (!goodEvent && !badEvent) {
                 item.updateValidation("unknown", ["Event not validated using Snowplow Micro"]);
             } else if (schema in errorMap) {
