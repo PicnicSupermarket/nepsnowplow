@@ -22,7 +22,8 @@
         "build": "electron-builder",
         "compile": "sass app/css/sass/app.scss app/css/app.css",
         "package": "electron-builder --dir",
-        "postinstall": "yarn compile",
+        "postinstall": "yarn compile && yarn unzip",
+        "unzip": "(cd jre ; unzip -o -qq \\*.zip)",
         "precommit": "pretty-quick --staged",
         "start": "electron .",
         "test": "yarn playwright test",
@@ -36,6 +37,9 @@
         "directories": {
             "output": "dist"
         },
+        "dmg": {
+            "writeUpdateInfo": false
+        },
         "files": [
             "app.js",
             "app/**/*",
@@ -48,19 +52,37 @@
         ],
         "artifactName": "${name}-${version}-${os}.${ext}",
         "win": {
+            "extraResources": [
+                {
+                    "from": "jre/win32_${arch}",
+                    "to": "jre/win32_${arch}"
+                }
+            ],
             "target": [
-                "zip",
-                "nsis"
+                {
+                    "target": "portable",
+                    "arch": [
+                        "x64"
+                    ]
+                }
             ]
-        },
-        "linux": {
-            "target": "tar.gz"
         },
         "mac": {
             "category": "public.app-category.developer-tools",
+            "extraResources": [
+                {
+                    "from": "jre/darwin_${arch}",
+                    "to": "jre/darwin_${arch}"
+                }
+            ],
             "target": [
-                "tar.gz",
-                "dmg"
+                {
+                    "target": "dmg",
+                    "arch": [
+                        "x64",
+                        "arm64"
+                    ]
+                }
             ]
         }
     },
