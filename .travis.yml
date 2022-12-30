@@ -4,7 +4,7 @@ matrix:
           osx_image: xcode10.2
           language: node_js
           node_js:
-            - 10
+              - 10
           env:
               - ELECTRON_CACHE=$HOME/.cache/electron
               - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
@@ -19,7 +19,7 @@ matrix:
           services: docker
           language: node_js
           node_js:
-            - 10
+              - 10
           script:
               # Run mocha tests using a virtual screen.
               - xvfb-run yarn test
@@ -36,9 +36,6 @@ matrix:
                     -v ~/.cache/electron-builder:/root/.cache/electron-builder \
                     electronuserland/builder:wine \
                     /bin/bash -c "yarn build --linux --win --publish ${DEPLOY_TYPE}"
-
-
-
 
 env:
     global:

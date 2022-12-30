@@ -1,5 +1,3 @@
-"use strict";
-
 const { ipcRenderer } = require("electron");
 const remote = require("@electron/remote");
 const os = require("os");
@@ -7,12 +5,12 @@ const path = require("path");
 const network = require("network");
 
 const appLogger = require("../../../server/appLogger");
-const filter = require("../../..//server/filter");
+const filter = require("../../../server/filter");
 const { Template } = require("../Template");
 const { PaneGroup, SidebarListPane, DetailsPane } = require("../Pane");
 const Server = require("../../../server/Server");
 
-var server = new Server();
+const server = new Server();
 server.start();
 
 function enableSearchListener() {
@@ -30,7 +28,7 @@ function enableSearchListener() {
     });
 
     filterEventsInput.addEventListener("keyup", (e) => {
-        let value = e.target.value;
+        const { value } = e.target;
         if (e.key === "Escape") {
             filter.clearSearchQuery();
             e.currentTarget.blur();
@@ -91,7 +89,7 @@ function enableWindowButtonListeners() {
     });
 
     document.getElementById("max-button").addEventListener("click", () => {
-        let window = remote.getCurrentWindow();
+        const window = remote.getCurrentWindow();
         if (!window.isMaximized()) {
             window.maximize();
         } else {
@@ -101,9 +99,10 @@ function enableWindowButtonListeners() {
 }
 
 function scrollIntoView(elem, relativeTo) {
-    let pos = elem.offsetTop;
-    let top = typeof relativeTo !== "undefined" ? relativeTo.scrollTop : elem.parentNode.scrollTop;
-    let bottom = top + relativeTo.offsetHeight;
+    const pos = elem.offsetTop;
+    const top =
+        typeof relativeTo !== "undefined" ? relativeTo.scrollTop : elem.parentNode.scrollTop;
+    const bottom = top + relativeTo.offsetHeight;
     if (pos > bottom) {
         elem.scrollIntoView(false);
     } else if (pos < top) {
@@ -117,18 +116,18 @@ function enableKeyListeners() {
             // prevent regular scrolling behaviour
             e.preventDefault();
 
-            let eventId = document.querySelector("#events-container li.selected").id;
+            const eventId = document.querySelector("#events-container li.selected").id;
 
             // Get all events in view.
             // Not the same as all stored events, because we might be filtering.
-            let events = Array.from(document.querySelectorAll("#events-container li")).filter(
+            const events = Array.from(document.querySelectorAll("#events-container li")).filter(
                 (elem) => elem.style.display !== "none"
             );
-            let index = events.findIndex((elem) => elem.id === eventId);
-            let targetIndex = e.key === "ArrowUp" ? index - 1 : index + 1;
+            const index = events.findIndex((elem) => elem.id === eventId);
+            const targetIndex = e.key === "ArrowUp" ? index - 1 : index + 1;
 
             if (targetIndex >= 0 && targetIndex < events.length) {
-                let event = events[targetIndex];
+                const event = events[targetIndex];
                 event.click();
                 scrollIntoView(event, event.parentNode.parentNode);
             }
@@ -146,8 +145,8 @@ function renderHeader(target) {
     });
     const data = {
         title: "NepSnowplow",
-        isWindows: isWindows,
-        filterValidEvents: filterValidEvents,
+        isWindows,
+        filterValidEvents,
     };
     tmpl.render(
         data,
@@ -166,18 +165,18 @@ function renderHeader(target) {
 }
 
 function renderMain(target) {
-    let paneGroup = new PaneGroup(target);
+    const paneGroup = new PaneGroup(target);
     paneGroup.createSubPane(new SidebarListPane());
     paneGroup.createSubPane(new DetailsPane());
     paneGroup.show();
 }
 
 function renderFooter(target, ip, port) {
-    let tmpl = new Template({
+    const tmpl = new Template({
         path: path.join(__dirname, "FooterToolbar.hbs"),
         parent: target,
     });
-    let data = {
+    const data = {
         ipAddress: ip || "...",
         port: port || "...",
     };
@@ -187,7 +186,7 @@ function renderFooter(target, ip, port) {
 function updateFooter(target) {
     server.getInstance().on("ready", (port) => {
         network.get_active_interface((err, iface) => {
-            let footer = document.getElementById("footer");
+            const footer = document.getElementById("footer");
             footer.parentNode.removeChild(footer);
 
             renderFooter(target, iface.ip_address, port);
@@ -196,7 +195,7 @@ function updateFooter(target) {
 }
 
 function renderWindow() {
-    let target = document.getElementById("window");
+    const target = document.getElementById("window");
     renderHeader(target);
     renderMain(target);
     renderFooter(target);

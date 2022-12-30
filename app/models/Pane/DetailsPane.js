@@ -1,7 +1,6 @@
-"use strict";
-const { Template } = require("../Template");
 const Mark = require("mark.js");
 const path = require("path");
+const { Template } = require("../Template");
 
 class DetailsPane {
     constructor(parent) {
@@ -10,7 +9,7 @@ class DetailsPane {
     }
 
     show() {
-        let tmpl = new Template({
+        const tmpl = new Template({
             path: path.join(__dirname, "DetailsPane.hbs"),
             parent: this.parent,
         });
@@ -28,20 +27,20 @@ class DetailsPane {
     }
 
     highlightDetails(value) {
-        let container = this.getRoot();
-        let codeContainer = container.querySelectorAll("pre");
+        const container = this.getRoot();
+        const codeContainer = container.querySelectorAll("pre");
         if (typeof container !== "undefined" && typeof codeContainer !== "undefined") {
-            let markInst = new Mark(codeContainer);
+            const markInst = new Mark(codeContainer);
             markInst.unmark({
-                done: function () {
+                done() {
                     if (typeof value !== "undefined" && value !== "") {
                         markInst.mark(value, {
                             separateWordSearch: false,
                             exclude: [".key"],
-                            noMatch: function () {
+                            noMatch() {
                                 container.style.display = "none";
                             },
-                            done: function () {
+                            done() {
                                 if (container.getElementsByTagName("mark").length > 0) {
                                     container.style.display = "";
                                 }

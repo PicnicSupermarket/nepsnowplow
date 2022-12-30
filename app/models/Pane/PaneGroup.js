@@ -1,6 +1,5 @@
-"use strict";
-const { Template } = require("../Template");
 const path = require("path");
+const { Template } = require("../Template");
 
 class PaneGroup {
     constructor(parent) {
@@ -9,14 +8,15 @@ class PaneGroup {
     }
 
     show() {
-        let tmpl = new Template({
+        const tmpl = new Template({
             path: path.join(__dirname, "PaneGroup.hbs"),
             parent: this.parent,
         });
         tmpl.render({}, () => {
             this.children.forEach((pane) => {
-                pane.parent = this.parent.querySelector(".pane-group");
-                pane.show();
+                const currentPane = pane;
+                currentPane.parent = this.parent.querySelector(".pane-group");
+                currentPane.show();
             });
         });
     }

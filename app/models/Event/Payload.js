@@ -1,4 +1,3 @@
-"use strict";
 const renderjson = require("renderjson");
 
 class Payload {
@@ -15,9 +14,11 @@ class Payload {
     getSchemaName() {
         if (this.data.schema !== undefined) {
             return this.data.schema.split("/")[1];
-        } else if (this.data.action !== undefined) {
+        }
+        if (this.data.action !== undefined) {
             return this.data.action;
         }
+        return undefined;
     }
 
     getSchemaVersion() {

@@ -1,5 +1,3 @@
-"use strict";
-
 const { _electron: electron } = require("playwright");
 const { test, expect } = require("@playwright/test");
 
@@ -14,9 +12,9 @@ chai.should();
 chai.use(chaiAsPromised);
 chai.use(chaiHttp);
 
-var app;
-var server;
-var listeningPort;
+let app;
+let server;
+let listeningPort;
 
 const validSnowplowObject = {
     data: [
@@ -28,6 +26,12 @@ const validSnowplowObject = {
     ],
 };
 
+function delay(time) {
+    return new Promise((resolve) => {
+        setTimeout(resolve, time);
+    });
+}
+
 test.beforeAll(async () => {
     listeningPort = 3000;
     server = chai.request(`http://localhost:${listeningPort}`);
@@ -36,34 +40,31 @@ test.beforeAll(async () => {
     await delay(1000);
 });
 
-test.describe("server", function () {
-    test("is running", async () => {
-        return server
+test.describe("server", () => {
+    test("is running", async () =>
+        server
             .post("/")
             .send("")
-            .then(function (response) {
+            .then((response) => {
                 response.should.not.have.status(404);
-            });
-    });
-    test("rejects non-Snowplow data", async () => {
-        return server
+            }));
+    test("rejects non-Snowplow data", async () =>
+        server
             .post("/")
             .send("")
-            .then(function (response) {
+            .then((response) => {
                 response.should.not.have.status(204);
-            });
-    });
-    test("accepts Snowplow event", async () => {
-        return server
+            }));
+    test("accepts Snowplow event", async () =>
+        server
             .post("/")
             .send(validSnowplowObject)
-            .then(function (response) {
+            .then((response) => {
                 response.should.have.status(204);
-            });
-    });
+            }));
 });
 
-test.describe("application", function () {
+test.describe("application", () => {
     test("logs Snowplow event", async () => {
         await server.post("/").send(validSnowplowObject);
         const window = await app.firstWindow();
@@ -71,9 +72,3 @@ test.describe("application", function () {
         await expect(eventElement).toHaveCount(1);
     });
 });
-
-function delay(time) {
-    return new Promise(function (resolve) {
-        setTimeout(resolve, time);
-    });
-}
