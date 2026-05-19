@@ -1,11 +1,38 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, ipcMain } from "electron";
+import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
+import { CH, Options, RawEvent } from "../shared/ipc";
 
-// Phase 0 main process. Just opens the renderer window. Server start,
-// settings load, IPC handlers, autoUpdater wiring all move in later
-// phases — for now we only need the window to come up so the new
-// pipeline can be verified end-to-end.
+// Phase 1 main process. Opens the renderer window with a sandboxed
+// webPreferences and registers the IPC surface declared in
+// src/shared/ipc.ts. Event capture (push channel) and snowplow-micro
+// server startup are wired in Phase 3 — until then `getInitialEvents`
+// returns an empty array and `onEvent` simply never fires.
+
+const DEFAULT_OPTIONS: Options = {
+    listeningPort: 3000,
+    filterValidEvents: false,
+};
+
+function loadOptions(): Options {
+    try {
+        // In packaged mode `app.getAppPath()` returns path/to/app.asar but
+        // settings.json ships in extraResources alongside it; in dev it
+        // returns the project root and the same path resolves directly.
+        const resourcesPath = app.getAppPath().replace("app.asar", "");
+        const raw = fs.readFileSync(path.resolve(resourcesPath, "settings.json"), "utf-8");
+        const parsed = JSON.parse(raw) as Partial<Options>;
+        return { ...DEFAULT_OPTIONS, ...parsed };
+    } catch {
+        return { ...DEFAULT_OPTIONS };
+    }
+}
+
+// In-memory state owned by main. The renderer treats main as the source of
+// truth so a window reload re-seeds from here instead of losing history.
+let options: Options = { ...DEFAULT_OPTIONS };
+const trackedEvents: RawEvent[] = [];
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -29,9 +56,6 @@ function createMainWindow(): void {
         },
     });
 
-    // In dev electron-vite serves the renderer over HTTP and injects the
-    // URL via ELECTRON_RENDERER_URL. In production the renderer is bundled
-    // to ../renderer/index.html relative to the compiled main entry.
     const devUrl = process.env.ELECTRON_RENDERER_URL;
     if (devUrl) {
         mainWindow.loadURL(devUrl);
@@ -42,6 +66,31 @@ function createMainWindow(): void {
     mainWindow.on("closed", () => {
         mainWindow = null;
     });
+}
+
+function registerIpc(): void {
+    ipcMain.handle(CH.GET_OPTIONS, () => options);
+
+    ipcMain.handle(CH.SET_FILTER_VALID_EVENTS, (_e, value: boolean) => {
+        options = { ...options, filterValidEvents: Boolean(value) };
+    });
+
+    ipcMain.handle(CH.GET_INITIAL_EVENTS, () => trackedEvents.slice());
+
+    ipcMain.handle(CH.CLEAR_EVENTS, () => {
+        trackedEvents.length = 0;
+    });
+
+    ipcMain.on(CH.WINDOW_MINIMIZE, () => mainWindow?.minimize());
+    ipcMain.on(CH.WINDOW_MAXIMIZE, () => {
+        if (!mainWindow) return;
+        if (mainWindow.isMaximized()) {
+            mainWindow.unmaximize();
+        } else {
+            mainWindow.maximize();
+        }
+    });
+    ipcMain.on(CH.WINDOW_CLOSE, () => mainWindow?.close());
 }
 
 app.on("window-all-closed", () => {
@@ -55,5 +104,7 @@ app.on("activate", () => {
 });
 
 app.whenReady().then(() => {
+    options = loadOptions();
+    registerIpc();
     createMainWindow();
 });

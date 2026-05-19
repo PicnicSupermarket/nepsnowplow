@@ -37,6 +37,26 @@ body {
 }
 
 .placeholder p {
-    margin: 0;
+    margin: 0 0 16px;
     opacity: 0.7;
+}
+
+.placeholder pre {
+    margin: 0;
+    padding: 12px 14px;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.05);
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 12px;
+    -webkit-app-region: no-drag;
+}
+
+@media (prefers-color-scheme: dark) {
+    .placeholder pre {
+        background: rgba(255, 255, 255, 0.06);
+    }
+}
+
+.placeholder pre.error {
+    color: #b00020;
 }
