@@ -76,7 +76,7 @@ async function resolveServerBaseURL(electronApp, { timeoutMs = 20000, intervalMs
         await probe.dispose();
     }
     throw new Error(
-        `Timed out waiting for nepsnowplow server (last seen port: ${lastPort ?? "none"})`
+        `Timed out waiting for neppersnowplow server (last seen port: ${lastPort ?? "none"})`
     );
 }
 

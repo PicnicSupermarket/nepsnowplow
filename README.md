@@ -1,4 +1,4 @@
-# <img src="https://github.com/PicnicSupermarket/nepsnowplow/blob/master/icon.png?raw=true" width="28" alt="NepSnowplow" /> NepSnowplow
+# <img src="https://github.com/PicnicSupermarket/nepsnowplow/blob/master/icon.png?raw=true" width="28" alt="NepperSnowplow" /> NepperSnowplow
 
 [![Code style: prettier][prettier-badge]][prettier]
 [![Build Status][travisci-badge]][travisci-builds]
@@ -15,7 +15,7 @@ Simply run:
 # Install dependencies and compile styles
 yarn
 
-# Start NepSnowplow
+# Start NepperSnowplow
 yarn start
 ```
 
@@ -26,7 +26,7 @@ and listening port is listed at the bottom of the app. Events should appear with
 
 ### Events
 
-For each event, NepSnowplow will list the event details and all associated contexts. For more
+For each event, NepperSnowplow will list the event details and all associated contexts. For more
 information about Snowplow events, check out the docs on the [Snowplow Canonical Event
 Model][canonical-event-model].
 
@@ -43,19 +43,19 @@ Options can be set in `settings.json`, the defaults are:
 
 ```js
 {
-  "listeningPort": 3000          // port NepSnowplow listens to
+  "listeningPort": 3000          // port NepperSnowplow listens to
 }
 ```
 
 Depending on your operating system, the settings can be found in the following location:
 
 -   Windows:
-    -   Installed version (exe): `C:\Users\<username>\AppData\Local\Programs\nepsnowplow\Resources`.
+    -   Installed version (exe): `C:\Users\<username>\AppData\Local\Programs\neppersnowplow\Resources`.
     -   Portable version (zip): where you've extracted the `*.zip` file.
--   OS X: `~/Applications/NepSnowplow/Contents/Resources`.
+-   OS X: `~/Applications/NepperSnowplow/Contents/Resources`.
 -   Linux: where you've extracted the `*.tar.gz` file.
 
-_If no events arrive, check if NepSnowplow is allowed by Windows Firewall_
+_If no events arrive, check if NepperSnowplow is allowed by Windows Firewall_
 
 ## Development
 
@@ -96,7 +96,7 @@ provider: github
 ```
 
 Finally, to make sure it works in production, you can execute `yarn build` and run
-`dist\<platform>-unpacked\NepSnowplow.exe`. Don't forget to set the version back to the right value
+`dist\<platform>-unpacked\NepperSnowplow.exe`. Don't forget to set the version back to the right value
 before pushing any commits.
 
 ## Roadmap

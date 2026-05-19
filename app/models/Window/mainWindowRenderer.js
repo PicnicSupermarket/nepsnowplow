@@ -147,7 +147,7 @@ function renderHeader(target) {
         parent: target,
     });
     const data = {
-        title: "NepSnowplow",
+        title: "NepperSnowplow",
         isWindows,
         filterValidEvents,
     };

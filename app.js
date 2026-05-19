@@ -49,7 +49,7 @@ function createMainWindow() {
         minWidth: 1024,
         minHeight: 768,
         acceptFirstMouse: true,
-        title: "NepSnowplow",
+        title: "NepperSnowplow",
         titleBarStyle: "hidden",
         frame: !isWindows,
         webPreferences: {
@@ -65,7 +65,7 @@ function createMainWindow() {
 
     const template = [
         {
-            label: "NepSnowplow",
+            label: "NepperSnowplow",
             submenu: [
                 {
                     label: "Quit",
@@ -175,7 +175,7 @@ autoUpdater.on("download-progress", (progressObj) => {
 });
 
 autoUpdater.on("update-downloaded", () => {
-    // Update will be installed silently after quitting NepSnowplow
+    // Update will be installed silently after quitting NepperSnowplow
     logger.info("Update downloaded. Restart the app to install.");
 });
 
