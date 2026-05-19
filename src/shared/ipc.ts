@@ -36,6 +36,11 @@ export const CH = {
 export type Channel = (typeof CH)[keyof typeof CH];
 
 export interface Api {
+    // Synchronous platform identifier mirrored from `process.platform` in
+    // the preload context. Renderer uses it for chrome that has to react
+    // to the host OS (e.g. reserving space for the macOS traffic lights).
+    readonly platform: string;
+
     getOptions(): Promise<Options>;
     setFilterValidEvents(value: boolean): Promise<void>;
 

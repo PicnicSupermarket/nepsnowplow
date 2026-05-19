@@ -37,7 +37,7 @@ const trackedEvents: RawEvent[] = [];
 let mainWindow: BrowserWindow | null = null;
 
 function createMainWindow(): void {
-    const isWindows = os.platform() === "win32";
+    const isMac = os.platform() === "darwin";
 
     mainWindow = new BrowserWindow({
         width: 1024,
@@ -46,8 +46,11 @@ function createMainWindow(): void {
         minHeight: 768,
         acceptFirstMouse: true,
         title: "NepperSnowplow",
-        titleBarStyle: "hidden",
-        frame: !isWindows,
+        // On macOS we let the OS render the traffic lights inside a
+        // reserved area at the top-left. The renderer reserves an
+        // equivalent strip of padding so toolbar contents never overlap.
+        // Other platforms get the standard system frame.
+        titleBarStyle: isMac ? "hiddenInset" : "default",
         webPreferences: {
             contextIsolation: true,
             nodeIntegration: false,

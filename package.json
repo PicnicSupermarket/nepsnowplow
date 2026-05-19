@@ -127,6 +127,7 @@
         "mark.js": "^8.11.1",
         "network": "^0.5.0",
         "preact": "^10.29.2",
-        "renderjson": "^1.4.0"
+        "renderjson": "^1.4.0",
+        "zustand": "^5.0.13"
     }
 }

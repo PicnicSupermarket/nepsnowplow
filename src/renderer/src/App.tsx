@@ -1,25 +1,44 @@
-import { useEffect, useState } from "preact/hooks";
-import type { Options } from "../../shared/ipc";
+import { useEffect } from "preact/hooks";
+import { HeaderToolbar } from "./components/HeaderToolbar";
+import { FooterToolbar } from "./components/FooterToolbar";
+import { PaneGroup } from "./components/PaneGroup";
+import { useStore } from "./store";
 
 export function App() {
-    const [options, setOptions] = useState<Options | null>(null);
-    const [error, setError] = useState<string | null>(null);
-
     useEffect(() => {
-        window.api
-            .getOptions()
-            .then(setOptions)
-            .catch((err: unknown) => setError(String(err)));
+        // Tag the root for platform-specific chrome (currently used to
+        // reserve space for the macOS traffic light buttons).
+        document.documentElement.dataset.platform = window.api.platform;
+
+        // Seed the renderer-side filterValidEvents from the canonical copy
+        // owned by main, so a window reload doesn't reset the toggle.
+        let cancelled = false;
+        window.api.getOptions().then((opts) => {
+            if (!cancelled) {
+                useStore.getState().setFilterValidEvents(opts.filterValidEvents);
+            }
+        });
+        return () => {
+            cancelled = true;
+        };
     }, []);
 
     return (
-        <div class="placeholder">
-            <h1>NepperSnowplow</h1>
-            <p>Phase 1 scaffold — IPC bridge is live.</p>
-            {error && <pre class="error">{error}</pre>}
-            {options && (
-                <pre class="options">{JSON.stringify(options, null, 2)}</pre>
-            )}
+        <div class="app">
+            <HeaderToolbar />
+            <PaneGroup
+                sidebar={<EmptySidebar />}
+                details={<EmptyDetails />}
+            />
+            <FooterToolbar />
         </div>
     );
+}
+
+function EmptySidebar() {
+    return <div class="empty">No events yet</div>;
+}
+
+function EmptyDetails() {
+    return <div class="empty">Select an event to inspect it</div>;
 }

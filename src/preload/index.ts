@@ -6,6 +6,8 @@ import { Api, CH, Options, RawEvent, ServerInfo } from "../shared/ipc";
 // channels are wrapped here and the renderer only ever sees the supplied
 // callback being invoked with the payload.
 const api: Api = {
+    platform: process.platform,
+
     getOptions: () => ipcRenderer.invoke(CH.GET_OPTIONS) as Promise<Options>,
 
     setFilterValidEvents: (value) =>
