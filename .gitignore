@@ -49,3 +49,7 @@ snowplow_micro_config/*
 
 # Local AI / scratch notes
 ai-notes/
+
+# Playwright artefacts
+test-results/
+playwright-report/

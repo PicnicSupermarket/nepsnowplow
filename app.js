@@ -1,5 +1,5 @@
 const remote = require("@electron/remote/main");
-const logger = require("electron-log");
+const logger = require("electron-log/main");
 const { app, ipcMain, BrowserWindow, Menu } = require("electron");
 const { autoUpdater } = require("electron-updater");
 
