@@ -198,6 +198,12 @@ function updateFooter(target) {
 }
 
 function renderWindow() {
+    // Pre-warm every .hbs under app/models/ so the first event render
+    // (and the header/footer/pane renders below) hit a warm Handlebars
+    // cache instead of paying synchronous fs.readFileSync on the
+    // renderer thread. Cheap (~7 small files) and one-shot at startup.
+    Template.precompileDir(path.join(__dirname, ".."));
+
     const target = document.getElementById("window");
     renderHeader(target);
     renderMain(target);
