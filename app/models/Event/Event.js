@@ -1,4 +1,3 @@
-const remote = require("@electron/remote");
 const path = require("path");
 const filter = require("../../../server/filter");
 const Payload = require("./Payload");
@@ -11,10 +10,11 @@ class Event extends Payload {
 
         this.contexts = data.contexts.map((ctx) => new Context(ctx));
 
+        // The caller (appLogger / displayEvents) is responsible for passing in
+        // the index from the renderer-local event store. Computing it here used
+        // to require a synchronous IPC call to the main process on every
+        // construction.
         this.index = index;
-        if (typeof index === "undefined") {
-            this.index = remote.getGlobal("trackedEvents").length - 1;
-        }
     }
 
     showDetails(event) {

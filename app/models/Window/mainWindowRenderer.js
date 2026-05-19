@@ -5,6 +5,7 @@ const path = require("path");
 const network = require("network");
 
 const appLogger = require("../../../server/appLogger");
+const eventStore = require("../../../server/eventStore");
 const filter = require("../../../server/filter");
 const { Template } = require("../Template");
 const { PaneGroup, SidebarListPane, DetailsPane } = require("../Pane");
@@ -51,6 +52,7 @@ function enableToolbarButtonListeners() {
     document.getElementById("reset-button").addEventListener("click", () => {
         // remove events from memory
         ipcRenderer.send("clear-events");
+        eventStore.clear();
         server.resetEvents();
 
         // clear events from window
@@ -200,7 +202,14 @@ function renderWindow() {
     renderMain(target);
     renderFooter(target);
     updateFooter(target);
-    appLogger.displayEvents(remote.getGlobal("trackedEvents"));
+    // Seed the renderer-local store from main's mirror so events survive a
+    // window reload, then render them. After this point all reads go through
+    // the local store and avoid synchronous IPC.
+    const initialEvents = remote.getGlobal("trackedEvents");
+    if (Array.isArray(initialEvents) && initialEvents.length > 0 && eventStore.size() === 0) {
+        eventStore.seed(initialEvents);
+    }
+    appLogger.displayEvents(initialEvents);
 }
 
 function mainWindowRenderer() {
