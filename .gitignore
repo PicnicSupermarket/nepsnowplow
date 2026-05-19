@@ -46,3 +46,6 @@ jre
 
 # Config
 snowplow_micro_config/*
+
+# Local AI / scratch notes
+ai-notes/

@@ -14,6 +14,11 @@ class Server {
         this.instance = express();
         this.instance.use(bodyParser.json()); // to parse application/json
         this.instance.use(bodyParser.urlencoded({ extended: true })); // to parse application/x-www-form-urlencoded
+
+        // Serializes validate → fetch → reset against Snowplow Micro so that
+        // each bundle only sees its own events and we don't accumulate the
+        // full session history on every request.
+        this.validationQueue = Promise.resolve();
     }
 
     start() {
@@ -76,23 +81,38 @@ class Server {
             return;
         }
 
-        const bundle = body.data.reverse();
+        const bundle = [...body.data].reverse();
 
         let badEvents = [];
         let goodEvents = [];
 
-        try {
-            await this.snowplowMicroServer.validateEvent(body);
-            const [badEventResponse, goodEventResponse] = await Promise.all([
-                this.snowplowMicroServer.retrieveBadEvents(),
-                this.snowplowMicroServer.retrieveGoodEvents(),
-            ]);
-
-            badEvents = badEventResponse.data;
-            goodEvents = goodEventResponse.data;
-        } catch (error) {
-            Logger.error(error);
-        }
+        // Chain onto the validation queue so only one bundle is being validated
+        // against Snowplow Micro at a time. This lets us reset Micro between
+        // bundles without races, keeping each fetch O(bundle size) instead of
+        // O(total session events).
+        const validation = this.validationQueue.then(async () => {
+            try {
+                await this.snowplowMicroServer.validateEvent(body);
+                const [badEventResponse, goodEventResponse] = await Promise.all([
+                    this.snowplowMicroServer.retrieveBadEvents(),
+                    this.snowplowMicroServer.retrieveGoodEvents(),
+                ]);
+                badEvents = badEventResponse.data;
+                goodEvents = goodEventResponse.data;
+            } catch (error) {
+                Logger.error(error);
+            } finally {
+                try {
+                    await this.snowplowMicroServer.resetEvents();
+                } catch (error) {
+                    Logger.error(error);
+                }
+            }
+        });
+        // Swallow rejections on the shared chain so one failure can't poison
+        // every subsequent request.
+        this.validationQueue = validation.catch(() => {});
+        await validation;
 
         const that = this;
         bundle.forEach((data) => {
