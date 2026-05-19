@@ -94,8 +94,12 @@ function flushPending() {
     container.insertAdjacentHTML("beforeend", html);
 
     // List items render hidden by default; one filter pass per batch flips
-    // visibility for everything that matches the current query.
-    filter.update();
+    // visibility for everything that matches the current query. `force: true`
+    // ensures `mark.js` re-scans the sidebar so freshly inserted
+    // `.schema-name` nodes get highlighted under an active query — the
+    // highlight panes otherwise cache by query value and skip identical
+    // runs.
+    filter.update({ force: true });
 }
 
 function scheduleFlush() {

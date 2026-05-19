@@ -5,6 +5,9 @@ const { Template } = require("../Template");
 class DetailsPane {
     constructor(parent) {
         this.parent = parent;
+        // Sentinel that can never equal a real query string, so the first
+        // call always runs through `mark.js`.
+        this.lastHighlightValue = null;
         this.enableListeners();
     }
 
@@ -18,7 +21,8 @@ class DetailsPane {
 
     enableListeners() {
         document.addEventListener("highlight", (event) => {
-            this.highlightDetails(event.detail);
+            const detail = event.detail || {};
+            this.highlightDetails(detail.value, detail.force);
         });
     }
 
@@ -26,7 +30,15 @@ class DetailsPane {
         return document.getElementById("details-container");
     }
 
-    highlightDetails(value) {
+    highlightDetails(value, force) {
+        // mark.js walks every `<pre>` node in the details pane on each run;
+        // when the query is unchanged the result is identical to the
+        // previous pass.
+        if (!force && value === this.lastHighlightValue) {
+            return;
+        }
+        this.lastHighlightValue = value;
+
         const container = this.getRoot();
         const codeContainer = container.querySelectorAll("pre");
         if (typeof container !== "undefined" && typeof codeContainer !== "undefined") {

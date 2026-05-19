@@ -3,11 +3,16 @@ const eventStore = require("./eventStore");
 
 let filterQuery = "";
 let filterValidEvents = false;
+// Sticky across debounce coalescing: if any caller in the current debounce
+// window asks to force a re-highlight (e.g. new items were appended to the
+// sidebar), the eventual `filterItems` pass must honour it even if a later,
+// non-forced `update()` call "won" the debounce.
+let forceNextHighlight = false;
 
-function highlight(value) {
+function highlight(value, force) {
     document.dispatchEvent(
         new CustomEvent("highlight", {
-            detail: value,
+            detail: { value, force },
         })
     );
 }
@@ -28,9 +33,7 @@ function filterItems() {
             try {
                 if (filterQuery) {
                     const searchable = eventStore.getSearchable(index);
-                    match =
-                        typeof searchable === "string" &&
-                        searchable.indexOf(filterQuery) > -1;
+                    match = typeof searchable === "string" && searchable.indexOf(filterQuery) > -1;
                 }
 
                 if (match && filterValidEvents) {
@@ -50,13 +53,22 @@ function filterItems() {
         }
     }
 
-    highlight(filterQuery);
+    const force = forceNextHighlight;
+    forceNextHighlight = false;
+    highlight(filterQuery, force);
 }
 
 // 50ms was tight enough that successive keystrokes overlapped with the
 // previous filter pass; 150ms keeps the UI responsive while letting bursts
 // coalesce.
-const update = debounce(filterItems, 150);
+const debouncedFilterItems = debounce(filterItems, 150);
+
+function update(options) {
+    if (options && options.force) {
+        forceNextHighlight = true;
+    }
+    debouncedFilterItems();
+}
 
 function setFilterValidEvents(filterEvents) {
     filterValidEvents = filterEvents;
