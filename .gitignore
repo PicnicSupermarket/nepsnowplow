@@ -17,6 +17,8 @@ _site
 *.vi
 *.css.map
 *.css
+# Hand-authored renderer styles under src/ are real source.
+!src/**/*.css
 *~
 
 # OS or Editor folders
@@ -39,7 +41,9 @@ nbproject
 
 # Folders to ignore
 dist
+out
 node_modules
+*.tsbuildinfo
 bower_components
 example-components
 jre
