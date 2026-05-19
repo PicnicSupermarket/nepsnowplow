@@ -53,6 +53,7 @@ function enableToolbarButtonListeners() {
         // remove events from memory
         ipcRenderer.send("clear-events");
         eventStore.clear();
+        appLogger.reset();
         server.resetEvents();
 
         // clear events from window

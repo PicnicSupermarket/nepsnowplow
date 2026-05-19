@@ -1,5 +1,4 @@
 const path = require("path");
-const filter = require("../../../server/filter");
 const Payload = require("./Payload");
 const Context = require("./Context");
 const { Template } = require("../Template");
@@ -17,12 +16,15 @@ class Event extends Payload {
         this.index = index;
     }
 
-    showDetails(event) {
+    showDetails(itemEl) {
+        // Called from the delegated click handler on #events-container, so we
+        // receive the <li> directly rather than a click event whose
+        // currentTarget would be the container.
         const selectedEvents = document.querySelectorAll("#events-container li.selected");
         Array.from(selectedEvents).forEach((elem) => {
             elem.classList.remove("selected");
         });
-        event.currentTarget.classList.add("selected");
+        itemEl.classList.add("selected");
         this.renderDetails();
     }
 
@@ -52,7 +54,11 @@ class Event extends Payload {
         });
     }
 
-    logItem() {
+    logItemHtml() {
+        // Pure: produces the HTML for this event's list item but does not
+        // touch the DOM. The caller (appLogger) batches inserts to keep
+        // bursty traffic from causing one layout + one filter pass per
+        // event.
         const tmpl = new Template(path.join(__dirname, "EventLogItem.hbs"));
         const data = {
             index: this.index,
@@ -66,21 +72,11 @@ class Event extends Payload {
             })),
         };
 
-        tmpl.render(data, (html) => {
-            const container = document.getElementById("events-container");
-            const item = document.createElement("li");
-            container.appendChild(item);
-            item.outerHTML = html;
-
-            document
-                .getElementById(`event-${this.index}`)
-                .addEventListener("click", this.showDetails.bind(this));
-
-            // event items are hidden by default
-            // if filter is set and events match the filter,
-            // below will unhide the generated element
-            filter.update();
+        let html;
+        tmpl.render(data, (rendered) => {
+            html = rendered;
         });
+        return html;
     }
 }
 
