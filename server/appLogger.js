@@ -42,9 +42,40 @@ function ensureDelegatedClickHandler(container) {
     });
 }
 
+// Drop everything we know about an evicted event so its DOM node, view-model,
+// and any not-yet-flushed pending entry all disappear together. Called from
+// `logEvent`/`displayEvents` whenever `eventStore.add` reports the head was
+// trimmed by the FIFO cap.
+function evictFromUi(evictedIndex) {
+    viewModelsByIndex.delete(evictedIndex);
+
+    // A burst large enough to overflow the cap in a single flush window
+    // (e.g. the reload-time seed of a long-running session) can evict
+    // entries that never reached the DOM. Strip those from the pending
+    // queue so we don't render rows whose backing store entry is already
+    // gone.
+    const stillPendingAt = pendingViewModels.findIndex((v) => v.index === evictedIndex);
+    if (stillPendingAt !== -1) {
+        pendingViewModels.splice(stillPendingAt, 1);
+        return;
+    }
+
+    const el = document.getElementById(`event-${evictedIndex}`);
+    if (el && el.parentNode) {
+        el.parentNode.removeChild(el);
+    }
+}
+
 function flushPending() {
     flushScheduled = false;
     if (pendingViewModels.length === 0) {
+        return;
+    }
+
+    const container = document.getElementById("events-container");
+    if (!container) {
+        // The sidebar pane hasn't mounted yet. Leave the queue intact so a
+        // later flush (after `renderMain`) picks it up.
         return;
     }
 
@@ -59,15 +90,6 @@ function flushPending() {
         html += view.logItemHtml();
     }
 
-    const container = document.getElementById("events-container");
-    if (!container) {
-        // The sidebar pane hasn't mounted yet. Put the batch back so a later
-        // flush (after `renderMain`) picks it up.
-        for (let i = batch.length - 1; i >= 0; i -= 1) {
-            pendingViewModels.unshift(batch[i]);
-        }
-        return;
-    }
     ensureDelegatedClickHandler(container);
     container.insertAdjacentHTML("beforeend", html);
 
@@ -88,12 +110,21 @@ function queueDisplay(rawEvent, index) {
     pendingViewModels.push(new Event(rawEvent, index));
 }
 
+// Seeds the renderer-local store from the main-process mirror and renders the
+// resulting list. Owning the seed here (rather than seeding the store
+// separately in the window renderer) means oversized seeds go through the
+// same FIFO-eviction path as live events and indices always match what the
+// store assigned.
 function displayEvents(events) {
     if (!Array.isArray(events) || events.length === 0) {
         return;
     }
     for (let i = 0; i < events.length; i += 1) {
-        queueDisplay(events[i], i);
+        const { index, evictedIndex } = eventStore.add(events[i]);
+        if (evictedIndex !== null) {
+            evictFromUi(evictedIndex);
+        }
+        queueDisplay(events[i], index);
     }
     // Flush synchronously for the seed path so the initial list is on screen
     // before any subsequent code reads from the DOM.
@@ -104,8 +135,12 @@ function logEvent(rawEvent) {
     // Add to the renderer-local store first so the index and any subsequent
     // filter/render work doesn't depend on a synchronous IPC round-trip to
     // main. The mirror to main is fire-and-forget for persistence only.
-    const index = eventStore.add(rawEvent);
+    const { index, evictedIndex } = eventStore.add(rawEvent);
     ipcRenderer.send("add-event", rawEvent);
+
+    if (evictedIndex !== null) {
+        evictFromUi(evictedIndex);
+    }
 
     queueDisplay(rawEvent, index);
     scheduleFlush();

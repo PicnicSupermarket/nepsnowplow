@@ -205,12 +205,12 @@ function renderWindow() {
     updateFooter(target);
     // Seed the renderer-local store from main's mirror so events survive a
     // window reload, then render them. After this point all reads go through
-    // the local store and avoid synchronous IPC.
-    const initialEvents = remote.getGlobal("trackedEvents");
-    if (Array.isArray(initialEvents) && initialEvents.length > 0 && eventStore.size() === 0) {
-        eventStore.seed(initialEvents);
+    // the local store and avoid synchronous IPC. `displayEvents` owns the
+    // seed so oversized restores share the FIFO-eviction path with live
+    // traffic.
+    if (eventStore.size() === 0) {
+        appLogger.displayEvents(remote.getGlobal("trackedEvents"));
     }
-    appLogger.displayEvents(initialEvents);
 }
 
 function mainWindowRenderer() {

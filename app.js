@@ -13,6 +13,12 @@ const os = require("os");
 const fs = require("fs");
 const path = require("path");
 
+// Same FIFO cap the renderer-local store applies. Both processes have to
+// trim in lockstep: if main grew unboundedly, a window reload would re-seed
+// the renderer with a giant array and immediately blow past the cap on the
+// renderer side too.
+const { MAX_EVENTS: MAX_TRACKED_EVENTS } = require("./server/eventStore");
+
 remote.initialize();
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -126,6 +132,11 @@ global.options = loadOptions();
 // Register custom event listeners.
 ipcMain.on("add-event", (event, spEvent) => {
     global.trackedEvents.push(spEvent);
+    if (global.trackedEvents.length > MAX_TRACKED_EVENTS) {
+        // FIFO: oldest event falls off. `shift` is O(n) but n is bounded by
+        // the cap and this only fires once per insert past the cap.
+        global.trackedEvents.shift();
+    }
 });
 
 ipcMain.on("clear-events", () => {
