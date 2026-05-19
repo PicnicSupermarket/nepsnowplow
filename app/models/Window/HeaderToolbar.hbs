@@ -10,13 +10,15 @@
     </div>
     {{/if}}
 
-    <div class="toolbar-actions">
+    <div class="toolbar-actions{{#unless isWindows}} toolbar-actions-mac{{/unless}}">
         <div class="btn-group">
             <button class="btn btn-default" id="reset-button" title="Remove all events">
-                <span class="icon icon-trash"></span>
+                <span class="icon icon-trash icon-text"></span>
+                Clear
             </button>
             <button class="btn btn-default {{#if filterValidEvents}}active{{/if}}" id="validation-filter" title="Filter valid events">
-                <span class="icon icon-cancel-circled"></span>
+                <span class="icon icon-cancel-circled icon-text"></span>
+                Hide valid
             </button>
         </div>
         <div class="filter pull-right">
