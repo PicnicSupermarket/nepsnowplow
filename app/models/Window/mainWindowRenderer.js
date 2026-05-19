@@ -115,25 +115,41 @@ function scrollIntoView(elem, relativeTo) {
 
 function enableKeyListeners() {
     document.addEventListener("keydown", (e) => {
-        if (e.key === "ArrowUp" || e.key === "ArrowDown") {
-            // prevent regular scrolling behaviour
-            e.preventDefault();
+        if (e.key !== "ArrowUp" && e.key !== "ArrowDown") {
+            return;
+        }
+        // prevent regular scrolling behaviour
+        e.preventDefault();
 
-            const eventId = document.querySelector("#events-container li.selected").id;
+        // Get all events in view.
+        // Not the same as all stored events, because we might be filtering.
+        const events = Array.from(document.querySelectorAll("#events-container li")).filter(
+            (elem) => elem.style.display !== "none"
+        );
+        if (events.length === 0) {
+            return;
+        }
 
-            // Get all events in view.
-            // Not the same as all stored events, because we might be filtering.
-            const events = Array.from(document.querySelectorAll("#events-container li")).filter(
-                (elem) => elem.style.display !== "none"
-            );
-            const index = events.findIndex((elem) => elem.id === eventId);
-            const targetIndex = e.key === "ArrowUp" ? index - 1 : index + 1;
+        // The current selection may not exist yet (no event has been clicked
+        // since startup) or may be filtered out of view; in either case fall
+        // back to a sensible end of the visible list rather than dereferencing
+        // a missing element.
+        const selectedEl = document.querySelector("#events-container li.selected");
+        const currentIndex = selectedEl
+            ? events.findIndex((elem) => elem.id === selectedEl.id)
+            : -1;
 
-            if (targetIndex >= 0 && targetIndex < events.length) {
-                const event = events[targetIndex];
-                event.click();
-                scrollIntoView(event, event.parentNode.parentNode);
-            }
+        let targetIndex;
+        if (currentIndex === -1) {
+            targetIndex = e.key === "ArrowDown" ? 0 : events.length - 1;
+        } else {
+            targetIndex = e.key === "ArrowDown" ? currentIndex + 1 : currentIndex - 1;
+        }
+
+        if (targetIndex >= 0 && targetIndex < events.length) {
+            const event = events[targetIndex];
+            event.click();
+            scrollIntoView(event, event.parentNode.parentNode);
         }
     });
 }
