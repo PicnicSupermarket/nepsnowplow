@@ -23,6 +23,8 @@
         "build": "electron-vite build && electron-builder",
         "start": "electron-vite preview",
         "typecheck": "tsc --build",
+        "lint": "eslint .",
+        "lint:fix": "eslint . --fix",
         "postinstall": "yarn unzip",
         "format": "yarn prettier --write .",
         "format:ci": "yarn prettier --check .",
@@ -91,6 +93,7 @@
         "releaseType": "draft"
     },
     "devDependencies": {
+        "@eslint/js": "^10.0.1",
         "@playwright/test": "^1.50.0",
         "@preact/preset-vite": "^2.10.5",
         "@types/body-parser": "^1.19.6",
@@ -99,9 +102,13 @@
         "electron": "^41.6.1",
         "electron-builder": "^26.0.0",
         "electron-vite": "^5.0.0",
+        "eslint": "^10.4.0",
+        "eslint-config-prettier": "^10.1.8",
+        "eslint-plugin-react-hooks": "^7.1.1",
         "playwright": "^1.50.0",
         "prettier": "^2.1.1",
         "typescript": "^6.0.3",
+        "typescript-eslint": "^8.59.4",
         "vite": "^8.0.13"
     },
     "dependencies": {

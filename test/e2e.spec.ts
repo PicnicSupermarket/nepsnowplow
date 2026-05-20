@@ -44,7 +44,6 @@ async function resolveCollectorBaseURL(
 ): Promise<string> {
     const deadline = Date.now() + timeoutMs;
     while (Date.now() < deadline) {
-        // eslint-disable-next-line no-await-in-loop
         const port = await electronApp.evaluate(
             // The debug global is set by recordServerReady in src/main/index.ts.
             () =>
@@ -54,7 +53,6 @@ async function resolveCollectorBaseURL(
         if (typeof port === "number" && port > 0) {
             return `http://127.0.0.1:${port}`;
         }
-        // eslint-disable-next-line no-await-in-loop
         await new Promise((r) => setTimeout(r, intervalMs));
     }
     throw new Error("Timed out waiting for the collector to bind a port");
