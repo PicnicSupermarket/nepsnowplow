@@ -1,8 +1,10 @@
-import { useEffect, useMemo, useRef } from "preact/hooks";
+import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import type { EventViewModel } from "../../../shared/event";
 import { useStore } from "../store";
 import { EventListItem } from "./EventListItem";
+import { ContextMenu, ContextMenuItem } from "./ui/context-menu";
+import { serializeEvent } from "../lib/serialize";
 
 // Approximate row height; virtualizer corrects against actual DOM size as
 // rows mount so this only affects the initial estimate.
@@ -26,6 +28,17 @@ function filterEvents(
     return out;
 }
 
+interface MenuState {
+    x: number;
+    y: number;
+    eventId: number;
+}
+
+async function copyEventJson(event: EventViewModel): Promise<void> {
+    const text = JSON.stringify(serializeEvent(event), null, 2);
+    await navigator.clipboard.writeText(text);
+}
+
 export function EventList() {
     const events = useStore((s) => s.events);
     const eventOrder = useStore((s) => s.eventOrder);
@@ -33,6 +46,7 @@ export function EventList() {
     const filterValidEvents = useStore((s) => s.filterValidEvents);
     const selectedId = useStore((s) => s.selectedId);
     const select = useStore((s) => s.select);
+    const [menu, setMenu] = useState<MenuState | null>(null);
 
     // Memoised so the virtualizer's `count` reference is stable across
     // unrelated store updates (e.g. typing in the filter doesn't rebuild
@@ -107,12 +121,41 @@ export function EventList() {
                             role="option"
                             aria-selected={isSelected}
                             onClick={() => select(event.id)}
+                            onContextMenu={(e) => {
+                                // Selecting the row before opening the menu
+                                // keeps the details pane in sync with the
+                                // event the menu actions will target.
+                                e.preventDefault();
+                                select(event.id);
+                                setMenu({
+                                    x: e.clientX,
+                                    y: e.clientY,
+                                    eventId: event.id,
+                                });
+                            }}
                         >
                             <EventListItem event={event} highlight={filterQuery} />
                         </div>
                     );
                 })}
             </div>
+            <ContextMenu
+                open={menu !== null}
+                x={menu?.x ?? 0}
+                y={menu?.y ?? 0}
+                onClose={() => setMenu(null)}
+            >
+                <ContextMenuItem
+                    onSelect={() => {
+                        if (menu === null) return;
+                        const event = events.get(menu.eventId);
+                        setMenu(null);
+                        if (event) void copyEventJson(event);
+                    }}
+                >
+                    Copy event JSON
+                </ContextMenuItem>
+            </ContextMenu>
         </div>
     );
 }

@@ -105,6 +105,19 @@ test.describe("renderer", () => {
         await expect(row).toContainText("web_page");
     });
 
+    test("right-click on an event row opens a copy menu", async () => {
+        await request.post("/", { data: validBundle, failOnStatusCode: false });
+        const row = window.locator('[role="option"]').first();
+        await row.click({ button: "right" });
+
+        const menu = window.getByRole("menu");
+        await expect(menu).toBeVisible();
+        await expect(menu.getByRole("menuitem", { name: /copy event json/i })).toBeVisible();
+
+        await menu.getByRole("menuitem", { name: /copy event json/i }).click();
+        await expect(menu).toBeHidden();
+    });
+
     test("dropping events while paused", async () => {
         await window.getByRole("button", { name: /^pause$/i }).click();
 
