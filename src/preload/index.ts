@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from "electron";
-import { Api, CH, Options, RawEvent, ServerInfo } from "../shared/ipc";
+import { Api, CH, Options, ServerInfo } from "../shared/ipc";
+import type { EventViewModel } from "../shared/event";
 
 // The contextBridge boundary requires every value exposed to the renderer
 // to be cloneable; functions cross fine but listeners cannot, so push
@@ -13,12 +14,13 @@ const api: Api = {
     setFilterValidEvents: (value) =>
         ipcRenderer.invoke(CH.SET_FILTER_VALID_EVENTS, value) as Promise<void>,
 
-    getInitialEvents: () => ipcRenderer.invoke(CH.GET_INITIAL_EVENTS) as Promise<RawEvent[]>,
+    getInitialEvents: () =>
+        ipcRenderer.invoke(CH.GET_INITIAL_EVENTS) as Promise<EventViewModel[]>,
 
     clearEvents: () => ipcRenderer.invoke(CH.CLEAR_EVENTS) as Promise<void>,
 
     onEvent: (cb) => {
-        const listener = (_e: IpcRendererEvent, event: RawEvent) => cb(event);
+        const listener = (_e: IpcRendererEvent, event: EventViewModel) => cb(event);
         ipcRenderer.on(CH.EVENT_PUSH, listener);
         return () => {
             ipcRenderer.removeListener(CH.EVENT_PUSH, listener);

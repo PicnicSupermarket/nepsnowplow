@@ -12,6 +12,10 @@
     --accent: #0a84ff;
     --accent-soft: rgba(10, 132, 255, 0.12);
     --status-ok: #34c759;
+    --status-warn: #ff9f0a;
+    --status-bad: #ff3b30;
+    --selected: rgba(10, 132, 255, 0.12);
+    --highlight: rgba(255, 214, 10, 0.55);
 
     --header-height: 44px;
     --footer-height: 26px;
@@ -36,6 +40,8 @@
         --border: #3a3a3c;
         --accent: #0a84ff;
         --accent-soft: rgba(10, 132, 255, 0.22);
+        --selected: rgba(10, 132, 255, 0.22);
+        --highlight: rgba(255, 214, 10, 0.4);
     }
 }
 
@@ -186,6 +192,107 @@ input {
 .pane--sidebar {
     border-right: 1px solid var(--border);
     background: var(--bg-elevated);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ----- Event list ------------------------------------------------------- */
+
+.event-list {
+    flex: 1;
+    overflow: auto;
+    outline: 0;
+}
+
+.event-list__inner {
+    position: relative;
+    width: 100%;
+}
+
+.event-row {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.08s ease;
+}
+
+.event-row:hover {
+    background: var(--bg-sunken);
+}
+
+.event-row.is-selected {
+    background: var(--selected);
+}
+
+.event-item__header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+}
+
+.event-item__schema {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.event-item__version {
+    margin-left: auto;
+    font-weight: 400;
+    font-size: 11px;
+    color: var(--fg-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.event-item__contexts {
+    list-style: none;
+    margin: 4px 0 0;
+    padding: 0 0 0 14px;
+    font-size: 12px;
+    color: var(--fg-muted);
+}
+
+.event-item__contexts li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    line-height: 1.6;
+}
+
+mark {
+    background: var(--highlight);
+    color: inherit;
+    border-radius: 2px;
+    padding: 0 1px;
+}
+
+/* ----- Validity dot ----------------------------------------------------- */
+
+.validity {
+    flex-shrink: 0;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--fg-muted);
+}
+
+.validity--valid {
+    background: var(--status-ok);
+}
+
+.validity--invalid {
+    background: var(--status-bad);
+}
+
+.validity--unknown {
+    background: var(--status-warn);
 }
 
 .empty {

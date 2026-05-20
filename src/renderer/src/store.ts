@@ -1,17 +1,6 @@
 import { create } from "zustand";
 import type { ServerInfo } from "../../shared/ipc";
-
-// Phase 3 will replace this with a richer view-model carrying parsed
-// payload, contexts, validation status, etc. The store only needs to
-// know there is an addressable id and that more fields may exist.
-export interface EventViewModel {
-    id: number;
-}
-
-// FIFO cap matches the main-process trackedEvents bound in the legacy
-// server/eventStore.js (500). Both ends have to trim in lockstep so a
-// window reload re-seeded from main never exceeds the renderer cap.
-export const MAX_EVENTS = 500;
+import { EventViewModel, MAX_EVENTS } from "../../shared/event";
 
 interface State {
     events: Map<number, EventViewModel>;

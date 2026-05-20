@@ -2,13 +2,9 @@ import { app, BrowserWindow, ipcMain } from "electron";
 import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
-import { CH, Options, RawEvent } from "../shared/ipc";
-
-// Phase 1 main process. Opens the renderer window with a sandboxed
-// webPreferences and registers the IPC surface declared in
-// src/shared/ipc.ts. Event capture (push channel) and snowplow-micro
-// server startup are wired in Phase 3 — until then `getInitialEvents`
-// returns an empty array and `onEvent` simply never fires.
+import { CH, Options, ServerInfo } from "../shared/ipc";
+import { EventViewModel, MAX_EVENTS } from "../shared/event";
+import { Collector } from "./server/collector";
 
 const DEFAULT_OPTIONS: Options = {
     listeningPort: 3000,
@@ -29,12 +25,26 @@ function loadOptions(): Options {
     }
 }
 
-// In-memory state owned by main. The renderer treats main as the source of
-// truth so a window reload re-seeds from here instead of losing history.
+function firstLanIp(): string | null {
+    for (const ifaces of Object.values(os.networkInterfaces())) {
+        for (const iface of ifaces ?? []) {
+            if (iface.family === "IPv4" && !iface.internal) {
+                return iface.address;
+            }
+        }
+    }
+    return null;
+}
+
+// Source-of-truth state owned by main. Window reloads re-seed the
+// renderer from this mirror so captured history survives a refresh.
 let options: Options = { ...DEFAULT_OPTIONS };
-const trackedEvents: RawEvent[] = [];
+const trackedEvents: EventViewModel[] = [];
+let nextEventId = 0;
+let serverInfo: ServerInfo = { ip: null, port: 0 };
 
 let mainWindow: BrowserWindow | null = null;
+let collector: Collector | null = null;
 
 function createMainWindow(): void {
     const isMac = os.platform() === "darwin";
@@ -82,6 +92,7 @@ function registerIpc(): void {
 
     ipcMain.handle(CH.CLEAR_EVENTS, () => {
         trackedEvents.length = 0;
+        nextEventId = 0;
     });
 
     ipcMain.on(CH.WINDOW_MINIMIZE, () => mainWindow?.minimize());
@@ -96,7 +107,44 @@ function registerIpc(): void {
     ipcMain.on(CH.WINDOW_CLOSE, () => mainWindow?.close());
 }
 
+function pushToRenderer(channel: string, payload: unknown): void {
+    // The renderer is the only consumer of push channels. When the window
+    // is closed (between `closed` and `activate`) we drop pushes silently
+    // — the renderer will re-seed from `trackedEvents` on next mount.
+    if (!mainWindow || mainWindow.isDestroyed()) return;
+    mainWindow.webContents.send(channel, payload);
+}
+
+function recordEvent(event: EventViewModel): void {
+    trackedEvents.push(event);
+    while (trackedEvents.length > MAX_EVENTS) {
+        trackedEvents.shift();
+    }
+    pushToRenderer(CH.EVENT_PUSH, event);
+}
+
+function recordServerReady(port: number): void {
+    serverInfo = { ip: firstLanIp(), port };
+    pushToRenderer(CH.SERVER_READY, serverInfo);
+}
+
+async function startCollector(): Promise<void> {
+    collector = new Collector({
+        appPath: app.getAppPath(),
+        proposedPort: options.listeningPort,
+        onEvent: recordEvent,
+        onReady: recordServerReady,
+        nextId: () => nextEventId++,
+    });
+    try {
+        await collector.start();
+    } catch (err) {
+        console.error("Failed to start collector", err);
+    }
+}
+
 app.on("window-all-closed", () => {
+    collector?.stop();
     app.quit();
 });
 
@@ -106,8 +154,12 @@ app.on("activate", () => {
     }
 });
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
     options = loadOptions();
     registerIpc();
     createMainWindow();
+    // The collector is the slow part of startup (JVM boot). Run it after
+    // the window is created so the renderer can paint its shell and
+    // show "waiting for collector…" instead of a blank screen.
+    await startCollector();
 });
