@@ -34,6 +34,10 @@
     --color-warn: #ff9f0a;
     --color-bad: #ff3b30;
 
+    /* JSON tree syntax tones */
+    --color-json-string: light-dark(#b65f00, #ffb86c);
+    --color-json-bool: light-dark(#af52de, #d77be4);
+
     /* Radii */
     --radius-sm: 4px;
     --radius: 6px;
@@ -43,32 +47,12 @@
     --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
 }
 
-/*
- * Aliases for the legacy variable names. Each component still reading
- * `var(--bg)` etc. keeps working unchanged; deleting these aliases is
- * the final step of the Tailwind migration once every component has
- * moved to utility classes.
- */
 :root {
     color-scheme: light dark;
     font-family: var(--font-sans);
     font-size: 13px;
     color: var(--color-fg);
     background: var(--color-surface);
-
-    --bg: var(--color-surface);
-    --bg-elevated: var(--color-elevated);
-    --bg-sunken: var(--color-sunken);
-    --fg: var(--color-fg);
-    --fg-muted: var(--color-muted);
-    --border: var(--color-border);
-    --accent: var(--color-accent);
-    --accent-soft: var(--color-accent-soft);
-    --selected: var(--color-selected);
-    --highlight: var(--color-highlight);
-    --status-ok: var(--color-ok);
-    --status-warn: var(--color-warn);
-    --status-bad: var(--color-bad);
 }
 
 /* ----- Reset / base ------------------------------------------------------ */
@@ -107,99 +91,11 @@ input {
 }
 
 mark {
-    background: var(--highlight);
+    background: var(--color-highlight);
     color: inherit;
     border-radius: 2px;
     padding: 0 1px;
 }
 
-/* ----- JSON tree -------------------------------------------------------- */
-
-.json-collection {
-    display: inline-block;
-    vertical-align: top;
-}
-
-.json-toggle {
-    display: inline-flex;
-    align-items: baseline;
-    gap: 2px;
-    padding: 0;
-    margin: 0;
-    background: transparent;
-    border: 0;
-    cursor: pointer;
-    color: inherit;
-    font: inherit;
-}
-
-.json-toggle:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 1px;
-    border-radius: 2px;
-}
-
-.json-caret {
-    display: inline-block;
-    width: 10px;
-    color: var(--fg-muted);
-    font-size: 10px;
-}
-
-.json-bracket {
-    color: var(--fg-muted);
-}
-
-.json-summary {
-    margin: 0 4px;
-    color: var(--fg-muted);
-    font-style: italic;
-}
-
-.json-list {
-    list-style: none;
-    margin: 0;
-    padding: 0 0 0 18px;
-    border-left: 1px dashed var(--border);
-    margin-left: 4px;
-}
-
-.json-row {
-    line-height: 1.55;
-}
-
-.json-key {
-    color: var(--accent);
-}
-
-.json-index {
-    color: var(--fg-muted);
-    font-variant-numeric: tabular-nums;
-}
-
-.json-colon {
-    color: var(--fg-muted);
-}
-
-.json-string {
-    color: light-dark(#b65f00, #ffb86c);
-}
-
-.json-number {
-    color: #0a84ff;
-}
-
-.json-bool {
-    color: light-dark(#af52de, #d77be4);
-}
-
-.json-null {
-    color: var(--fg-muted);
-    font-style: italic;
-}
-
-.json-empty {
-    color: var(--fg-muted);
-}
 
 

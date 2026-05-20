@@ -27,20 +27,20 @@ interface NodeProps {
 }
 
 function Node({ value, highlight, collapseAfter, depth }: NodeProps) {
-    if (value === null) return <span class="json-token json-null">null</span>;
-    if (value === undefined) return <span class="json-token json-null">undefined</span>;
+    if (value === null) return <span class="text-muted italic">null</span>;
+    if (value === undefined) return <span class="text-muted italic">undefined</span>;
     if (typeof value === "string") {
         return (
-            <span class="json-token json-string">
+            <span class="text-json-string">
                 "<Highlight text={value} query={highlight} />"
             </span>
         );
     }
     if (typeof value === "number") {
-        return <span class="json-token json-number">{String(value)}</span>;
+        return <span class="text-accent">{String(value)}</span>;
     }
     if (typeof value === "boolean") {
-        return <span class="json-token json-bool">{String(value)}</span>;
+        return <span class="text-json-bool">{String(value)}</span>;
     }
     if (Array.isArray(value)) {
         return (
@@ -48,7 +48,7 @@ function Node({ value, highlight, collapseAfter, depth }: NodeProps) {
                 entries={value.map((item, i) => [i, item] as const)}
                 open="["
                 close="]"
-                renderKey={(k) => <span class="json-token json-index">{k}</span>}
+                renderKey={(k) => <span class="text-muted tabular-nums">{k}</span>}
                 highlight={highlight}
                 collapseAfter={collapseAfter}
                 depth={depth}
@@ -63,7 +63,7 @@ function Node({ value, highlight, collapseAfter, depth }: NodeProps) {
                 open="{"
                 close="}"
                 renderKey={(k) => (
-                    <span class="json-token json-key">
+                    <span class="text-accent">
                         "<Highlight text={String(k)} query={highlight} />"
                     </span>
                 )}
@@ -73,7 +73,7 @@ function Node({ value, highlight, collapseAfter, depth }: NodeProps) {
             />
         );
     }
-    return <span class="json-token">{String(value)}</span>;
+    return <span>{String(value)}</span>;
 }
 
 interface CollectionProps<K extends string | number> {
@@ -98,36 +98,38 @@ function Collection<K extends string | number>({
     const [collapsed, setCollapsed] = useState(entries.length > collapseAfter);
     if (entries.length === 0) {
         return (
-            <span class="json-token json-empty">
+            <span class="text-muted">
                 {open}
                 {close}
             </span>
         );
     }
     return (
-        <span class="json-collection">
+        <span class="inline-block align-top">
             <button
                 type="button"
-                class="json-toggle"
+                class="inline-flex items-baseline gap-0.5 p-0 m-0 bg-transparent border-0 cursor-pointer text-inherit font-inherit focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-1 rounded-sm"
                 onClick={() => setCollapsed((c) => !c)}
                 aria-expanded={!collapsed}
             >
-                <span class="json-caret">{collapsed ? "▸" : "▾"}</span>
-                <span class="json-bracket">{open}</span>
+                <span class="inline-block w-2.5 text-muted text-[10px]">
+                    {collapsed ? "▸" : "▾"}
+                </span>
+                <span class="text-muted">{open}</span>
                 {collapsed && (
-                    <span class="json-summary">
+                    <span class="mx-1 text-muted italic">
                         {entries.length} item{entries.length === 1 ? "" : "s"}
                     </span>
                 )}
-                {collapsed && <span class="json-bracket">{close}</span>}
+                {collapsed && <span class="text-muted">{close}</span>}
             </button>
             {!collapsed && (
                 <>
-                    <ul class="json-list">
+                    <ul class="list-none m-0 ml-1 pl-[18px] border-l border-dashed border-border">
                         {entries.map(([key, val]) => (
-                            <li key={String(key)} class="json-row">
+                            <li key={String(key)} class="leading-[1.55]">
                                 {renderKey(key)}
-                                <span class="json-colon">: </span>
+                                <span class="text-muted">: </span>
                                 <Node
                                     value={val}
                                     highlight={highlight}
@@ -137,7 +139,7 @@ function Collection<K extends string | number>({
                             </li>
                         ))}
                     </ul>
-                    <span class="json-bracket">{close}</span>
+                    <span class="text-muted">{close}</span>
                 </>
             )}
         </span>
