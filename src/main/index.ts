@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from "electron";
+import { app, BrowserWindow, dialog, ipcMain } from "electron";
 import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
@@ -132,6 +132,19 @@ function registerIpc(): void {
     ipcMain.handle(CH.CLEAR_EVENTS, () => {
         trackedEvents.length = 0;
         nextEventId = 0;
+    });
+
+    ipcMain.handle(CH.EXPORT_EVENTS, async (_e, payload: string) => {
+        if (!mainWindow) return false;
+        const today = new Date().toISOString().slice(0, 10);
+        const { canceled, filePath } = await dialog.showSaveDialog(mainWindow, {
+            title: "Export events",
+            defaultPath: `nepsnowplow-events-${today}.json`,
+            filters: [{ name: "JSON", extensions: ["json"] }],
+        });
+        if (canceled || !filePath) return false;
+        await fs.promises.writeFile(filePath, payload, "utf-8");
+        return true;
     });
 
     ipcMain.on(CH.WINDOW_MINIMIZE, () => mainWindow?.minimize());

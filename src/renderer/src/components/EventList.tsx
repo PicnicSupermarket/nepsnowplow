@@ -3,30 +3,14 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import type { EventViewModel } from "../../../shared/event";
 import { useStore } from "../store";
 import { EventListItem } from "./EventListItem";
-import { ContextMenu, ContextMenuItem } from "./ui/context-menu";
+import { ContextMenu, ContextMenuItem, ContextMenuSeparator } from "./ui/context-menu";
 import { serializeEvent } from "../lib/serialize";
+import { filterEvents } from "../lib/visible-events";
+import { exportVisibleEvents } from "../actions";
 
 // Approximate row height; virtualizer corrects against actual DOM size as
 // rows mount so this only affects the initial estimate.
 const ROW_ESTIMATE = 48;
-
-function filterEvents(
-    events: Map<number, EventViewModel>,
-    order: number[],
-    query: string,
-    hideValid: boolean,
-): EventViewModel[] {
-    const q = query.trim().toLowerCase();
-    const out: EventViewModel[] = [];
-    for (const id of order) {
-        const e = events.get(id);
-        if (!e) continue;
-        if (hideValid && e.isValid) continue;
-        if (q && !e.searchableText.includes(q)) continue;
-        out.push(e);
-    }
-    return out;
-}
 
 interface MenuState {
     x: number;
@@ -154,6 +138,15 @@ export function EventList() {
                     }}
                 >
                     Copy event JSON
+                </ContextMenuItem>
+                <ContextMenuSeparator />
+                <ContextMenuItem
+                    onSelect={() => {
+                        setMenu(null);
+                        void exportVisibleEvents();
+                    }}
+                >
+                    Export all visible events ({visible.length})…
                 </ContextMenuItem>
             </ContextMenu>
         </div>

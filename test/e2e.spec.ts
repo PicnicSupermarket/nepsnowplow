@@ -113,9 +113,40 @@ test.describe("renderer", () => {
         const menu = window.getByRole("menu");
         await expect(menu).toBeVisible();
         await expect(menu.getByRole("menuitem", { name: /copy event json/i })).toBeVisible();
+        await expect(
+            menu.getByRole("menuitem", { name: /export all visible events/i }),
+        ).toBeVisible();
 
         await menu.getByRole("menuitem", { name: /copy event json/i }).click();
         await expect(menu).toBeHidden();
+    });
+
+    test("export button writes visible events to the chosen file", async () => {
+        await request.post("/", { data: validBundle, failOnStatusCode: false });
+        await expect(window.locator('[role="option"]').first()).toBeVisible();
+
+        // Mock the save dialog inside the main process so the test doesn't
+        // hit the OS picker. Capture the JSON payload that main receives
+        // and write it through the original handler so we can read it
+        // back from a temp file.
+        const outFile = path.join(__dirname, "..", "test-results", "export.json");
+        await app.evaluate(async ({ dialog }, target: string) => {
+            (dialog as unknown as { showSaveDialog: unknown }).showSaveDialog =
+                async () => ({ canceled: false, filePath: target, bookmark: "" });
+        }, outFile);
+
+        await window.getByRole("button", { name: /^export$/i }).click();
+
+        // Wait for main to finish writing the file before reading.
+        const fs = await import("node:fs");
+        await expect.poll(() => fs.existsSync(outFile)).toBeTruthy();
+        const written = JSON.parse(fs.readFileSync(outFile, "utf-8"));
+        expect(Array.isArray(written)).toBe(true);
+        expect(written.length).toBeGreaterThan(0);
+        expect(written[0]).toMatchObject({
+            schema: expect.stringContaining("page_view"),
+        });
+        fs.rmSync(outFile);
     });
 
     test("dropping events while paused", async () => {

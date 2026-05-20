@@ -6,6 +6,7 @@ import { EventList } from "./components/EventList";
 import { EventDetails } from "./components/EventDetails";
 import { useStore } from "./store";
 import { focusSearch } from "./lib/focus";
+import { exportVisibleEvents } from "./actions";
 
 export function App() {
     useEffect(() => {
@@ -45,15 +46,22 @@ export function App() {
     }, []);
 
     // Global keyboard shortcuts. ⌘F focuses the in-event search,
-    // ⌘⇧F focuses the sidebar filter. Bound on window rather than
-    // per-input so users can hit the shortcut anywhere in the app and
-    // land in the right field even if focus is currently elsewhere.
+    // ⌘⇧F focuses the sidebar filter, ⌘S exports the visible
+    // events. Bound on window rather than per-input so users can hit
+    // the shortcut anywhere in the app and land in the right field
+    // even if focus is currently elsewhere.
     useEffect(() => {
         const onKey = (e: KeyboardEvent) => {
             const mod = e.metaKey || e.ctrlKey;
-            if (!mod || e.key.toLowerCase() !== "f") return;
-            e.preventDefault();
-            focusSearch(e.shiftKey ? "list-filter" : "event-search");
+            if (!mod) return;
+            const key = e.key.toLowerCase();
+            if (key === "f") {
+                e.preventDefault();
+                focusSearch(e.shiftKey ? "list-filter" : "event-search");
+            } else if (key === "s" && !e.shiftKey) {
+                e.preventDefault();
+                void exportVisibleEvents();
+            }
         };
         window.addEventListener("keydown", onKey);
         return () => window.removeEventListener("keydown", onKey);

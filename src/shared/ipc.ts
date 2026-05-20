@@ -25,6 +25,8 @@ export const CH = {
     SET_LISTENING_PORT: "options:set-listening-port",
     SET_PAUSED: "options:set-paused",
 
+    EXPORT_EVENTS: "events:export",
+
     GET_INITIAL_EVENTS: "events:get-initial",
     CLEAR_EVENTS: "events:clear",
     EVENT_PUSH: "events:push",
@@ -59,6 +61,11 @@ export interface Api {
 
     getInitialEvents(): Promise<EventViewModel[]>;
     clearEvents(): Promise<void>;
+    // Opens the OS save dialog and writes `payload` (a serialised JSON
+    // string the renderer already produced) to the chosen file. Resolves
+    // to true on a successful save, false if the user canceled the
+    // dialog. Rejects on IO errors.
+    exportEvents(payload: string): Promise<boolean>;
 
     // Subscribe to push channels. Returns an unsubscribe function so callers
     // (typically component effects) can detach without juggling listener

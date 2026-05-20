@@ -24,6 +24,9 @@ const api: Api = {
 
     clearEvents: () => ipcRenderer.invoke(CH.CLEAR_EVENTS) as Promise<void>,
 
+    exportEvents: (payload) =>
+        ipcRenderer.invoke(CH.EXPORT_EVENTS, payload) as Promise<boolean>,
+
     onEvent: (cb) => {
         const listener = (_e: IpcRendererEvent, event: EventViewModel) => cb(event);
         ipcRenderer.on(CH.EVENT_PUSH, listener);
