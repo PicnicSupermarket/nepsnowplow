@@ -42,6 +42,10 @@ export interface CollectorOptions {
     onEvent(event: EventViewModel): void;
     onReady(actualPort: number): void;
     nextId(): number;
+    // Polled at the top of each handleEvent. When it returns true the
+    // collector 204s the request immediately and skips the snowplow-micro
+    // round-trip + view-model build entirely.
+    isPaused(): boolean;
 }
 
 export class Collector {
@@ -115,6 +119,13 @@ export class Collector {
         const body = req.body as Bundle | undefined;
         if (!body?.data) {
             res.sendStatus(400);
+            return;
+        }
+        if (this.opts.isPaused()) {
+            // Drop on the floor: the tracker gets a normal 204 so it
+            // doesn't retry, but neither the JVM nor the renderer ever
+            // see this bundle.
+            res.sendStatus(204);
             return;
         }
 

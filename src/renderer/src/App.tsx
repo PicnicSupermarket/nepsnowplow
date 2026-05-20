@@ -22,6 +22,7 @@ export function App() {
             ([opts, events]) => {
                 if (cancelled) return;
                 store.setFilterValidEvents(opts.filterValidEvents);
+                store.setPaused(opts.paused);
                 store.ingestEvents(events);
             },
         );

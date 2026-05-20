@@ -7,6 +7,11 @@ import type { EventViewModel } from "./event";
 export interface Options {
     listeningPort: number;
     filterValidEvents: boolean;
+    // When true the collector still accepts POSTs but short-circuits to
+    // 204 without running the snowplow-micro validation pipeline or
+    // forwarding the event to the renderer. Session-scoped: resets to
+    // false on every app launch so a paused state can't be left behind.
+    paused: boolean;
 }
 
 export interface ServerInfo {
@@ -18,6 +23,7 @@ export const CH = {
     GET_OPTIONS: "options:get",
     SET_FILTER_VALID_EVENTS: "options:set-filter-valid-events",
     SET_LISTENING_PORT: "options:set-listening-port",
+    SET_PAUSED: "options:set-paused",
 
     GET_INITIAL_EVENTS: "events:get-initial",
     CLEAR_EVENTS: "events:clear",
@@ -40,6 +46,10 @@ export interface Api {
 
     getOptions(): Promise<Options>;
     setFilterValidEvents(value: boolean): Promise<void>;
+    // Pauses / resumes the collector. While paused incoming Snowplow
+    // posts still 204 immediately but skip the validation pipeline and
+    // never reach the renderer.
+    setPaused(value: boolean): Promise<void>;
     // Persists the new port to settings.json and restarts the Express
     // collector listener on it. Rejects with an Error if the port is
     // outside [0, 65535]; passing 0 asks the OS to pick a free one.

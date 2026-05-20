@@ -8,6 +8,7 @@ interface State {
     selectedId: number | null;
     filterQuery: string;
     filterValidEvents: boolean;
+    paused: boolean;
     serverInfo: ServerInfo;
 }
 
@@ -17,6 +18,7 @@ interface Actions {
     select(id: number | null): void;
     setFilterQuery(query: string): void;
     setFilterValidEvents(value: boolean): void;
+    setPaused(value: boolean): void;
     setServerInfo(info: ServerInfo): void;
 }
 
@@ -28,6 +30,7 @@ const initialState: State = {
     selectedId: null,
     filterQuery: "",
     filterValidEvents: false,
+    paused: false,
     serverInfo: { ip: null, port: 0 },
 };
 
@@ -76,6 +79,8 @@ export const useStore = create<Store>((set) => ({
     setFilterQuery: (query) => set({ filterQuery: query }),
 
     setFilterValidEvents: (value) => set({ filterValidEvents: value }),
+
+    setPaused: (value) => set({ paused: value }),
 
     setServerInfo: (info) => set({ serverInfo: info }),
 }));

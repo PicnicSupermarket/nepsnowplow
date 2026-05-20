@@ -19,6 +19,11 @@ export function setFilterQuery(query: string): void {
     useStore.getState().setFilterQuery(query);
 }
 
+export async function setPaused(value: boolean): Promise<void> {
+    useStore.getState().setPaused(value);
+    await window.api.setPaused(value);
+}
+
 export async function setListeningPort(port: number): Promise<number> {
     // Main rejects on out-of-range values; bubble that up so the caller
     // can surface the error in the dialog rather than silently swallowing.

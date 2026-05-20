@@ -10,6 +10,7 @@ import { startUpdater } from "./updater";
 const DEFAULT_OPTIONS: Options = {
     listeningPort: 3000,
     filterValidEvents: false,
+    paused: false,
 };
 
 // Resolves the directory containing the bundled extra resources (jre/,
@@ -110,6 +111,10 @@ function registerIpc(): void {
         options = { ...options, filterValidEvents: Boolean(value) };
     });
 
+    ipcMain.handle(CH.SET_PAUSED, (_e, value: boolean) => {
+        options = { ...options, paused: Boolean(value) };
+    });
+
     ipcMain.handle(CH.SET_LISTENING_PORT, async (_e, port: number) => {
         if (!Number.isInteger(port) || port < 0 || port > 65535) {
             throw new Error(`Invalid port: ${port}`);
@@ -178,6 +183,10 @@ async function startCollector(): Promise<void> {
         onEvent: recordEvent,
         onReady: recordServerReady,
         nextId: () => nextEventId++,
+        // Polled on every POST; reading through a closure so flipping
+        // the flag at runtime affects subsequent requests without having
+        // to thread the new value back through the collector.
+        isPaused: () => options.paused,
     });
     try {
         await collector.start();

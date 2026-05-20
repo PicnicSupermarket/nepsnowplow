@@ -105,6 +105,28 @@ test.describe("renderer", () => {
         await expect(row).toContainText("web_page");
     });
 
+    test("dropping events while paused", async () => {
+        await window.getByRole("button", { name: /^pause$/i }).click();
+
+        // Tracker still gets a 204 — the collector accepts the request,
+        // it just doesn't store or forward the bundle.
+        const res = await request.post("/", {
+            data: validBundle,
+            failOnStatusCode: false,
+        });
+        expect(res.status()).toBe(204);
+
+        // Give the renderer a beat in case anything was going to land,
+        // then assert the list stayed empty.
+        await window.waitForTimeout(200);
+        await expect(window.locator('[role="option"]')).toHaveCount(0);
+
+        // Resuming restores capture for subsequent bundles.
+        await window.getByRole("button", { name: /^resume$/i }).click();
+        await request.post("/", { data: validBundle, failOnStatusCode: false });
+        await expect(window.locator('[role="option"]').first()).toBeVisible();
+    });
+
     test("shows event payload in the details pane when selected", async () => {
         await request.post("/", { data: validBundle, failOnStatusCode: false });
 

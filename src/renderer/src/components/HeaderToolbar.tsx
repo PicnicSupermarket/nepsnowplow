@@ -1,6 +1,11 @@
 import { useState } from "preact/hooks";
 import { useStore } from "../store";
-import { clearAllEvents, setFilterQuery, setFilterValidEvents } from "../actions";
+import {
+    clearAllEvents,
+    setFilterQuery,
+    setFilterValidEvents,
+    setPaused,
+} from "../actions";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { SettingsDialog } from "./SettingsDialog";
@@ -31,6 +36,23 @@ function IconEyeOff() {
                 stroke-linecap="round"
                 stroke-linejoin="round"
             />
+        </svg>
+    );
+}
+
+function IconPause() {
+    return (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect x="6" y="5" width="4" height="14" rx="1" fill="currentColor" />
+            <rect x="14" y="5" width="4" height="14" rx="1" fill="currentColor" />
+        </svg>
+    );
+}
+
+function IconPlay() {
+    return (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M7 5l12 7-12 7V5z" fill="currentColor" />
         </svg>
     );
 }
@@ -67,6 +89,7 @@ function IconSearch() {
 export function HeaderToolbar() {
     const filterQuery = useStore((s) => s.filterQuery);
     const filterValidEvents = useStore((s) => s.filterValidEvents);
+    const paused = useStore((s) => s.paused);
     const [settingsOpen, setSettingsOpen] = useState(false);
 
     return (
@@ -79,6 +102,21 @@ export function HeaderToolbar() {
                 class="flex gap-1.5"
                 style="-webkit-app-region: no-drag"
             >
+                <Button
+                    variant="toggle"
+                    pressed={paused}
+                    onClick={() => {
+                        void setPaused(!paused);
+                    }}
+                    title={
+                        paused
+                            ? "Resume recording incoming events"
+                            : "Pause recording — incoming posts get a 204 but are dropped"
+                    }
+                >
+                    {paused ? <IconPlay /> : <IconPause />}
+                    <span>{paused ? "Resume" : "Pause"}</span>
+                </Button>
                 <Button
                     onClick={() => {
                         void clearAllEvents();
