@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import { setListeningPort } from "../actions";
 import { useStore } from "../store";
+import { Button } from "./ui/button";
 
 interface Props {
     open: boolean;
@@ -74,17 +75,12 @@ export function SettingsDialog({ open, onClose }: Props) {
                 {error && <div class="dialog__error">{error}</div>}
 
                 <div class="dialog__actions">
-                    <button
-                        type="button"
-                        class="btn"
-                        onClick={onClose}
-                        disabled={saving}
-                    >
+                    <Button onClick={onClose} disabled={saving}>
                         Cancel
-                    </button>
-                    <button type="submit" class="btn btn--primary" disabled={saving}>
+                    </Button>
+                    <Button type="submit" variant="primary" disabled={saving}>
                         {saving ? "Saving…" : "Save"}
-                    </button>
+                    </Button>
                 </div>
             </form>
         </dialog>

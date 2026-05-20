@@ -1,6 +1,7 @@
 import { useState } from "preact/hooks";
 import { useStore } from "../store";
 import { clearAllEvents, setFilterQuery, setFilterValidEvents } from "../actions";
+import { Button } from "./ui/button";
 import { SettingsDialog } from "./SettingsDialog";
 
 // Two-up SVG icons kept inline so we don't ship a font for two glyphs.
@@ -70,9 +71,7 @@ export function HeaderToolbar() {
     return (
         <header class="app-header">
             <div class="app-header__actions">
-                <button
-                    type="button"
-                    class="btn"
+                <Button
                     onClick={() => {
                         void clearAllEvents();
                     }}
@@ -80,11 +79,10 @@ export function HeaderToolbar() {
                 >
                     <IconTrash />
                     <span>Clear</span>
-                </button>
-                <button
-                    type="button"
-                    class={`btn btn--toggle${filterValidEvents ? " is-active" : ""}`}
-                    aria-pressed={filterValidEvents}
+                </Button>
+                <Button
+                    variant="toggle"
+                    pressed={filterValidEvents}
                     onClick={() => {
                         void setFilterValidEvents(!filterValidEvents);
                     }}
@@ -92,7 +90,7 @@ export function HeaderToolbar() {
                 >
                     <IconEyeOff />
                     <span>Hide valid</span>
-                </button>
+                </Button>
             </div>
             <label class="app-header__search">
                 <IconSearch />
@@ -104,15 +102,15 @@ export function HeaderToolbar() {
                     aria-label="Filter events"
                 />
             </label>
-            <button
-                type="button"
-                class="btn btn--icon"
+            <Button
+                variant="ghost"
+                size="icon"
                 onClick={() => setSettingsOpen(true)}
                 aria-label="Settings"
                 title="Settings"
             >
                 <IconSettings />
-            </button>
+            </Button>
             <SettingsDialog open={settingsOpen} onClose={() => setSettingsOpen(false)} />
         </header>
     );

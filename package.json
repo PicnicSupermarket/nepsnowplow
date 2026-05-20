@@ -116,10 +116,13 @@
     "dependencies": {
         "@tanstack/react-virtual": "^3.13.24",
         "body-parser": "^2.2.2",
+        "class-variance-authority": "^0.7.1",
+        "clsx": "^2.1.1",
         "electron-log": "^5.4.4",
         "electron-updater": "^6.8.3",
         "express": "^5.2.1",
         "preact": "^10.29.2",
+        "tailwind-merge": "^3.6.0",
         "zustand": "^5.0.13"
     }
 }
