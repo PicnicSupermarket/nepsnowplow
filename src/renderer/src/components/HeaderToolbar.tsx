@@ -152,15 +152,17 @@ export function HeaderToolbar() {
                     class="flex-1 min-w-0 h-auto px-0 border-0 bg-transparent rounded-none focus:border-0"
                 />
             </label>
-            <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setSettingsOpen(true)}
-                aria-label="Settings"
-                title="Settings"
-            >
-                <IconSettings />
-            </Button>
+            <div style="-webkit-app-region: no-drag">
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setSettingsOpen(true)}
+                    aria-label="Settings"
+                    title="Settings"
+                >
+                    <IconSettings />
+                </Button>
+            </div>
             <SettingsDialog open={settingsOpen} onClose={() => setSettingsOpen(false)} />
         </header>
     );
