@@ -1,4 +1,4 @@
-import type { EventViewModel, EventContext } from "../../../shared/event";
+import type { EventKind, EventViewModel, EventContext } from "../../../shared/event";
 
 // Clean wire-friendly shape for events the user copies / exports. Drops
 // view-model internals (id, timestamp, searchableText, isValid) that
@@ -14,6 +14,7 @@ interface SerializedContext {
 
 interface SerializedEvent {
     timestamp: string;
+    kind: EventKind;
     schema: string | null;
     payload: unknown;
     contexts: SerializedContext[];
@@ -28,6 +29,7 @@ function formatSchema(name: string, version: string): string | null {
 export function serializeEvent(event: EventViewModel): SerializedEvent {
     return {
         timestamp: new Date(event.timestamp).toISOString(),
+        kind: event.kind,
         schema: formatSchema(event.schema.name, event.schema.version),
         payload: event.payload,
         contexts: event.contexts.map((c) => ({

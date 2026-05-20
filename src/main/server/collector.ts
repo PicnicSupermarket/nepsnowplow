@@ -4,7 +4,7 @@ import type { Server as HttpServer } from "node:http";
 import { decode } from "./base64";
 import { SnowplowMicro, MicroBadEvent, MicroGoodEvent } from "./snowplow-micro";
 import { buildEventViewModel, SchemaEnvelope, DecodedEvent } from "./event-builder";
-import type { EventViewModel } from "../../shared/event";
+import type { EventKind, EventViewModel } from "../../shared/event";
 
 // One entry inside a `body.data` array as sent by a Snowplow tracker.
 // `cx` is the base64-encoded `co` (contexts envelope), `ue_pr` / `ue_px`
@@ -170,7 +170,7 @@ export class Collector {
     }
 
     private decodeBundleEntry(entry: BundleEntry): DecodedEvent {
-        const payloadEnvelope = this.extractPayload(entry);
+        const { payload, kind } = this.extractPayload(entry);
         const contextsRaw = JSON.parse(decode(entry.cx)) as
             | { data?: SchemaEnvelope[] }
             | SchemaEnvelope[];
@@ -179,17 +179,17 @@ export class Collector {
             : Array.isArray(contextsRaw.data)
               ? contextsRaw.data
               : [];
-        return { eid: entry.eid, payload: payloadEnvelope, contexts };
+        return { eid: entry.eid, kind, payload, contexts };
     }
 
-    private extractPayload(entry: BundleEntry): SchemaEnvelope {
+    private extractPayload(entry: BundleEntry): { payload: SchemaEnvelope; kind: EventKind } {
         if (entry.ue_pr !== undefined) {
             const parsed = JSON.parse(entry.ue_pr) as SchemaEnvelope;
-            return this.unwrap(parsed);
+            return { payload: this.unwrap(parsed), kind: "self-describing" };
         }
         if (entry.ue_px !== undefined) {
             const parsed = JSON.parse(decode(entry.ue_px)) as SchemaEnvelope;
-            return this.unwrap(parsed);
+            return { payload: this.unwrap(parsed), kind: "self-describing" };
         }
         // Structured event: no schema, just the labelled fields.
         const data: Record<string, string> = {};
@@ -197,7 +197,7 @@ export class Collector {
             const raw = entry[k];
             if (raw !== undefined) data[v] = raw;
         }
-        return { data };
+        return { payload: { data }, kind: "structured" };
     }
 
     private unwrap(envelope: SchemaEnvelope): SchemaEnvelope {

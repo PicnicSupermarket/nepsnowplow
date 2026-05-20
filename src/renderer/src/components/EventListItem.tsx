@@ -1,6 +1,7 @@
 import type { EventViewModel } from "../../../shared/event";
 import { Highlight } from "./Highlight";
 import { ValidityDot } from "./ui/validity-dot";
+import { displayTitle } from "../lib/event-display";
 
 interface Props {
     event: EventViewModel;
@@ -13,9 +14,9 @@ export function EventListItem({ event, highlight }: Props) {
             <header class="flex items-center gap-1.5 font-semibold">
                 <ValidityDot status={event.validationStatus} />
                 <span class="truncate">
-                    <Highlight text={event.schema.name || "(no schema)"} query={highlight} />
+                    <Highlight text={displayTitle(event)} query={highlight} />
                 </span>
-                {event.schema.version && (
+                {event.kind === "self-describing" && event.schema.version && (
                     <span class="ml-auto text-[11px] font-normal text-muted tabular-nums">
                         {event.schema.version}
                     </span>

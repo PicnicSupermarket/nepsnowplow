@@ -7,6 +7,7 @@ import { JsonTree } from "./JsonTree";
 import { ContextCard } from "./ContextCard";
 import { registerSearch } from "../lib/focus";
 import { shortcut } from "../lib/shortcut";
+import { displayTitle } from "../lib/event-display";
 
 const STATUS_LABEL: Record<EventViewModel["validationStatus"], string> = {
     valid: "Valid",
@@ -36,14 +37,19 @@ export function EventDetails() {
                 <ValidityDot status={event.validationStatus} />
                 <div class="flex items-baseline gap-2 flex-1 min-w-0">
                     <h2 class="m-0 text-base font-semibold truncate">
-                        {event.schema.name || "(no schema)"}
+                        {displayTitle(event)}
                     </h2>
-                    {event.schema.version && (
+                    {event.kind === "self-describing" && event.schema.version && (
                         <span class="text-xs text-muted tabular-nums">
                             {event.schema.version}
                         </span>
                     )}
                 </div>
+                {event.kind === "structured" && (
+                    <Badge variant="neutral" title="Snowplow structured event (no schema)">
+                        Structured
+                    </Badge>
+                )}
                 <Badge variant={event.validationStatus}>
                     {STATUS_LABEL[event.validationStatus]}
                 </Badge>

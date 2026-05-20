@@ -1,4 +1,9 @@
-import type { EventViewModel, ValidationStatus, EventSchema } from "../../shared/event";
+import type {
+    EventKind,
+    EventViewModel,
+    ValidationStatus,
+    EventSchema,
+} from "../../shared/event";
 import type { MicroBadEvent, MicroGoodEvent } from "./snowplow-micro";
 
 // Both `payload` and each `context` arrive on the wire as an Iglu envelope:
@@ -12,6 +17,7 @@ export interface SchemaEnvelope {
 
 export interface DecodedEvent {
     eid: string;
+    kind: EventKind;
     payload: SchemaEnvelope;
     contexts: SchemaEnvelope[];
 }
@@ -126,6 +132,7 @@ export function buildEventViewModel(
     return {
         id,
         timestamp: Date.now(),
+        kind: decoded.kind,
         schema: splitSchema(decoded.payload.schema),
         payload: decoded.payload.data,
         validationStatus: payloadValidation.status,

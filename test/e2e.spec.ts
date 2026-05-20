@@ -31,6 +31,19 @@ const validBundle = {
     ],
 };
 
+// Snowplow structured event: no schema URI, just the labelled fields.
+const structuredBundle = {
+    data: [
+        {
+            eid: "00000000-0000-4000-8000-000000000002",
+            e: "se",
+            se_ca: "GENERIC",
+            se_ac: "view_component",
+            cx: Buffer.from(JSON.stringify([])).toString("base64"),
+        },
+    ],
+};
+
 let app: ElectronApplication;
 let window: Page;
 let request: APIRequestContext;
@@ -169,6 +182,26 @@ test.describe("renderer", () => {
         await window.getByRole("button", { name: /^resume$/i }).click();
         await request.post("/", { data: validBundle, failOnStatusCode: false });
         await expect(window.locator('[role="option"]').first()).toBeVisible();
+    });
+
+    test("renders structured events as category / action with a Structured badge", async () => {
+        await request.post("/", {
+            data: structuredBundle,
+            failOnStatusCode: false,
+        });
+        const row = window.locator('[role="option"]').first();
+        await expect(row).toBeVisible();
+        // Sidebar title comes from the synthesised category / action pair
+        // rather than the legacy (no schema) fallback.
+        await expect(row).toContainText("GENERIC / view_component");
+
+        await row.click();
+        const details = window.getByRole("region", { name: "Event details" });
+        await expect(details.getByRole("heading", { level: 2 })).toHaveText(
+            "GENERIC / view_component",
+        );
+        // Structured marker badge appears next to the validation badge.
+        await expect(details.getByText("Structured", { exact: true })).toBeVisible();
     });
 
     test("shows event payload in the details pane when selected", async () => {

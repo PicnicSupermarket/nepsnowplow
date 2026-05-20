@@ -6,6 +6,13 @@
 
 export type ValidationStatus = "valid" | "invalid" | "unknown";
 
+// Self-describing events (`e=ue` on the wire) carry an Iglu schema in
+// their envelope. Structured events (`e=se`) are the legacy shape and
+// only ship `se_ca`/`se_ac`/`se_la`/`se_pr`/`se_va` — they have no
+// schema URI by design, so the renderer treats them as a distinct kind
+// instead of pretending they're unschematized self-describing events.
+export type EventKind = "self-describing" | "structured";
+
 export interface EventSchema {
     name: string;
     version: string;
@@ -21,6 +28,7 @@ export interface EventContext {
 export interface EventViewModel {
     id: number;
     timestamp: number;
+    kind: EventKind;
     schema: EventSchema;
     payload: unknown;
     validationStatus: ValidationStatus;
