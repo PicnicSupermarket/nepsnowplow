@@ -1,34 +1,28 @@
-import { useEffect, useRef, useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 import { setListeningPort } from "../actions";
 import { useStore } from "../store";
 import { Button } from "./ui/button";
+import { Dialog, DialogContent, DialogTitle } from "./ui/dialog";
 
 interface Props {
     open: boolean;
     onClose(): void;
 }
 
-// Settings dialog backed by the native <dialog> element. showModal()
-// handles focus trapping, ESC-to-close, and inert background by itself,
-// so we just track open/close state and the form fields.
+// Radix Dialog handles focus trapping, ESC dismiss, body scroll lock,
+// and click-outside via the overlay. We only own the form state.
 export function SettingsDialog({ open, onClose }: Props) {
     const currentPort = useStore((s) => s.serverInfo.port);
-    const ref = useRef<HTMLDialogElement>(null);
     const [portInput, setPortInput] = useState(String(currentPort || 3000));
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const dialog = ref.current;
-        if (!dialog) return;
-        if (open && !dialog.open) {
-            // Reset the form to the latest known port whenever the dialog
-            // opens, in case the user closed without saving last time.
+        // Reset the form to the latest known port whenever the dialog
+        // opens, in case the user closed without saving last time.
+        if (open) {
             setPortInput(String(currentPort || 3000));
             setError(null);
-            dialog.showModal();
-        } else if (!open && dialog.open) {
-            dialog.close();
         }
     }, [open, currentPort]);
 
@@ -52,37 +46,46 @@ export function SettingsDialog({ open, onClose }: Props) {
     }
 
     return (
-        <dialog ref={ref} class="dialog" onClose={onClose}>
-            <form class="dialog__form" onSubmit={handleSave}>
-                <h2 class="dialog__title">Settings</h2>
+        <Dialog open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
+            <DialogContent>
+                <form class="flex flex-col gap-4" onSubmit={handleSave}>
+                    <DialogTitle>Settings</DialogTitle>
 
-                <label class="dialog__field">
-                    <span class="dialog__label">Listening port</span>
-                    <input
-                        type="number"
-                        min={0}
-                        max={65535}
-                        value={portInput}
-                        onInput={(e) => setPortInput((e.target as HTMLInputElement).value)}
-                        autofocus
-                    />
-                    <span class="dialog__hint">
-                        Port the Snowplow collector listens on. Use 0 to let the
-                        OS pick a free port automatically.
-                    </span>
-                </label>
+                    <label class="flex flex-col gap-1.5">
+                        <span class="text-xs font-medium">Listening port</span>
+                        <input
+                            type="number"
+                            min={0}
+                            max={65535}
+                            value={portInput}
+                            onInput={(e) =>
+                                setPortInput((e.target as HTMLInputElement).value)
+                            }
+                            autofocus
+                            class="h-7 px-2 rounded-sm border border-border bg-sunken text-fg tabular-nums focus:outline-none focus:border-accent"
+                        />
+                        <span class="text-[11px] text-muted">
+                            Port the Snowplow collector listens on. Use 0 to let the
+                            OS pick a free port automatically.
+                        </span>
+                    </label>
 
-                {error && <div class="dialog__error">{error}</div>}
+                    {error && (
+                        <div class="px-3 py-2 rounded-sm bg-bad/10 border border-bad/30 text-bad text-xs">
+                            {error}
+                        </div>
+                    )}
 
-                <div class="dialog__actions">
-                    <Button onClick={onClose} disabled={saving}>
-                        Cancel
-                    </Button>
-                    <Button type="submit" variant="primary" disabled={saving}>
-                        {saving ? "Saving…" : "Save"}
-                    </Button>
-                </div>
-            </form>
-        </dialog>
+                    <div class="flex justify-end gap-2">
+                        <Button onClick={onClose} disabled={saving}>
+                            Cancel
+                        </Button>
+                        <Button type="submit" variant="primary" disabled={saving}>
+                            {saving ? "Saving…" : "Save"}
+                        </Button>
+                    </div>
+                </form>
+            </DialogContent>
+        </Dialog>
     );
 }

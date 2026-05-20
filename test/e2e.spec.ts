@@ -140,7 +140,7 @@ test.describe("settings", () => {
     test("changing the listening port restarts the collector on it", async () => {
         await window.getByRole("button", { name: /settings/i }).click();
 
-        const portInput = window.locator(".dialog input[type=number]");
+        const portInput = window.getByRole("spinbutton");
         await expect(portInput).toBeVisible();
 
         // Ask the OS to pick a free port; the dialog closes once main has
@@ -148,10 +148,9 @@ test.describe("settings", () => {
         // the new serverInfo.
         await portInput.fill("0");
         await window.getByRole("button", { name: /^save$/i }).click();
-        // The native <dialog> element stays in the DOM after .close() — it
-        // just drops its `open` attribute and becomes display: none — so
-        // assert on visibility rather than DOM presence.
-        await expect(window.locator(".dialog")).not.toBeVisible();
+        // Radix unmounts the dialog content on close, so assert on the
+        // input the dialog owns rather than a wrapper class.
+        await expect(portInput).toBeHidden();
 
         // The collector is now on a new port; ask main for it and confirm
         // it accepts a fresh bundle, proving the listener really moved
