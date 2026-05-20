@@ -22,7 +22,7 @@ export function PaneGroup({ sidebar, details }: Props) {
                 {sidebar}
             </aside>
             <section
-                class="min-h-0 overflow-auto bg-surface"
+                class="min-h-0 overflow-auto bg-surface select-text"
                 aria-label="Event details"
             >
                 {details}
