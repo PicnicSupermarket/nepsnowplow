@@ -108,57 +108,11 @@ input {
 
 /* ----- Header ------------------------------------------------------------ */
 
-.app-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 0 12px;
-    border-bottom: 1px solid var(--border);
-    background: var(--bg-elevated);
-    -webkit-app-region: drag;
-}
-
-:root[data-platform="darwin"] .app-header {
+/* macOS reserves a fixed strip at the top-left for the traffic-light
+   buttons; the header element opts in via [data-traffic-light-pad] so
+   the platform branch stays out of JSX. */
+:root[data-platform="darwin"] [data-traffic-light-pad] {
     padding-left: 78px;
-}
-
-.app-header__actions {
-    display: flex;
-    gap: 6px;
-    -webkit-app-region: no-drag;
-}
-
-.app-header__search {
-    margin-left: auto;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 0 8px;
-    width: 220px;
-    height: 26px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    background: var(--bg-sunken);
-    color: var(--fg-muted);
-    -webkit-app-region: no-drag;
-}
-
-.app-header__search:focus-within {
-    border-color: var(--accent);
-    color: var(--fg);
-}
-
-.app-header__search input {
-    flex: 1;
-    min-width: 0;
-    border: 0;
-    background: transparent;
-    outline: 0;
-    color: var(--fg);
-}
-
-.app-header__search input::-webkit-search-cancel-button {
-    appearance: none;
 }
 
 /* ----- Panes ------------------------------------------------------------- */

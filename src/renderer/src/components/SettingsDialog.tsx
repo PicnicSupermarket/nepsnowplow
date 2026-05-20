@@ -3,6 +3,7 @@ import { setListeningPort } from "../actions";
 import { useStore } from "../store";
 import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogTitle } from "./ui/dialog";
+import { Input } from "./ui/input";
 
 interface Props {
     open: boolean;
@@ -53,7 +54,7 @@ export function SettingsDialog({ open, onClose }: Props) {
 
                     <label class="flex flex-col gap-1.5">
                         <span class="text-xs font-medium">Listening port</span>
-                        <input
+                        <Input
                             type="number"
                             min={0}
                             max={65535}
@@ -62,7 +63,7 @@ export function SettingsDialog({ open, onClose }: Props) {
                                 setPortInput((e.target as HTMLInputElement).value)
                             }
                             autofocus
-                            class="h-7 px-2 rounded-sm border border-border bg-sunken text-fg tabular-nums focus:outline-none focus:border-accent"
+                            class="tabular-nums"
                         />
                         <span class="text-[11px] text-muted">
                             Port the Snowplow collector listens on. Use 0 to let the

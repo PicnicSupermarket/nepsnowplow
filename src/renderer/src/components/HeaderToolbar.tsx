@@ -2,6 +2,7 @@ import { useState } from "preact/hooks";
 import { useStore } from "../store";
 import { clearAllEvents, setFilterQuery, setFilterValidEvents } from "../actions";
 import { Button } from "./ui/button";
+import { Input } from "./ui/input";
 import { SettingsDialog } from "./SettingsDialog";
 
 // Two-up SVG icons kept inline so we don't ship a font for two glyphs.
@@ -69,8 +70,15 @@ export function HeaderToolbar() {
     const [settingsOpen, setSettingsOpen] = useState(false);
 
     return (
-        <header class="app-header">
-            <div class="app-header__actions">
+        <header
+            class="flex items-center gap-3 px-3 border-b border-border bg-elevated"
+            style="-webkit-app-region: drag"
+            data-traffic-light-pad
+        >
+            <div
+                class="flex gap-1.5"
+                style="-webkit-app-region: no-drag"
+            >
                 <Button
                     onClick={() => {
                         void clearAllEvents();
@@ -92,14 +100,18 @@ export function HeaderToolbar() {
                     <span>Hide valid</span>
                 </Button>
             </div>
-            <label class="app-header__search">
+            <label
+                class="ml-auto flex items-center gap-1.5 px-2 w-56 h-[26px] rounded-sm border border-border bg-sunken text-muted focus-within:border-accent focus-within:text-fg"
+                style="-webkit-app-region: no-drag"
+            >
                 <IconSearch />
-                <input
+                <Input
                     type="search"
                     placeholder="Filter events"
                     value={filterQuery}
                     onInput={(e) => setFilterQuery((e.target as HTMLInputElement).value)}
                     aria-label="Filter events"
+                    class="flex-1 min-w-0 h-auto px-0 border-0 bg-transparent rounded-none focus:border-0"
                 />
             </label>
             <Button
