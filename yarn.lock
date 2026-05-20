@@ -292,7 +292,7 @@
     minimatch "^9.0.3"
     plist "^3.1.0"
 
-"@emnapi/core@1.10.0":
+"@emnapi/core@1.10.0", "@emnapi/core@^1.10.0":
   version "1.10.0"
   resolved "https://nexus.global.picnicinternational.com/repository/npm/@emnapi/core/-/core-1.10.0.tgz#380ccc8f2412ea22d1d972df7f8ee23a3b9c7467"
   integrity sha512-yq6OkJ4p82CAfPl0u9mQebQHKPJkY7WrIuk205cTYnYe+k2Z8YBh11FrbRG/H6ihirqcacOgl2BIO8oyMQLeXw==
@@ -300,14 +300,14 @@
     "@emnapi/wasi-threads" "1.2.1"
     tslib "^2.4.0"
 
-"@emnapi/runtime@1.10.0":
+"@emnapi/runtime@1.10.0", "@emnapi/runtime@^1.10.0":
   version "1.10.0"
   resolved "https://nexus.global.picnicinternational.com/repository/npm/@emnapi/runtime/-/runtime-1.10.0.tgz#4b260c0d3534204e98c6110b8db1a987d26ec87c"
   integrity sha512-ewvYlk86xUoGI0zQRNq/mC+16R1QeDlKQy21Ki3oSYXNgLb45GV1P6A0M+/s6nyCuNDqe5VpaY84BzXGwVbwFA==
   dependencies:
     tslib "^2.4.0"
 
-"@emnapi/wasi-threads@1.2.1":
+"@emnapi/wasi-threads@1.2.1", "@emnapi/wasi-threads@^1.2.1":
   version "1.2.1"
   resolved "https://nexus.global.picnicinternational.com/repository/npm/@emnapi/wasi-threads/-/wasi-threads-1.2.1.tgz#28fed21a1ba1ce797c44a070abc94d42f3ae8548"
   integrity sha512-uTII7OYF+/Mes/MrcIOYp5yOtSMLBWSIoLPpcgwipoiKbli6k322tcoFsxoIIxPDqW01SQGAgko4EzZi2BNv2w==
@@ -759,6 +759,113 @@
   integrity sha512-4BAffykYOgO+5nzBWYwE3W90sBgLJoUPRWWcL8wlyiM8IB8ipJz3UMJ9KXQd1RKQXpKp8Tutn80HZtWsu2u76w==
   dependencies:
     defer-to-connect "^2.0.0"
+
+"@tailwindcss/node@4.3.0":
+  version "4.3.0"
+  resolved "https://nexus.global.picnicinternational.com/repository/npm/@tailwindcss/node/-/node-4.3.0.tgz#9dc5312bf41c48658529f36021e0b466c4eb7860"
+  integrity sha512-aFb4gUhFOgdh9AXo4IzBEOzBkkAxm9VigwDJnMIYv3lcfXCJVesNfbEaBl4BNgVRyid92AmdviqwBUBRKSeY3g==
+  dependencies:
+    "@jridgewell/remapping" "^2.3.5"
+    enhanced-resolve "^5.21.0"
+    jiti "^2.6.1"
+    lightningcss "1.32.0"
+    magic-string "^0.30.21"
+    source-map-js "^1.2.1"
+    tailwindcss "4.3.0"
+
+"@tailwindcss/oxide-android-arm64@4.3.0":
+  version "4.3.0"
+  resolved "https://nexus.global.picnicinternational.com/repository/npm/@tailwindcss/oxide-android-arm64/-/oxide-android-arm64-4.3.0.tgz#e4533b6125236fe81a899cf5a82028c85244def8"
+  integrity sha512-TJPiq67tKlLuObP6RkwvVGDoxCMBVtDgKkLfa/uyj7/FyxvQwHS+UOnVrXXgbEsfUaMgiVvC4KbJnRr26ho4Ng==
+
+"@tailwindcss/oxide-darwin-arm64@4.3.0":
+  version "4.3.0"
+  resolved "https://nexus.global.picnicinternational.com/repository/npm/@tailwindcss/oxide-darwin-arm64/-/oxide-darwin-arm64-4.3.0.tgz#96b074ef64ec6c41d580063740c8d36cf5c459ce"
+  integrity sha512-oMN/WZRb+SO37BmUElEgeEWuU8E/HXRkiODxJxLe1UTHVXLrdVSgfaJV7pSlhRGMSOiXLuxTIjfsF3wYvz8cgQ==
+
+"@tailwindcss/oxide-darwin-x64@4.3.0":
+  version "4.3.0"
+  resolved "https://nexus.global.picnicinternational.com/repository/npm/@tailwindcss/oxide-darwin-x64/-/oxide-darwin-x64-4.3.0.tgz#0d9638d06d38684339b2dc06631966a7296bb64e"
+  integrity sha512-N6CUmu4a6bKVADfw77p+iw6Yd9Q3OBhe0veaDX+QazfuVYlQsHfDgxBrsjQ/IW+zywL8mTrNd0SdJT/zgtvMdA==
+
+"@tailwindcss/oxide-freebsd-x64@4.3.0":
+  version "4.3.0"
+  resolved "https://nexus.global.picnicinternational.com/repository/npm/@tailwindcss/oxide-freebsd-x64/-/oxide-freebsd-x64-4.3.0.tgz#efc7acd17cd38d7585c07cb938a4f1b703f79d7a"
+  integrity sha512-zDL5hBkQdH5C6MpqbK3gQAgP80tsMwSI26vjOzjJtNCMUo0lFgOItzHKBIupOZNQxt3ouPH7RPhvNhiTfCe5CQ==
+
+"@tailwindcss/oxide-linux-arm-gnueabihf@4.3.0":
+  version "4.3.0"
+  resolved "https://nexus.global.picnicinternational.com/repository/npm/@tailwindcss/oxide-linux-arm-gnueabihf/-/oxide-linux-arm-gnueabihf-4.3.0.tgz#e41c945e529670cd93fd6ed0c6a2880de5c40333"
+  integrity sha512-R06HdNi7A7OEoMsf6d4tjZ71RCWnZQPHj2mnotSFURjNLdBC+cIgXQ7l81CqeoiQftjf6OOblxXMInMgN2VzMA==
+
+"@tailwindcss/oxide-linux-arm64-gnu@4.3.0":
+  version "4.3.0"
+  resolved "https://nexus.global.picnicinternational.com/repository/npm/@tailwindcss/oxide-linux-arm64-gnu/-/oxide-linux-arm64-gnu-4.3.0.tgz#6bb608b16ba7146d61097c2f4c7ee927d1f3580a"
+  integrity sha512-qTJHELX8jetjhRQHCLilkVLmybpzNQAtaI/gaoVoidn/ufbNDbAo8KlK2J+yPoc8wQxvDxCmh/5lr8nC1+lTbg==
+
+"@tailwindcss/oxide-linux-arm64-musl@4.3.0":
+  version "4.3.0"
+  resolved "https://nexus.global.picnicinternational.com/repository/npm/@tailwindcss/oxide-linux-arm64-musl/-/oxide-linux-arm64-musl-4.3.0.tgz#1bb443aa371bb99b50cb39d4d688151fadcd8a63"
+  integrity sha512-Z6sukiQsngnWO+l39X4pPbiWT81IC+PLKF+PHxIlyZbGNb9MODfYlXEVlFvej5BOZInWX01kVyzeLvHsXhfczQ==
+
+"@tailwindcss/oxide-linux-x64-gnu@4.3.0":
+  version "4.3.0"
+  resolved "https://nexus.global.picnicinternational.com/repository/npm/@tailwindcss/oxide-linux-x64-gnu/-/oxide-linux-x64-gnu-4.3.0.tgz#5267c0bb2597426c0d2e759acb5389cde2aa71fd"
+  integrity sha512-DRNdQRpSGzRGfARVuVkxvM8Q12nh19l4BF/G7zGA1oe+9wcC6saFBHTISrpIcKzhiXtSrlSrluCfvMuledoCTQ==
+
+"@tailwindcss/oxide-linux-x64-musl@4.3.0":
+  version "4.3.0"
+  resolved "https://nexus.global.picnicinternational.com/repository/npm/@tailwindcss/oxide-linux-x64-musl/-/oxide-linux-x64-musl-4.3.0.tgz#fb2da97c67b218e5c7c723cb32782d55d7e4a5d5"
+  integrity sha512-Z0IADbDo8bh6I7h2IQMx601AdXBLfFpEdUotft86evd/8ZPflZe9COPO8Q1vw+pfLWIUo9zN/JGZvwuAJqduqg==
+
+"@tailwindcss/oxide-wasm32-wasi@4.3.0":
+  version "4.3.0"
+  resolved "https://nexus.global.picnicinternational.com/repository/npm/@tailwindcss/oxide-wasm32-wasi/-/oxide-wasm32-wasi-4.3.0.tgz#3f6538e511066d67d8683863dcaeeb16c22de849"
+  integrity sha512-HNZGOUxEmElksYR7S6sC5jTeNGpobAsy9u7Gu0AskJ8/20FR9GqebUyB+HBcU/ax6BHuiuJi+Oda4B+YX6H1yA==
+  dependencies:
+    "@emnapi/core" "^1.10.0"
+    "@emnapi/runtime" "^1.10.0"
+    "@emnapi/wasi-threads" "^1.2.1"
+    "@napi-rs/wasm-runtime" "^1.1.4"
+    "@tybys/wasm-util" "^0.10.1"
+    tslib "^2.8.1"
+
+"@tailwindcss/oxide-win32-arm64-msvc@4.3.0":
+  version "4.3.0"
+  resolved "https://nexus.global.picnicinternational.com/repository/npm/@tailwindcss/oxide-win32-arm64-msvc/-/oxide-win32-arm64-msvc-4.3.0.tgz#ec45fba773c76759338c05d4fe5cf42c4eea2e4e"
+  integrity sha512-Pe+RPVTi1T+qymuuRpcdvwSVZjnll/f7n8gBxMMh3xLTctMDKqpdfGimbMyioqtLhUYZxdJ9wGNhV7MKHvgZsQ==
+
+"@tailwindcss/oxide-win32-x64-msvc@4.3.0":
+  version "4.3.0"
+  resolved "https://nexus.global.picnicinternational.com/repository/npm/@tailwindcss/oxide-win32-x64-msvc/-/oxide-win32-x64-msvc-4.3.0.tgz#58cdd6e06adbe2e3160274edfcd0b0b43e17fee4"
+  integrity sha512-Mvrf2kXW/yeW/OTezZlCGOirXRcUuLIBx/5Y12BaPM7wJoryG6dfS/NJL8aBPqtTEx/Vm4T4vKzFUcKDT+TKUA==
+
+"@tailwindcss/oxide@4.3.0":
+  version "4.3.0"
+  resolved "https://nexus.global.picnicinternational.com/repository/npm/@tailwindcss/oxide/-/oxide-4.3.0.tgz#cc1c61e88f62c0e9f56062de3e7873acaa2159d4"
+  integrity sha512-F7HZGBeN9I0/AuuJS5PwcD8xayx5ri5GhjYUDBEVYUkexyA/giwbDNjRVrxSezE3T250OU2K/wp/ltWx3UOefg==
+  optionalDependencies:
+    "@tailwindcss/oxide-android-arm64" "4.3.0"
+    "@tailwindcss/oxide-darwin-arm64" "4.3.0"
+    "@tailwindcss/oxide-darwin-x64" "4.3.0"
+    "@tailwindcss/oxide-freebsd-x64" "4.3.0"
+    "@tailwindcss/oxide-linux-arm-gnueabihf" "4.3.0"
+    "@tailwindcss/oxide-linux-arm64-gnu" "4.3.0"
+    "@tailwindcss/oxide-linux-arm64-musl" "4.3.0"
+    "@tailwindcss/oxide-linux-x64-gnu" "4.3.0"
+    "@tailwindcss/oxide-linux-x64-musl" "4.3.0"
+    "@tailwindcss/oxide-wasm32-wasi" "4.3.0"
+    "@tailwindcss/oxide-win32-arm64-msvc" "4.3.0"
+    "@tailwindcss/oxide-win32-x64-msvc" "4.3.0"
+
+"@tailwindcss/vite@^4.3.0":
+  version "4.3.0"
+  resolved "https://nexus.global.picnicinternational.com/repository/npm/@tailwindcss/vite/-/vite-4.3.0.tgz#b2bbc069a4c700ea7aef5ee30416d84b7652e136"
+  integrity sha512-t6J3OrB5Fc0ExuhohouH0fWUGMYL6PTLhW+E7zIk/pdbnJARZDCwjBznFnkh5ynRnIRSI4YjtTH0t6USjJISrw==
+  dependencies:
+    "@tailwindcss/node" "4.3.0"
+    "@tailwindcss/oxide" "4.3.0"
+    tailwindcss "4.3.0"
 
 "@tanstack/react-virtual@^3.13.24":
   version "3.13.24"
@@ -1821,6 +1928,14 @@ end-of-stream@^1.1.0:
   dependencies:
     once "^1.4.0"
 
+enhanced-resolve@^5.21.0:
+  version "5.21.5"
+  resolved "https://nexus.global.picnicinternational.com/repository/npm/enhanced-resolve/-/enhanced-resolve-5.21.5.tgz#8f80167d009d8f01267ad61035e59fe5c94ac3a6"
+  integrity sha512-mLCNbrQli11K1ySUmuNt4ZUB3OpGIDq4q2vTBTf5cL2lpsRjI9QKqSD0ndjW8FyvcW/Jj46gMe9syyHAsvMa/A==
+  dependencies:
+    graceful-fs "^4.2.4"
+    tapable "^2.3.3"
+
 entities@^4.2.0:
   version "4.5.0"
   resolved "https://nexus.global.picnicinternational.com/repository/npm/entities/-/entities-4.5.0.tgz#5d268ea5e7113ec74c4d033b79ea5a35a488fb48"
@@ -2585,7 +2700,7 @@ jake@^10.8.5:
     filelist "^1.0.1"
     minimatch "^3.0.4"
 
-jiti@^2.4.2:
+jiti@^2.4.2, jiti@^2.6.1:
   version "2.7.0"
   resolved "https://nexus.global.picnicinternational.com/repository/npm/jiti/-/jiti-2.7.0.tgz#974228f2f4ca2bc21885a1797b45fea68e950c64"
   integrity sha512-AC/7JofJvZGrrneWNaEnJeOLUx+JlGt7tNa0wZiRPT4MY1wmfKjt2+6O2p2uz2+skll8OZZmJMNqeke7kKbNgQ==
@@ -2728,7 +2843,7 @@ lightningcss-win32-x64-msvc@1.32.0:
   resolved "https://nexus.global.picnicinternational.com/repository/npm/lightningcss-win32-x64-msvc/-/lightningcss-win32-x64-msvc-1.32.0.tgz#141aa5605645064928902bb4af045fa7d9f4220a"
   integrity sha512-Amq9B/SoZYdDi1kFrojnoqPLxYhQ4Wo5XiL8EVJrVsB8ARoC1PWW6VGtT0WKCemjy8aC+louJnjS7U18x3b06Q==
 
-lightningcss@^1.32.0:
+lightningcss@1.32.0, lightningcss@^1.32.0:
   version "1.32.0"
   resolved "https://nexus.global.picnicinternational.com/repository/npm/lightningcss/-/lightningcss-1.32.0.tgz#b85aae96486dcb1bf49a7c8571221273f4f1e4a9"
   integrity sha512-NXYBzinNrblfraPGyrbPoD19C1h9lfI/1mzgWYvXUTe414Gz/X1FD2XBZSZM7rRTrMA8JL3OtAaGifrIKhQ5yQ==
@@ -3597,6 +3712,16 @@ supports-color@^7.1.0:
   dependencies:
     has-flag "^4.0.0"
 
+tailwindcss@4.3.0, tailwindcss@^4.3.0:
+  version "4.3.0"
+  resolved "https://nexus.global.picnicinternational.com/repository/npm/tailwindcss/-/tailwindcss-4.3.0.tgz#0a874e044a859cf6de413f3a59e76a9bedf05264"
+  integrity sha512-y6nxMGB1nMW9R6k96e5gdIFzcfL/gTJRNaqGes1YvkLnPVXzWgbqFF2yLC0T8G774n24cx3Pe8XrKoniCOAH+Q==
+
+tapable@^2.3.3:
+  version "2.3.3"
+  resolved "https://nexus.global.picnicinternational.com/repository/npm/tapable/-/tapable-2.3.3.tgz#5da7c9992c46038221267985ab28421a8879f160"
+  integrity sha512-uxc/zpqFg6x7C8vOE7lh6Lbda8eEL9zmVm/PLeTPBRhh1xCgdWaQ+J1CUieGpIfm2HdtsUpRv+HshiasBMcc6A==
+
 tar@^7.5.4, tar@^7.5.7:
   version "7.5.15"
   resolved "https://nexus.global.picnicinternational.com/repository/npm/tar/-/tar-7.5.15.tgz#afe6d1316cddf614a566e3813e42fe01aed46fee"
@@ -3667,7 +3792,7 @@ ts-api-utils@^2.5.0:
   resolved "https://nexus.global.picnicinternational.com/repository/npm/ts-api-utils/-/ts-api-utils-2.5.0.tgz#4acd4a155e22734990a5ed1fe9e97f113bcb37c1"
   integrity sha512-OJ/ibxhPlqrMM0UiNHJ/0CKQkoKF243/AEmplt3qpRgkW8VG7IfOS41h7V8TjITqdByHzrjcS/2si+y4lIh8NA==
 
-tslib@^2.4.0:
+tslib@^2.4.0, tslib@^2.8.1:
   version "2.8.1"
   resolved "https://nexus.global.picnicinternational.com/repository/npm/tslib/-/tslib-2.8.1.tgz#612efe4ed235d567e8aba5f2a5fab70280ade83f"
   integrity sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==

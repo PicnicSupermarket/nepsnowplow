@@ -1,48 +1,74 @@
+@import "tailwindcss";
+
 /* ----- Design tokens ----------------------------------------------------- */
+/*
+ * Single source of truth for colours, radii, fonts. Lives in @theme so
+ * Tailwind generates matching utilities (bg-surface, text-fg, border-border,
+ * rounded-sm, etc.). light-dark() flips values automatically based on the
+ * color-scheme on :root, so we don't need a parallel set of dark-mode
+ * variables or `dark:` variants.
+ */
+@theme {
+    /* Surfaces */
+    --color-surface: light-dark(#f6f6f7, #1c1c1e);
+    --color-elevated: light-dark(#ffffff, #2c2c2e);
+    --color-sunken: light-dark(#ececee, #141416);
 
-:root {
-    color-scheme: light dark;
+    /* Text */
+    --color-fg: light-dark(#1a1a1a, #e8e8ea);
+    --color-muted: light-dark(#6b6b70, #8e8e93);
 
-    --bg: #f6f6f7;
-    --bg-elevated: #ffffff;
-    --bg-sunken: #ececee;
-    --fg: #1a1a1a;
-    --fg-muted: #6b6b70;
-    --border: #d8d8dc;
-    --accent: #0a84ff;
-    --accent-soft: rgba(10, 132, 255, 0.12);
-    --status-ok: #34c759;
-    --status-warn: #ff9f0a;
-    --status-bad: #ff3b30;
-    --selected: rgba(10, 132, 255, 0.12);
-    --highlight: rgba(255, 214, 10, 0.55);
+    /* Border */
+    --color-border: light-dark(#d8d8dc, #3a3a3c);
 
-    --header-height: 44px;
-    --footer-height: 26px;
-    --traffic-light-pad: 78px;
+    /* Accent */
+    --color-accent: #0a84ff;
+    --color-accent-soft: light-dark(rgba(10, 132, 255, 0.12), rgba(10, 132, 255, 0.22));
 
-    --radius: 6px;
+    /* Selection / highlight */
+    --color-selected: light-dark(rgba(10, 132, 255, 0.12), rgba(10, 132, 255, 0.22));
+    --color-highlight: light-dark(rgba(255, 214, 10, 0.55), rgba(255, 214, 10, 0.4));
+
+    /* Validity status */
+    --color-ok: #34c759;
+    --color-warn: #ff9f0a;
+    --color-bad: #ff3b30;
+
+    /* Radii */
     --radius-sm: 4px;
+    --radius: 6px;
 
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-    font-size: 13px;
-    color: var(--fg);
-    background: var(--bg);
+    /* Fonts */
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        --bg: #1c1c1e;
-        --bg-elevated: #2c2c2e;
-        --bg-sunken: #141416;
-        --fg: #e8e8ea;
-        --fg-muted: #8e8e93;
-        --border: #3a3a3c;
-        --accent: #0a84ff;
-        --accent-soft: rgba(10, 132, 255, 0.22);
-        --selected: rgba(10, 132, 255, 0.22);
-        --highlight: rgba(255, 214, 10, 0.4);
-    }
+/*
+ * Aliases for the legacy variable names. Each component still reading
+ * `var(--bg)` etc. keeps working unchanged; deleting these aliases is
+ * the final step of the Tailwind migration once every component has
+ * moved to utility classes.
+ */
+:root {
+    color-scheme: light dark;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--color-fg);
+    background: var(--color-surface);
+
+    --bg: var(--color-surface);
+    --bg-elevated: var(--color-elevated);
+    --bg-sunken: var(--color-sunken);
+    --fg: var(--color-fg);
+    --fg-muted: var(--color-muted);
+    --border: var(--color-border);
+    --accent: var(--color-accent);
+    --accent-soft: var(--color-accent-soft);
+    --selected: var(--color-selected);
+    --highlight: var(--color-highlight);
+    --status-ok: var(--color-ok);
+    --status-warn: var(--color-warn);
+    --status-bad: var(--color-bad);
 }
 
 /* ----- Reset / base ------------------------------------------------------ */
@@ -75,7 +101,7 @@ input {
 
 .app {
     display: grid;
-    grid-template-rows: var(--header-height) 1fr var(--footer-height);
+    grid-template-rows: 44px 1fr 26px;
     height: 100%;
     background: var(--bg);
 }
@@ -92,9 +118,8 @@ input {
     -webkit-app-region: drag;
 }
 
-/* Reserve space on the left for the macOS traffic-light buttons. */
 :root[data-platform="darwin"] .app-header {
-    padding-left: var(--traffic-light-pad);
+    padding-left: 78px;
 }
 
 .app-header__actions {
@@ -149,7 +174,9 @@ input {
     background: var(--bg-elevated);
     color: var(--fg);
     cursor: pointer;
-    transition: background-color 0.12s ease, border-color 0.12s ease;
+    transition:
+        background-color 0.12s ease,
+        border-color 0.12s ease;
 }
 
 .btn:hover {
@@ -299,6 +326,15 @@ input {
     overflow: hidden;
     display: flex;
     flex-direction: column;
+}
+
+.empty {
+    display: grid;
+    place-items: center;
+    height: 100%;
+    padding: 24px;
+    color: var(--fg-muted);
+    text-align: center;
 }
 
 /* ----- Event list ------------------------------------------------------- */
@@ -463,7 +499,7 @@ mark {
     border: 1px solid var(--border);
     border-radius: var(--radius);
     background: var(--bg-elevated);
-    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-family: var(--font-mono);
     font-size: 12px;
     overflow-x: auto;
 }
@@ -565,7 +601,7 @@ mark {
 }
 
 .context-card__json {
-    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-family: var(--font-mono);
     font-size: 12px;
     overflow-x: auto;
 }
@@ -639,7 +675,7 @@ mark {
 }
 
 .json-string {
-    color: #b65f00;
+    color: light-dark(#b65f00, #ffb86c);
 }
 
 .json-number {
@@ -647,7 +683,7 @@ mark {
 }
 
 .json-bool {
-    color: #af52de;
+    color: light-dark(#af52de, #d77be4);
 }
 
 .json-null {
@@ -657,24 +693,6 @@ mark {
 
 .json-empty {
     color: var(--fg-muted);
-}
-
-@media (prefers-color-scheme: dark) {
-    .json-string {
-        color: #ffb86c;
-    }
-    .json-bool {
-        color: #d77be4;
-    }
-}
-
-.empty {
-    display: grid;
-    place-items: center;
-    height: 100%;
-    padding: 24px;
-    color: var(--fg-muted);
-    text-align: center;
 }
 
 /* ----- Footer ------------------------------------------------------------ */

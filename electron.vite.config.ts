@@ -1,5 +1,6 @@
 import { defineConfig } from "electron-vite";
 import preact from "@preact/preset-vite";
+import tailwindcss from "@tailwindcss/vite";
 import { createRequire } from "node:module";
 import { resolve } from "node:path";
 
@@ -55,7 +56,7 @@ export default defineConfig({
     },
     renderer: {
         root: resolve(__dirname, "src/renderer"),
-        plugins: [preact()],
+        plugins: [preact(), tailwindcss()],
         build: {
             rollupOptions: {
                 input: { index: resolve(__dirname, "src/renderer/index.html") },

@@ -96,6 +96,7 @@
         "@eslint/js": "^10.0.1",
         "@playwright/test": "^1.50.0",
         "@preact/preset-vite": "^2.10.5",
+        "@tailwindcss/vite": "^4.3.0",
         "@types/body-parser": "^1.19.6",
         "@types/express": "^5.0.6",
         "@types/node": "^25.9.0",
@@ -107,6 +108,7 @@
         "eslint-plugin-react-hooks": "^7.1.1",
         "playwright": "^1.50.0",
         "prettier": "^2.1.1",
+        "tailwindcss": "^4.3.0",
         "typescript": "^6.0.3",
         "typescript-eslint": "^8.59.4",
         "vite": "^8.0.13"
