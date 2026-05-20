@@ -17,6 +17,7 @@ export interface ServerInfo {
 export const CH = {
     GET_OPTIONS: "options:get",
     SET_FILTER_VALID_EVENTS: "options:set-filter-valid-events",
+    SET_LISTENING_PORT: "options:set-listening-port",
 
     GET_INITIAL_EVENTS: "events:get-initial",
     CLEAR_EVENTS: "events:clear",
@@ -39,6 +40,12 @@ export interface Api {
 
     getOptions(): Promise<Options>;
     setFilterValidEvents(value: boolean): Promise<void>;
+    // Persists the new port to settings.json and restarts the Express
+    // collector listener on it. Rejects with an Error if the port is
+    // outside [0, 65535]; passing 0 asks the OS to pick a free one.
+    // Resolves to the port the listener actually bound to (which may
+    // differ from the requested port when EADDRINUSE forces a fallback).
+    setListeningPort(port: number): Promise<number>;
 
     getInitialEvents(): Promise<EventViewModel[]>;
     clearEvents(): Promise<void>;

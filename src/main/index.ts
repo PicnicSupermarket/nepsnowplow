@@ -24,17 +24,27 @@ function resourcesPath(): string {
     return path.resolve(__dirname, "..", "..");
 }
 
+function settingsPath(): string {
+    return path.resolve(resourcesPath(), "settings.json");
+}
+
 function loadOptions(): Options {
     try {
-        const raw = fs.readFileSync(
-            path.resolve(resourcesPath(), "settings.json"),
-            "utf-8",
-        );
+        const raw = fs.readFileSync(settingsPath(), "utf-8");
         const parsed = JSON.parse(raw) as Partial<Options>;
         return { ...DEFAULT_OPTIONS, ...parsed };
     } catch {
         return { ...DEFAULT_OPTIONS };
     }
+}
+
+// Persist the subset of options that survives across app restarts.
+// `filterValidEvents` is deliberately session-scoped (matches dev-tool
+// convention: filters reset between launches) so it stays out of the
+// file.
+function persistOptions(): void {
+    const payload = { listeningPort: options.listeningPort };
+    fs.writeFileSync(settingsPath(), `${JSON.stringify(payload, null, 4)}\n`, "utf-8");
 }
 
 function firstLanIp(): string | null {
@@ -98,6 +108,18 @@ function registerIpc(): void {
 
     ipcMain.handle(CH.SET_FILTER_VALID_EVENTS, (_e, value: boolean) => {
         options = { ...options, filterValidEvents: Boolean(value) };
+    });
+
+    ipcMain.handle(CH.SET_LISTENING_PORT, async (_e, port: number) => {
+        if (!Number.isInteger(port) || port < 0 || port > 65535) {
+            throw new Error(`Invalid port: ${port}`);
+        }
+        options = { ...options, listeningPort: port };
+        persistOptions();
+        if (collector) {
+            await collector.restartListener(port);
+        }
+        return serverInfo.port;
     });
 
     ipcMain.handle(CH.GET_INITIAL_EVENTS, () => trackedEvents.slice());

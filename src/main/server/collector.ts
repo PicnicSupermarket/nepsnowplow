@@ -70,6 +70,19 @@ export class Collector {
         await this.listen(this.opts.proposedPort);
     }
 
+    // Hot-restart the Express listener on a new port without restarting
+    // the JVM. Called from the Settings UI so flipping ports stays a
+    // sub-second action rather than a 10-second JVM reboot.
+    async restartListener(port: number): Promise<void> {
+        if (this.server) {
+            await new Promise<void>((resolve, reject) => {
+                this.server!.close((err) => (err ? reject(err) : resolve()));
+            });
+            this.server = null;
+        }
+        await this.listen(port);
+    }
+
     stop(): void {
         this.server?.close();
         this.server = null;

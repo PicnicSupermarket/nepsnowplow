@@ -1,5 +1,7 @@
+import { useState } from "preact/hooks";
 import { useStore } from "../store";
 import { clearAllEvents, setFilterQuery, setFilterValidEvents } from "../actions";
+import { SettingsDialog } from "./SettingsDialog";
 
 // Two-up SVG icons kept inline so we don't ship a font for two glyphs.
 // They render currentColor so theme tokens flow through unchanged.
@@ -31,6 +33,21 @@ function IconEyeOff() {
     );
 }
 
+function IconSettings() {
+    return (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5" />
+            <path
+                d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            />
+        </svg>
+    );
+}
+
 function IconSearch() {
     return (
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -48,6 +65,7 @@ function IconSearch() {
 export function HeaderToolbar() {
     const filterQuery = useStore((s) => s.filterQuery);
     const filterValidEvents = useStore((s) => s.filterValidEvents);
+    const [settingsOpen, setSettingsOpen] = useState(false);
 
     return (
         <header class="app-header">
@@ -86,6 +104,16 @@ export function HeaderToolbar() {
                     aria-label="Filter events"
                 />
             </label>
+            <button
+                type="button"
+                class="btn btn--icon"
+                onClick={() => setSettingsOpen(true)}
+                aria-label="Settings"
+                title="Settings"
+            >
+                <IconSettings />
+            </button>
+            <SettingsDialog open={settingsOpen} onClose={() => setSettingsOpen(false)} />
         </header>
     );
 }

@@ -14,6 +14,9 @@ const api: Api = {
     setFilterValidEvents: (value) =>
         ipcRenderer.invoke(CH.SET_FILTER_VALID_EVENTS, value) as Promise<void>,
 
+    setListeningPort: (port) =>
+        ipcRenderer.invoke(CH.SET_LISTENING_PORT, port) as Promise<number>,
+
     getInitialEvents: () =>
         ipcRenderer.invoke(CH.GET_INITIAL_EVENTS) as Promise<EventViewModel[]>,
 

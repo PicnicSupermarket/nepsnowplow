@@ -1,3 +1,4 @@
+import fs from "node:fs";
 import path from "node:path";
 import { _electron as electron, ElectronApplication, Page } from "playwright";
 import {
@@ -118,5 +119,66 @@ test.describe("renderer", () => {
         // Payload field is rendered in the JSON tree.
         await expect(details).toContainText("page");
         await expect(details).toContainText("/home");
+    });
+});
+
+test.describe("settings", () => {
+    // settings.json is tracked in git; snapshot it before the test mutates
+    // it through the UI and restore the original bytes on the way out so
+    // the working tree stays clean across runs.
+    const settingsFile = path.join(__dirname, "..", "settings.json");
+    let settingsSnapshot = "";
+
+    test.beforeAll(() => {
+        settingsSnapshot = fs.readFileSync(settingsFile, "utf-8");
+    });
+
+    test.afterAll(() => {
+        fs.writeFileSync(settingsFile, settingsSnapshot, "utf-8");
+    });
+
+    test("changing the listening port restarts the collector on it", async () => {
+        await window.getByRole("button", { name: /settings/i }).click();
+
+        const portInput = window.locator(".dialog input[type=number]");
+        await expect(portInput).toBeVisible();
+
+        // Ask the OS to pick a free port; the dialog closes once main has
+        // restarted the listener and the renderer's store has picked up
+        // the new serverInfo.
+        await portInput.fill("0");
+        await window.getByRole("button", { name: /^save$/i }).click();
+        // The native <dialog> element stays in the DOM after .close() — it
+        // just drops its `open` attribute and becomes display: none — so
+        // assert on visibility rather than DOM presence.
+        await expect(window.locator(".dialog")).not.toBeVisible();
+
+        // The collector is now on a new port; ask main for it and confirm
+        // it accepts a fresh bundle, proving the listener really moved
+        // (rather than the dialog just closing on a stale value).
+        const newPort = await app.evaluate(
+            () => (globalThis as { __nepsnowplowPort?: number }).__nepsnowplowPort ?? 0,
+        );
+        expect(newPort).toBeGreaterThan(0);
+
+        const probe = await playwrightRequest.newContext({
+            baseURL: `http://127.0.0.1:${newPort}`,
+        });
+        try {
+            const res = await probe.post("/", {
+                data: validBundle,
+                failOnStatusCode: false,
+            });
+            expect(res.status()).toBe(204);
+        } finally {
+            await probe.dispose();
+        }
+
+        // Future tests in this file pre-date the port change; rebuild the
+        // shared request context against the new base URL so they don't
+        // hit a dead listener.
+        await request.dispose();
+        baseURL = `http://127.0.0.1:${newPort}`;
+        request = await playwrightRequest.newContext({ baseURL });
     });
 });
