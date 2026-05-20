@@ -43,7 +43,10 @@ export function App() {
     }, []);
 
     return (
-        <div class="app">
+        <div
+            class="grid h-full bg-surface"
+            style="grid-template-rows: 44px 1fr 26px"
+        >
             <HeaderToolbar />
             <PaneGroup sidebar={<EventList />} details={<EventDetails />} />
             <FooterToolbar />

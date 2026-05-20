@@ -6,7 +6,7 @@ import { EventListItem } from "./EventListItem";
 
 // Approximate row height; virtualizer corrects against actual DOM size as
 // rows mount so this only affects the initial estimate.
-const ROW_ESTIMATE = 72;
+const ROW_ESTIMATE = 48;
 
 function filterEvents(
     events: Map<number, EventViewModel>,
@@ -48,8 +48,6 @@ export function EventList() {
         getScrollElement: () => scrollRef.current,
         estimateSize: () => ROW_ESTIMATE,
         overscan: 8,
-        // Stable identity keys so DOM nodes survive across filter changes
-        // when a given event remains in the visible set.
         getItemKey: (index) => visible[index].id,
     });
 
@@ -70,8 +68,7 @@ export function EventList() {
                 nextIdx = e.key === "ArrowDown" ? currentIdx + 1 : currentIdx - 1;
             }
             if (nextIdx < 0 || nextIdx >= visible.length) return;
-            const target_ = visible[nextIdx];
-            select(target_.id);
+            select(visible[nextIdx].id);
             virtualizer.scrollToIndex(nextIdx, { align: "auto" });
         };
         window.addEventListener("keydown", onKey);
@@ -80,7 +77,7 @@ export function EventList() {
 
     if (visible.length === 0) {
         return (
-            <div class="empty">
+            <div class="grid h-full place-items-center p-6 text-muted text-center">
                 {eventOrder.length === 0 ? "No events yet" : "No events match the filter"}
             </div>
         );
@@ -88,11 +85,13 @@ export function EventList() {
 
     const rows = virtualizer.getVirtualItems();
     return (
-        <div ref={scrollRef} class="event-list" role="listbox" aria-label="Captured events">
-            <div
-                class="event-list__inner"
-                style={{ height: `${virtualizer.getTotalSize()}px` }}
-            >
+        <div
+            ref={scrollRef}
+            class="flex-1 overflow-auto outline-none"
+            role="listbox"
+            aria-label="Captured events"
+        >
+            <div class="relative w-full" style={{ height: `${virtualizer.getTotalSize()}px` }}>
                 {rows.map((row) => {
                     const event = visible[row.index];
                     const isSelected = event.id === selectedId;
@@ -101,7 +100,9 @@ export function EventList() {
                             key={event.id}
                             data-index={row.index}
                             ref={virtualizer.measureElement}
-                            class={`event-row${isSelected ? " is-selected" : ""}`}
+                            class={`absolute inset-x-0 top-0 px-3 py-2 border-b border-border cursor-pointer select-none transition-colors duration-75 hover:bg-sunken ${
+                                isSelected ? "bg-selected" : ""
+                            }`}
                             style={{ transform: `translateY(${row.start}px)` }}
                             role="option"
                             aria-selected={isSelected}

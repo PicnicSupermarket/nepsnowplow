@@ -7,8 +7,14 @@ export function FooterToolbar() {
     const text = ready ? `${ip}:${port}` : "Waiting for collector…";
 
     return (
-        <footer class="app-footer" aria-live="polite">
-            <span class={`app-footer__status${ready ? " is-ready" : ""}`} />
+        <footer
+            class="flex items-center gap-2 px-3 border-t border-border bg-elevated text-muted text-[11px]"
+            aria-live="polite"
+        >
+            <span
+                class={`w-2 h-2 rounded-full ${ready ? "bg-ok" : "bg-muted"}`}
+                aria-hidden="true"
+            />
             <span>{text}</span>
         </footer>
     );

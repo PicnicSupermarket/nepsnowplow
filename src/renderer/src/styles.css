@@ -97,86 +97,13 @@ input {
     color: inherit;
 }
 
-/* ----- App shell --------------------------------------------------------- */
-
-.app {
-    display: grid;
-    grid-template-rows: 44px 1fr 26px;
-    height: 100%;
-    background: var(--bg);
-}
-
-/* ----- Header ------------------------------------------------------------ */
+/* ----- Platform chrome --------------------------------------------------- */
 
 /* macOS reserves a fixed strip at the top-left for the traffic-light
-   buttons; the header element opts in via [data-traffic-light-pad] so
-   the platform branch stays out of JSX. */
+   buttons; any element with [data-traffic-light-pad] reserves matching
+   space so its contents don't sit underneath. */
 :root[data-platform="darwin"] [data-traffic-light-pad] {
     padding-left: 78px;
-}
-
-/* ----- Panes ------------------------------------------------------------- */
-
-.pane-group {
-    display: grid;
-    grid-template-columns: 320px 1fr;
-    min-height: 0;
-}
-
-.pane {
-    min-height: 0;
-    overflow: auto;
-    background: var(--bg);
-}
-
-.pane--sidebar {
-    border-right: 1px solid var(--border);
-    background: var(--bg-elevated);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-}
-
-.empty {
-    display: grid;
-    place-items: center;
-    height: 100%;
-    padding: 24px;
-    color: var(--fg-muted);
-    text-align: center;
-}
-
-/* ----- Event list ------------------------------------------------------- */
-
-.event-list {
-    flex: 1;
-    overflow: auto;
-    outline: 0;
-}
-
-.event-list__inner {
-    position: relative;
-    width: 100%;
-}
-
-.event-row {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    padding: 8px 12px;
-    border-bottom: 1px solid var(--border);
-    cursor: pointer;
-    user-select: none;
-    transition: background-color 0.08s ease;
-}
-
-.event-row:hover {
-    background: var(--bg-sunken);
-}
-
-.event-row.is-selected {
-    background: var(--selected);
 }
 
 mark {
@@ -275,26 +202,4 @@ mark {
     color: var(--fg-muted);
 }
 
-/* ----- Footer ------------------------------------------------------------ */
 
-.app-footer {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 0 12px;
-    border-top: 1px solid var(--border);
-    background: var(--bg-elevated);
-    color: var(--fg-muted);
-    font-size: 11px;
-}
-
-.app-footer__status {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--fg-muted);
-}
-
-.app-footer__status.is-ready {
-    background: var(--status-ok);
-}

@@ -12,7 +12,7 @@ export function EventListItem({ event, highlight }: Props) {
         <article>
             <header class="flex items-center gap-1.5 font-semibold">
                 <ValidityDot status={event.validationStatus} />
-                <span class="event-item__schema truncate">
+                <span class="truncate">
                     <Highlight text={event.schema.name || "(no schema)"} query={highlight} />
                 </span>
                 {event.schema.version && (
@@ -29,7 +29,7 @@ export function EventListItem({ event, highlight }: Props) {
                             class="flex items-center gap-1.5 leading-6"
                         >
                             <ValidityDot status={ctx.validationStatus} />
-                            <span class="event-item__schema truncate">
+                            <span class="truncate">
                                 <Highlight
                                     text={ctx.schema.name || "(no schema)"}
                                     query={highlight}

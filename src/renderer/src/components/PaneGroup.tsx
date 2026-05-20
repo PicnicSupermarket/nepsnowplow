@@ -5,17 +5,26 @@ interface Props {
     details: ComponentChildren;
 }
 
-// Two-column split. Phase 3 fills the sidebar with the virtualised event
-// list; Phase 4 fills the details column with the inspector. The layout
-// itself stays simple — flex with a fixed-ish sidebar width feeding 1fr
-// to the details column.
+// Two-column shell. The sidebar holds the virtualised event list, the
+// details column holds the inspector for the selected event. Both
+// columns are min-height: 0 so their children can scroll independently
+// inside the parent grid's row.
 export function PaneGroup({ sidebar, details }: Props) {
     return (
-        <main class="pane-group">
-            <aside class="pane pane--sidebar" aria-label="Captured events">
+        <main
+            class="grid min-h-0"
+            style="grid-template-columns: 320px 1fr"
+        >
+            <aside
+                class="min-h-0 flex flex-col border-r border-border bg-elevated overflow-hidden"
+                aria-label="Captured events"
+            >
                 {sidebar}
             </aside>
-            <section class="pane pane--details" aria-label="Event details">
+            <section
+                class="min-h-0 overflow-auto bg-surface"
+                aria-label="Event details"
+            >
                 {details}
             </section>
         </main>
