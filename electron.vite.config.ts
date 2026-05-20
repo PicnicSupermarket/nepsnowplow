@@ -39,9 +39,17 @@ export default defineConfig({
     },
     preload: {
         build: {
+            // Sandboxed preload scripts must be CommonJS — Electron's
+            // sandbox loader can't execute ESM. Vite would otherwise emit
+            // .mjs which fails with "Cannot use import statement outside a
+            // module" at load time.
             rollupOptions: {
                 input: { index: resolve(__dirname, "src/preload/index.ts") },
                 external: isExternal,
+                output: {
+                    format: "cjs",
+                    entryFileNames: "[name].cjs",
+                },
             },
         },
     },

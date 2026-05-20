@@ -11,13 +11,24 @@ const DEFAULT_OPTIONS: Options = {
     filterValidEvents: false,
 };
 
+// Resolves the directory containing the bundled extra resources (jre/,
+// jars/, snowplow_micro_config/, settings.json). In packaged builds
+// electron-builder places these at process.resourcesPath; in dev and
+// e2e the bundled main entry sits at `<project>/out/main/index.mjs`,
+// so the project root is two dirs up.
+function resourcesPath(): string {
+    if (app.isPackaged) {
+        return process.resourcesPath;
+    }
+    return path.resolve(__dirname, "..", "..");
+}
+
 function loadOptions(): Options {
     try {
-        // In packaged mode `app.getAppPath()` returns path/to/app.asar but
-        // settings.json ships in extraResources alongside it; in dev it
-        // returns the project root and the same path resolves directly.
-        const resourcesPath = app.getAppPath().replace("app.asar", "");
-        const raw = fs.readFileSync(path.resolve(resourcesPath, "settings.json"), "utf-8");
+        const raw = fs.readFileSync(
+            path.resolve(resourcesPath(), "settings.json"),
+            "utf-8",
+        );
         const parsed = JSON.parse(raw) as Partial<Options>;
         return { ...DEFAULT_OPTIONS, ...parsed };
     } catch {
@@ -65,7 +76,7 @@ function createMainWindow(): void {
             contextIsolation: true,
             nodeIntegration: false,
             sandbox: true,
-            preload: path.join(__dirname, "../preload/index.mjs"),
+            preload: path.join(__dirname, "../preload/index.cjs"),
         },
     });
 
@@ -123,14 +134,23 @@ function recordEvent(event: EventViewModel): void {
     pushToRenderer(CH.EVENT_PUSH, event);
 }
 
+// Debug hook read by the Playwright e2e suite to discover the actual
+// port the collector bound to (which may differ from the configured one
+// when the configured port is busy). Kept on globalThis rather than on
+// the IPC surface so it stays a test-only affordance.
+interface DebugGlobals {
+    __nepsnowplowPort?: number;
+}
+
 function recordServerReady(port: number): void {
     serverInfo = { ip: firstLanIp(), port };
+    (globalThis as DebugGlobals).__nepsnowplowPort = port;
     pushToRenderer(CH.SERVER_READY, serverInfo);
 }
 
 async function startCollector(): Promise<void> {
     collector = new Collector({
-        appPath: app.getAppPath(),
+        resourcesPath: resourcesPath(),
         proposedPort: options.listeningPort,
         onEvent: recordEvent,
         onReady: recordServerReady,

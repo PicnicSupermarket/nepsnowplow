@@ -23,18 +23,14 @@ export class SnowplowMicro {
     private readonly readyPromise: Promise<void>;
     private resolveReady!: () => void;
 
-    constructor(private readonly appPath: string) {
+    constructor(private readonly resourcesPath: string) {
         this.readyPromise = new Promise((resolve) => {
             this.resolveReady = resolve;
         });
     }
 
     start(): Promise<void> {
-        // In packaged mode app.getAppPath() points inside app.asar but the
-        // JARs and JREs ship in extraResources alongside it; stripping
-        // app.asar resolves to the resources root in both packaged and
-        // dev modes.
-        const base = this.appPath.replace("app.asar", "");
+        const base = this.resourcesPath;
         const jarPath = path.join(base, "jars", "snowplow-micro-1.3.4.jar");
         const jrePath = path.join(base, `jre/${os.platform()}_${os.arch()}/bin/java`);
         const microConfPath = path.join(base, "snowplow_micro_config", "micro.conf");
@@ -48,6 +44,9 @@ export class SnowplowMicro {
             "--iglu",
             igluPath,
         ]);
+        this.process.on("error", (err) => {
+            console.error("[snowplow-micro] spawn failed:", err);
+        });
 
         // snowplow-micro logs `... :PORT ...` on stderr at startup. We pluck
         // the port out of the first match and consider the JVM ready then.

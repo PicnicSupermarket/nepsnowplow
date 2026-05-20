@@ -37,7 +37,7 @@ const STRUCTURED_FIELDS: Record<string, string> = {
 };
 
 export interface CollectorOptions {
-    appPath: string;
+    resourcesPath: string;
     proposedPort: number;
     onEvent(event: EventViewModel): void;
     onReady(actualPort: number): void;
@@ -54,7 +54,7 @@ export class Collector {
     private validationQueue: Promise<void> = Promise.resolve();
 
     constructor(private readonly opts: CollectorOptions) {
-        this.micro = new SnowplowMicro(opts.appPath);
+        this.micro = new SnowplowMicro(opts.resourcesPath);
         this.app.use(bodyParser.json());
         this.app.use(bodyParser.urlencoded({ extended: true }));
         // Match every path so a tracker pointed at any URL on this host is
