@@ -1,3 +1,4 @@
+import { useEffect, useLayoutEffect, useRef, useState } from "preact/hooks";
 import { useStore } from "../store";
 import type { EventViewModel } from "../../../shared/event";
 import { Badge } from "./ui/badge";
@@ -22,7 +23,58 @@ export function EventDetails() {
     const setDetailsQuery = useStore((s) => s.setDetailsQuery);
     const filterQuery = useStore((s) => s.filterQuery);
 
+    // Cycle state for the in-event search. activeMatch is the index into
+    // the currently-rendered list of `<mark data-kind="search">` nodes;
+    // matchCount mirrors that list's length so the toolbar chip can show
+    // "X of Y". Both reset to 0 / 0 whenever the query or the selected
+    // event changes.
+    const detailsRef = useRef<HTMLDivElement>(null);
+    const [activeMatch, setActiveMatch] = useState(0);
+    const [matchCount, setMatchCount] = useState(0);
+
     const event = selectedId !== null ? events.get(selectedId) : undefined;
+
+    // Reset cycle position whenever the query or the selected event
+    // changes; the layout effect below recomputes matchCount on the
+    // following render.
+    useEffect(() => {
+        setActiveMatch(0);
+    }, [detailsQuery, selectedId]);
+
+    // Sync data-current on the actual DOM nodes. Runs after every render
+    // so the active mark stays correctly tagged even when the JsonTree
+    // rebuilds. The setMatchCount call is guarded against the previous
+    // value so the effect can't loop.
+    useLayoutEffect(() => {
+        const root = detailsRef.current;
+        if (!root) {
+            if (matchCount !== 0) setMatchCount(0);
+            return;
+        }
+        const marks = root.querySelectorAll<HTMLElement>('mark[data-kind="search"]');
+        if (marks.length !== matchCount) {
+            setMatchCount(marks.length);
+        }
+        const idx = marks.length === 0 ? -1 : Math.min(activeMatch, marks.length - 1);
+        marks.forEach((m, i) => {
+            if (i === idx) {
+                m.dataset.current = "true";
+            } else {
+                delete m.dataset.current;
+            }
+        });
+        if (idx >= 0 && detailsQuery.trim()) {
+            marks[idx].scrollIntoView({ block: "nearest" });
+        }
+    }, [activeMatch, detailsQuery, selectedId, matchCount]);
+
+    function cycleMatch(direction: 1 | -1): void {
+        const root = detailsRef.current;
+        if (!root) return;
+        const count = root.querySelectorAll('mark[data-kind="search"]').length;
+        if (count === 0) return;
+        setActiveMatch((prev) => ((prev + direction) % count + count) % count);
+    }
 
     if (!event) {
         return (
@@ -33,7 +85,7 @@ export function EventDetails() {
     }
 
     return (
-        <div class="p-5 px-6" id={`details-${event.id}`}>
+        <div ref={detailsRef} class="p-5 px-6" id={`details-${event.id}`}>
             <header class="flex items-center gap-2.5 mb-3">
                 <ValidityDot status={event.validationStatus} />
                 <div class="flex items-baseline gap-2 flex-1 min-w-0">
@@ -56,7 +108,7 @@ export function EventDetails() {
                 </Badge>
             </header>
 
-            <div class="mb-5">
+            <div class="mb-5 flex items-center gap-2">
                 <Input
                     type="search"
                     placeholder={`Search in event  ${shortcut("Mod", "F")}`}
@@ -64,10 +116,26 @@ export function EventDetails() {
                     onInput={(e) =>
                         setDetailsQuery((e.target as HTMLInputElement).value)
                     }
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                            e.preventDefault();
+                            cycleMatch(e.shiftKey ? -1 : 1);
+                        }
+                    }}
                     aria-label="Search in event"
                     inputRef={(el) => registerSearch("event-search", el)}
-                    class="w-full"
+                    class="flex-1"
                 />
+                {detailsQuery.trim() && (
+                    <span
+                        class="text-[11px] text-muted tabular-nums whitespace-nowrap"
+                        aria-live="polite"
+                    >
+                        {matchCount === 0
+                            ? "No matches"
+                            : `${activeMatch + 1} of ${matchCount}`}
+                    </span>
+                )}
             </div>
 
             {event.errors && event.errors.length > 0 && (

@@ -31,6 +31,27 @@ const validBundle = {
     ],
 };
 
+// Self-describing payload with multiple occurrences of the same substring,
+// for exercising Enter-to-cycle through search matches.
+const multiMatchBundle = {
+    data: [
+        {
+            eid: "00000000-0000-4000-8000-000000000003",
+            ue_px: Buffer.from(
+                JSON.stringify({
+                    schema: SCHEMA,
+                    data: {
+                        page: "/home",
+                        title: "page title",
+                        description: "another page",
+                    },
+                }),
+            ).toString("base64"),
+            cx: Buffer.from(JSON.stringify([])).toString("base64"),
+        },
+    ],
+};
+
 // Snowplow structured event: no schema URI, just the labelled fields.
 const structuredBundle = {
     data: [
@@ -182,6 +203,41 @@ test.describe("renderer", () => {
         await window.getByRole("button", { name: /^resume$/i }).click();
         await request.post("/", { data: validBundle, failOnStatusCode: false });
         await expect(window.locator('[role="option"]').first()).toBeVisible();
+    });
+
+    test("Enter cycles through in-event search matches", async () => {
+        await request.post("/", {
+            data: multiMatchBundle,
+            failOnStatusCode: false,
+        });
+        await window.locator('[role="option"]').first().click();
+
+        const search = window.getByRole("searchbox", { name: "Search in event" });
+        await search.fill("page");
+
+        // Counter shows the active position and the total; payload has
+        // three substrings containing "page" (key, two values).
+        await expect(window.getByText("1 of 3")).toBeVisible();
+
+        // Exactly one mark carries data-current=true at any time.
+        const currentMarks = window.locator(
+            'mark[data-kind="search"][data-current="true"]',
+        );
+        await expect(currentMarks).toHaveCount(1);
+
+        await search.press("Enter");
+        await expect(window.getByText("2 of 3")).toBeVisible();
+
+        await search.press("Enter");
+        await expect(window.getByText("3 of 3")).toBeVisible();
+
+        // Wraps around at the end.
+        await search.press("Enter");
+        await expect(window.getByText("1 of 3")).toBeVisible();
+
+        // Shift+Enter walks backwards (and also wraps).
+        await search.press("Shift+Enter");
+        await expect(window.getByText("3 of 3")).toBeVisible();
     });
 
     test("renders structured events as category / action with a Structured badge", async () => {
