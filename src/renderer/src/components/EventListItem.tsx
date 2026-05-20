@@ -1,40 +1,44 @@
-import type { EventViewModel, ValidationStatus } from "../../../shared/event";
+import type { EventViewModel } from "../../../shared/event";
 import { Highlight } from "./Highlight";
+import { ValidityDot } from "./ui/validity-dot";
 
 interface Props {
     event: EventViewModel;
     highlight: string;
 }
 
-function ValidityDot({ status }: { status: ValidationStatus }) {
-    return <span class={`validity validity--${status}`} aria-label={status} />;
-}
-
 export function EventListItem({ event, highlight }: Props) {
     return (
-        <article class="event-item">
-            <header class="event-item__header">
+        <article>
+            <header class="flex items-center gap-1.5 font-semibold">
                 <ValidityDot status={event.validationStatus} />
-                <span class="event-item__schema">
+                <span class="event-item__schema truncate">
                     <Highlight text={event.schema.name || "(no schema)"} query={highlight} />
                 </span>
                 {event.schema.version && (
-                    <span class="event-item__version">{event.schema.version}</span>
+                    <span class="ml-auto text-[11px] font-normal text-muted tabular-nums">
+                        {event.schema.version}
+                    </span>
                 )}
             </header>
             {event.contexts.length > 0 && (
-                <ul class="event-item__contexts">
+                <ul class="list-none m-0 mt-1 pl-3.5 text-xs text-muted">
                     {event.contexts.map((ctx, i) => (
-                        <li key={`${ctx.schema.name}-${i}`}>
+                        <li
+                            key={`${ctx.schema.name}-${i}`}
+                            class="flex items-center gap-1.5 leading-6"
+                        >
                             <ValidityDot status={ctx.validationStatus} />
-                            <span class="event-item__schema">
+                            <span class="event-item__schema truncate">
                                 <Highlight
                                     text={ctx.schema.name || "(no schema)"}
                                     query={highlight}
                                 />
                             </span>
                             {ctx.schema.version && (
-                                <span class="event-item__version">{ctx.schema.version}</span>
+                                <span class="ml-auto text-[11px] tabular-nums">
+                                    {ctx.schema.version}
+                                </span>
                             )}
                         </li>
                     ))}

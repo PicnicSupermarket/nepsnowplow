@@ -1,5 +1,7 @@
 import { useStore } from "../store";
 import type { EventViewModel } from "../../../shared/event";
+import { Badge } from "./ui/badge";
+import { ValidityDot } from "./ui/validity-dot";
 import { JsonTree } from "./JsonTree";
 import { ContextCard } from "./ContextCard";
 
@@ -17,45 +19,49 @@ export function EventDetails() {
     const event = selectedId !== null ? events.get(selectedId) : undefined;
 
     if (!event) {
-        return <div class="empty">Select an event to inspect it</div>;
+        return (
+            <div class="grid h-full place-items-center p-6 text-muted text-center">
+                Select an event to inspect it
+            </div>
+        );
     }
 
     return (
-        <div class="details" id={`details-${event.id}`}>
-            <header class="details__header">
-                <span class={`validity validity--${event.validationStatus}`} aria-hidden="true" />
-                <div class="details__title">
-                    <h2 class="details__schema">{event.schema.name || "(no schema)"}</h2>
+        <div class="p-5 px-6" id={`details-${event.id}`}>
+            <header class="flex items-center gap-2.5 mb-[18px]">
+                <ValidityDot status={event.validationStatus} />
+                <div class="flex items-baseline gap-2 flex-1 min-w-0">
+                    <h2 class="m-0 text-base font-semibold truncate">
+                        {event.schema.name || "(no schema)"}
+                    </h2>
                     {event.schema.version && (
-                        <span class="details__version">{event.schema.version}</span>
+                        <span class="text-xs text-muted tabular-nums">
+                            {event.schema.version}
+                        </span>
                     )}
                 </div>
-                <span class={`badge badge--${event.validationStatus}`}>
+                <Badge variant={event.validationStatus}>
                     {STATUS_LABEL[event.validationStatus]}
-                </span>
+                </Badge>
             </header>
 
             {event.errors && event.errors.length > 0 && (
                 <ErrorList status={event.validationStatus} errors={event.errors} />
             )}
 
-            <section class="details__section">
-                <h3 class="details__section-title">Payload</h3>
+            <Section title="Payload">
                 {event.payload === undefined || event.payload === null ? (
-                    <p class="details__empty">No payload</p>
+                    <p class="m-0 italic text-muted">No payload</p>
                 ) : (
-                    <div class="details__json">
+                    <div class="p-3 rounded border border-border bg-elevated font-mono text-xs overflow-x-auto">
                         <JsonTree value={event.payload} highlight={filterQuery} />
                     </div>
                 )}
-            </section>
+            </Section>
 
             {event.contexts.length > 0 && (
-                <section class="details__section">
-                    <h3 class="details__section-title">
-                        Attached contexts ({event.contexts.length})
-                    </h3>
-                    <div class="details__contexts">
+                <Section title={`Attached contexts (${event.contexts.length})`}>
+                    <div class="flex flex-col gap-2.5">
                         {event.contexts.map((ctx, i) => (
                             <ContextCard
                                 key={`${ctx.schema.name}-${i}`}
@@ -64,9 +70,20 @@ export function EventDetails() {
                             />
                         ))}
                     </div>
-                </section>
+                </Section>
             )}
         </div>
+    );
+}
+
+function Section({ title, children }: { title: string; children: preact.ComponentChildren }) {
+    return (
+        <section class="mb-6">
+            <h3 class="m-0 mb-2 text-[11px] font-semibold uppercase tracking-wider text-muted">
+                {title}
+            </h3>
+            {children}
+        </section>
     );
 }
 
@@ -77,8 +94,12 @@ function ErrorList({
     status: EventViewModel["validationStatus"];
     errors: string[];
 }) {
+    const tone =
+        status === "invalid"
+            ? "bg-bad/8 border-bad/30 text-bad"
+            : "bg-warn/8 border-warn/30 text-warn";
     return (
-        <ul class={`alert alert--${status}`}>
+        <ul class={`mb-4 px-3.5 py-2.5 rounded border list-none text-xs space-y-1 ${tone}`}>
             {errors.map((err, i) => (
                 <li key={i}>{err}</li>
             ))}

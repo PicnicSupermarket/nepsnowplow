@@ -111,10 +111,11 @@ test.describe("renderer", () => {
         const row = window.locator('[role="option"]').first();
         await row.click();
 
-        // Schema name appears in the details header.
-        const details = window.locator(".details");
+        // The details pane is a labelled region so the test doesn't have
+        // to know which utility classes implement the layout.
+        const details = window.getByRole("region", { name: "Event details" });
         await expect(details).toBeVisible();
-        await expect(details.locator(".details__schema")).toHaveText("page_view");
+        await expect(details.getByRole("heading", { level: 2 })).toHaveText("page_view");
 
         // Payload field is rendered in the JSON tree.
         await expect(details).toContainText("page");
