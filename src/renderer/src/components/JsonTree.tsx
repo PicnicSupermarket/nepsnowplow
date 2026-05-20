@@ -95,7 +95,20 @@ function Collection<K extends string | number>({
     collapseAfter,
     depth,
 }: CollectionProps<K>) {
-    const [collapsed, setCollapsed] = useState(entries.length > collapseAfter);
+    const [userCollapsed, setUserCollapsed] = useState(entries.length > collapseAfter);
+    // While a search query is active, force every collection open so the
+    // matches the user is looking for aren't hidden behind a collapsed
+    // node. Manual toggle state is preserved — once the query clears the
+    // user's previous expansion state comes back.
+    const hasQuery = highlight.trim().length > 0;
+    const collapsed = hasQuery ? false : userCollapsed;
+    const setCollapsed = (next: boolean | ((prev: boolean) => boolean)) => {
+        if (typeof next === "function") {
+            setUserCollapsed(next);
+        } else {
+            setUserCollapsed(next);
+        }
+    };
     if (entries.length === 0) {
         return (
             <span class="text-muted">

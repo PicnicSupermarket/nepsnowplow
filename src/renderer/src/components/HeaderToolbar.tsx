@@ -9,6 +9,8 @@ import {
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { SettingsDialog } from "./SettingsDialog";
+import { registerSearch } from "../lib/focus";
+import { shortcut } from "../lib/shortcut";
 
 // Two-up SVG icons kept inline so we don't ship a font for two glyphs.
 // They render currentColor so theme tokens flow through unchanged.
@@ -145,10 +147,11 @@ export function HeaderToolbar() {
                 <IconSearch />
                 <Input
                     type="search"
-                    placeholder="Filter events"
+                    placeholder={`Filter events  ${shortcut("Mod", "Shift", "F")}`}
                     value={filterQuery}
                     onInput={(e) => setFilterQuery((e.target as HTMLInputElement).value)}
                     aria-label="Filter events"
+                    inputRef={(el) => registerSearch("list-filter", el)}
                     class="flex-1 min-w-0 h-auto px-0 border-0 bg-transparent rounded-none focus:border-0"
                 />
             </label>

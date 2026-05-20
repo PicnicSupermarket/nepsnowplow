@@ -1,9 +1,12 @@
 import { useStore } from "../store";
 import type { EventViewModel } from "../../../shared/event";
 import { Badge } from "./ui/badge";
+import { Input } from "./ui/input";
 import { ValidityDot } from "./ui/validity-dot";
 import { JsonTree } from "./JsonTree";
 import { ContextCard } from "./ContextCard";
+import { registerSearch } from "../lib/focus";
+import { shortcut } from "../lib/shortcut";
 
 const STATUS_LABEL: Record<EventViewModel["validationStatus"], string> = {
     valid: "Valid",
@@ -14,7 +17,8 @@ const STATUS_LABEL: Record<EventViewModel["validationStatus"], string> = {
 export function EventDetails() {
     const selectedId = useStore((s) => s.selectedId);
     const events = useStore((s) => s.events);
-    const filterQuery = useStore((s) => s.filterQuery);
+    const detailsQuery = useStore((s) => s.detailsQuery);
+    const setDetailsQuery = useStore((s) => s.setDetailsQuery);
 
     const event = selectedId !== null ? events.get(selectedId) : undefined;
 
@@ -28,7 +32,7 @@ export function EventDetails() {
 
     return (
         <div class="p-5 px-6" id={`details-${event.id}`}>
-            <header class="flex items-center gap-2.5 mb-[18px]">
+            <header class="flex items-center gap-2.5 mb-3">
                 <ValidityDot status={event.validationStatus} />
                 <div class="flex items-baseline gap-2 flex-1 min-w-0">
                     <h2 class="m-0 text-base font-semibold truncate">
@@ -45,6 +49,20 @@ export function EventDetails() {
                 </Badge>
             </header>
 
+            <div class="mb-5">
+                <Input
+                    type="search"
+                    placeholder={`Search in event  ${shortcut("Mod", "F")}`}
+                    value={detailsQuery}
+                    onInput={(e) =>
+                        setDetailsQuery((e.target as HTMLInputElement).value)
+                    }
+                    aria-label="Search in event"
+                    inputRef={(el) => registerSearch("event-search", el)}
+                    class="w-full"
+                />
+            </div>
+
             {event.errors && event.errors.length > 0 && (
                 <ErrorList status={event.validationStatus} errors={event.errors} />
             )}
@@ -54,7 +72,7 @@ export function EventDetails() {
                     <p class="m-0 italic text-muted">No payload</p>
                 ) : (
                     <div class="p-3 rounded border border-border bg-elevated font-mono text-xs overflow-x-auto">
-                        <JsonTree value={event.payload} highlight={filterQuery} />
+                        <JsonTree value={event.payload} highlight={detailsQuery} />
                     </div>
                 )}
             </Section>
@@ -66,7 +84,7 @@ export function EventDetails() {
                             <ContextCard
                                 key={`${ctx.schema.name}-${i}`}
                                 context={ctx}
-                                highlight={filterQuery}
+                                highlight={detailsQuery}
                             />
                         ))}
                     </div>
