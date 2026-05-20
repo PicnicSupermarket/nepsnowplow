@@ -20,6 +20,7 @@ export function EventDetails() {
     const events = useStore((s) => s.events);
     const detailsQuery = useStore((s) => s.detailsQuery);
     const setDetailsQuery = useStore((s) => s.setDetailsQuery);
+    const filterQuery = useStore((s) => s.filterQuery);
 
     const event = selectedId !== null ? events.get(selectedId) : undefined;
 
@@ -78,7 +79,11 @@ export function EventDetails() {
                     <p class="m-0 italic text-muted">No payload</p>
                 ) : (
                     <div class="p-3 rounded border border-border bg-elevated font-mono text-xs overflow-x-auto">
-                        <JsonTree value={event.payload} highlight={detailsQuery} />
+                        <JsonTree
+                            value={event.payload}
+                            search={detailsQuery}
+                            filter={filterQuery}
+                        />
                     </div>
                 )}
             </Section>
@@ -90,7 +95,8 @@ export function EventDetails() {
                             <ContextCard
                                 key={`${ctx.schema.name}-${i}`}
                                 context={ctx}
-                                highlight={detailsQuery}
+                                search={detailsQuery}
+                                filter={filterQuery}
                             />
                         ))}
                     </div>

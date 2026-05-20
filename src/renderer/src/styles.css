@@ -28,6 +28,13 @@
     /* Selection / highlight */
     --color-selected: light-dark(rgba(10, 132, 255, 0.12), rgba(10, 132, 255, 0.22));
     --color-highlight: light-dark(rgba(255, 214, 10, 0.55), rgba(255, 214, 10, 0.4));
+    /* Active match in the cycle-through search (orange so it stands
+       out against the other yellow matches around it). */
+    --color-highlight-current: light-dark(rgba(255, 149, 0, 0.7), rgba(255, 175, 60, 0.6));
+    /* Sidebar filter matches inside the details pane — a distinct blue
+       tone so users can tell why an event is visible (filter) apart
+       from what they're actively grepping for (in-event search). */
+    --color-highlight-filter: light-dark(rgba(64, 156, 255, 0.3), rgba(64, 156, 255, 0.42));
 
     /* Validity status */
     --color-ok: #34c759;
@@ -91,10 +98,22 @@ input {
 }
 
 mark {
-    background: var(--color-highlight);
     color: inherit;
     border-radius: 2px;
     padding: 0 1px;
+    background: transparent;
+}
+
+mark[data-kind="search"] {
+    background: var(--color-highlight);
+}
+
+mark[data-kind="search"][data-current="true"] {
+    background: var(--color-highlight-current);
+}
+
+mark[data-kind="filter"] {
+    background: var(--color-highlight-filter);
 }
 
 

@@ -5,7 +5,8 @@ import { JsonTree } from "./JsonTree";
 
 interface Props {
     context: EventContext;
-    highlight: string;
+    search: string;
+    filter: string;
 }
 
 const STATUS_LABEL: Record<EventContext["validationStatus"], string> = {
@@ -14,7 +15,7 @@ const STATUS_LABEL: Record<EventContext["validationStatus"], string> = {
     unknown: "Unvalidated",
 };
 
-export function ContextCard({ context, highlight }: Props) {
+export function ContextCard({ context, search, filter }: Props) {
     const errorTone =
         context.validationStatus === "invalid"
             ? "bg-bad/8 border-bad/30 text-bad"
@@ -49,7 +50,7 @@ export function ContextCard({ context, highlight }: Props) {
 
             {context.payload !== undefined && context.payload !== null && (
                 <div class="font-mono text-xs overflow-x-auto">
-                    <JsonTree value={context.payload} highlight={highlight} />
+                    <JsonTree value={context.payload} search={search} filter={filter} />
                 </div>
             )}
         </article>

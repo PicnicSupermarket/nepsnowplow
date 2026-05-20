@@ -3,7 +3,13 @@ import { Highlight } from "./Highlight";
 
 interface Props {
     value: unknown;
-    highlight?: string;
+    // Primary (⌘F) in-event search; cycle-able via Enter on the search
+    // input. Painted with the search highlight colour.
+    search?: string;
+    // Secondary (⌘⇧F) sidebar filter; rendered underneath search
+    // matches in a different colour so users can see why a given event
+    // is visible at the same time as where their in-event search hits.
+    filter?: string;
     // Auto-collapse nodes that span more rows than this when first rendered.
     // The user can still expand them on demand. Picked to keep large
     // payloads (think e-commerce carts with hundreds of line items)
@@ -15,24 +21,33 @@ interface Props {
 // and string values flow through the same Highlight component the event
 // list uses, so the search field works inside the details pane without
 // any extra plumbing.
-export function JsonTree({ value, highlight = "", collapseAfter = 30 }: Props) {
-    return <Node value={value} highlight={highlight} collapseAfter={collapseAfter} depth={0} />;
+export function JsonTree({ value, search = "", filter = "", collapseAfter = 30 }: Props) {
+    return (
+        <Node
+            value={value}
+            search={search}
+            filter={filter}
+            collapseAfter={collapseAfter}
+            depth={0}
+        />
+    );
 }
 
 interface NodeProps {
     value: unknown;
-    highlight: string;
+    search: string;
+    filter: string;
     collapseAfter: number;
     depth: number;
 }
 
-function Node({ value, highlight, collapseAfter, depth }: NodeProps) {
+function Node({ value, search, filter, collapseAfter, depth }: NodeProps) {
     if (value === null) return <span class="text-muted italic">null</span>;
     if (value === undefined) return <span class="text-muted italic">undefined</span>;
     if (typeof value === "string") {
         return (
             <span class="text-json-string">
-                "<Highlight text={value} query={highlight} />"
+                "<Highlight text={value} search={search} filter={filter} />"
             </span>
         );
     }
@@ -49,7 +64,8 @@ function Node({ value, highlight, collapseAfter, depth }: NodeProps) {
                 open="["
                 close="]"
                 renderKey={(k) => <span class="text-muted tabular-nums">{k}</span>}
-                highlight={highlight}
+                search={search}
+                filter={filter}
                 collapseAfter={collapseAfter}
                 depth={depth}
             />
@@ -64,10 +80,11 @@ function Node({ value, highlight, collapseAfter, depth }: NodeProps) {
                 close="}"
                 renderKey={(k) => (
                     <span class="text-accent">
-                        "<Highlight text={String(k)} query={highlight} />"
+                        "<Highlight text={String(k)} search={search} filter={filter} />"
                     </span>
                 )}
-                highlight={highlight}
+                search={search}
+                filter={filter}
                 collapseAfter={collapseAfter}
                 depth={depth}
             />
@@ -81,7 +98,8 @@ interface CollectionProps<K extends string | number> {
     open: string;
     close: string;
     renderKey: (key: K) => preact.ComponentChild;
-    highlight: string;
+    search: string;
+    filter: string;
     collapseAfter: number;
     depth: number;
 }
@@ -91,16 +109,17 @@ function Collection<K extends string | number>({
     open,
     close,
     renderKey,
-    highlight,
+    search,
+    filter,
     collapseAfter,
     depth,
 }: CollectionProps<K>) {
     const [userCollapsed, setUserCollapsed] = useState(entries.length > collapseAfter);
-    // While a search query is active, force every collection open so the
+    // While either query is active, force every collection open so the
     // matches the user is looking for aren't hidden behind a collapsed
-    // node. Manual toggle state is preserved — once the query clears the
-    // user's previous expansion state comes back.
-    const hasQuery = highlight.trim().length > 0;
+    // node. Manual toggle state is preserved — once both queries clear
+    // the user's previous expansion state comes back.
+    const hasQuery = search.trim().length > 0 || filter.trim().length > 0;
     const collapsed = hasQuery ? false : userCollapsed;
     const setCollapsed = (next: boolean | ((prev: boolean) => boolean)) => {
         if (typeof next === "function") {
@@ -145,7 +164,8 @@ function Collection<K extends string | number>({
                                 <span class="text-muted">: </span>
                                 <Node
                                     value={val}
-                                    highlight={highlight}
+                                    search={search}
+                                    filter={filter}
                                     collapseAfter={collapseAfter}
                                     depth={depth + 1}
                                 />

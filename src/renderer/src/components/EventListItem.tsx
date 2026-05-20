@@ -14,7 +14,7 @@ export function EventListItem({ event, highlight }: Props) {
             <header class="flex items-center gap-1.5 font-semibold">
                 <ValidityDot status={event.validationStatus} />
                 <span class="truncate">
-                    <Highlight text={displayTitle(event)} query={highlight} />
+                    <Highlight text={displayTitle(event)} filter={highlight} />
                 </span>
                 {event.kind === "self-describing" && event.schema.version && (
                     <span class="ml-auto text-[11px] font-normal text-muted tabular-nums">
@@ -33,7 +33,7 @@ export function EventListItem({ event, highlight }: Props) {
                             <span class="truncate">
                                 <Highlight
                                     text={ctx.schema.name || "(no schema)"}
-                                    query={highlight}
+                                    filter={highlight}
                                 />
                             </span>
                             {ctx.schema.version && (
