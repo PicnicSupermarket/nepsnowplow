@@ -3,6 +3,7 @@ import { HeaderToolbar } from "./components/HeaderToolbar";
 import { FooterToolbar } from "./components/FooterToolbar";
 import { PaneGroup } from "./components/PaneGroup";
 import { EventList } from "./components/EventList";
+import { EventDetails } from "./components/EventDetails";
 import { useStore } from "./store";
 
 export function App() {
@@ -44,15 +45,8 @@ export function App() {
     return (
         <div class="app">
             <HeaderToolbar />
-            <PaneGroup
-                sidebar={<EventList />}
-                details={<EmptyDetails />}
-            />
+            <PaneGroup sidebar={<EventList />} details={<EventDetails />} />
             <FooterToolbar />
         </div>
     );
-}
-
-function EmptyDetails() {
-    return <div class="empty">Select an event to inspect it</div>;
 }

@@ -1,4 +1,5 @@
 import type { EventViewModel, ValidationStatus } from "../../../shared/event";
+import { Highlight } from "./Highlight";
 
 interface Props {
     event: EventViewModel;
@@ -7,30 +8,6 @@ interface Props {
 
 function ValidityDot({ status }: { status: ValidationStatus }) {
     return <span class={`validity validity--${status}`} aria-label={status} />;
-}
-
-// Render `text` with case-insensitive substring matches of `query` wrapped
-// in <mark>. Filtering already guarantees we only get here for rows that
-// contain the query somewhere; that match might be in a context name or
-// inside the payload, so a missing match in the schema name is fine.
-function Highlight({ text, query }: { text: string; query: string }) {
-    const q = query.trim();
-    if (!q) return <>{text}</>;
-    const lower = text.toLowerCase();
-    const needle = q.toLowerCase();
-    const parts: preact.ComponentChild[] = [];
-    let cursor = 0;
-    while (cursor < text.length) {
-        const idx = lower.indexOf(needle, cursor);
-        if (idx === -1) {
-            parts.push(text.slice(cursor));
-            break;
-        }
-        if (idx > cursor) parts.push(text.slice(cursor, idx));
-        parts.push(<mark key={idx}>{text.slice(idx, idx + needle.length)}</mark>);
-        cursor = idx + needle.length;
-    }
-    return <>{parts}</>;
 }
 
 export function EventListItem({ event, highlight }: Props) {
