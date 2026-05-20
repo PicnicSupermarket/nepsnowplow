@@ -5,6 +5,7 @@ import os from "node:os";
 import { CH, Options, ServerInfo } from "../shared/ipc";
 import { EventViewModel, MAX_EVENTS } from "../shared/event";
 import { Collector } from "./server/collector";
+import { startUpdater } from "./updater";
 
 const DEFAULT_OPTIONS: Options = {
     listeningPort: 3000,
@@ -178,6 +179,11 @@ app.whenReady().then(async () => {
     options = loadOptions();
     registerIpc();
     createMainWindow();
+    // The auto-updater check is fire-and-forget; failures get logged but
+    // never block startup.
+    if (app.isPackaged) {
+        startUpdater();
+    }
     // The collector is the slow part of startup (JVM boot). Run it after
     // the window is created so the renderer can paint its shell and
     // show "waiting for collector…" instead of a blank screen.
