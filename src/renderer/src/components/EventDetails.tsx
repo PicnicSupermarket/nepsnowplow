@@ -8,7 +8,7 @@ import { JsonTree } from "./JsonTree";
 import { ContextCard } from "./ContextCard";
 import { registerSearch } from "../lib/focus";
 import { shortcut } from "../lib/shortcut";
-import { displayTitle } from "../lib/event-display";
+import { displayTitle } from "../../../shared/event-display";
 
 const STATUS_LABEL: Record<EventViewModel["validationStatus"], string> = {
     valid: "Valid",

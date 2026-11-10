@@ -6,6 +6,9 @@ import type { EventViewModel } from "./event";
 
 export interface Options {
     listeningPort: number;
+    // Loopback port of the MCP endpoint agents connect to
+    // (http://127.0.0.1:<mcpPort>/mcp). 0 disables it.
+    mcpPort: number;
     filterValidEvents: boolean;
     // When true the collector still accepts POSTs but short-circuits to
     // 204 without running the snowplow-micro validation pipeline or
