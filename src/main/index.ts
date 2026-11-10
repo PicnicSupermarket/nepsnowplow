@@ -3,12 +3,15 @@ import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
 import { CH, Options, ServerInfo } from "../shared/ipc";
-import { EventViewModel, MAX_EVENTS } from "../shared/event";
+import { EventViewModel } from "../shared/event";
+import { EventStore } from "./event-store";
+import { DEFAULT_MCP_PORT, RunningMcpServer, startMcpServer } from "./mcp/server";
 import { Collector } from "./server/collector";
 import { startUpdater } from "./updater";
 
 const DEFAULT_OPTIONS: Options = {
     listeningPort: 3000,
+    mcpPort: DEFAULT_MCP_PORT,
     filterValidEvents: false,
     paused: false,
 };
@@ -44,7 +47,7 @@ function loadOptions(): Options {
 // convention: filters reset between launches) so it stays out of the
 // file.
 function persistOptions(): void {
-    const payload = { listeningPort: options.listeningPort };
+    const payload = { listeningPort: options.listeningPort, mcpPort: options.mcpPort };
     fs.writeFileSync(settingsPath(), `${JSON.stringify(payload, null, 4)}\n`, "utf-8");
 }
 
@@ -62,12 +65,12 @@ function firstLanIp(): string | null {
 // Source-of-truth state owned by main. Window reloads re-seed the
 // renderer from this mirror so captured history survives a refresh.
 let options: Options = { ...DEFAULT_OPTIONS };
-const trackedEvents: EventViewModel[] = [];
-let nextEventId = 0;
+const store = new EventStore();
 let serverInfo: ServerInfo = { ip: null, port: 0 };
 
 let mainWindow: BrowserWindow | null = null;
 let collector: Collector | null = null;
+let mcpServer: RunningMcpServer | null = null;
 
 function createMainWindow(): void {
     const isMac = os.platform() === "darwin";
@@ -127,12 +130,9 @@ function registerIpc(): void {
         return serverInfo.port;
     });
 
-    ipcMain.handle(CH.GET_INITIAL_EVENTS, () => trackedEvents.slice());
+    ipcMain.handle(CH.GET_INITIAL_EVENTS, () => store.all().slice());
 
-    ipcMain.handle(CH.CLEAR_EVENTS, () => {
-        trackedEvents.length = 0;
-        nextEventId = 0;
-    });
+    ipcMain.handle(CH.CLEAR_EVENTS, () => store.clear());
 
     ipcMain.handle(CH.EXPORT_EVENTS, async (_e, payload: string) => {
         if (!mainWindow) return false;
@@ -168,10 +168,7 @@ function pushToRenderer(channel: string, payload: unknown): void {
 }
 
 function recordEvent(event: EventViewModel): void {
-    trackedEvents.push(event);
-    while (trackedEvents.length > MAX_EVENTS) {
-        trackedEvents.shift();
-    }
+    store.add(event);
     pushToRenderer(CH.EVENT_PUSH, event);
 }
 
@@ -195,7 +192,7 @@ async function startCollector(): Promise<void> {
         proposedPort: options.listeningPort,
         onEvent: recordEvent,
         onReady: recordServerReady,
-        nextId: () => nextEventId++,
+        nextId: () => store.allocateId(),
         // Polled on every POST; reading through a closure so flipping
         // the flag at runtime affects subsequent requests without having
         // to thread the new value back through the collector.
@@ -208,7 +205,27 @@ async function startCollector(): Promise<void> {
     }
 }
 
+async function startMcp(): Promise<void> {
+    if (options.mcpPort === 0) return;
+    try {
+        mcpServer = await startMcpServer(
+            {
+                store,
+                getStatus: () => ({ collectorPort: serverInfo.port, paused: options.paused }),
+            },
+            options.mcpPort,
+        );
+        console.log(`MCP endpoint: http://127.0.0.1:${mcpServer.port}/mcp`);
+    } catch (err) {
+        // Agents hold the port in their config, so unlike the collector we
+        // don't fall back to a random one: a busy port is reported and the
+        // GUI keeps working without MCP.
+        console.error(`Failed to start MCP server on port ${options.mcpPort}`, err);
+    }
+}
+
 app.on("window-all-closed", () => {
+    void mcpServer?.close();
     collector?.stop();
     app.quit();
 });
@@ -228,6 +245,7 @@ app.whenReady().then(async () => {
     if (app.isPackaged) {
         startUpdater();
     }
+    await startMcp();
     // The collector is the slow part of startup (JVM boot). Run it after
     // the window is created so the renderer can paint its shell and
     // show "waiting for collector…" instead of a blank screen.
