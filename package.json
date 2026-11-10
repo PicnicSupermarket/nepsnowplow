@@ -113,6 +113,7 @@
         "vite": "^8.0.13"
     },
     "dependencies": {
+        "@modelcontextprotocol/sdk": "^1.32.2",
         "@tanstack/react-virtual": "^3.13.24",
         "body-parser": "^2.2.2",
         "class-variance-authority": "^0.7.1",
@@ -122,6 +123,7 @@
         "express": "^5.2.1",
         "preact": "^10.29.2",
         "tailwind-merge": "^3.6.0",
+        "zod": "^4.6.7",
         "zustand": "^5.0.13"
     }
 }

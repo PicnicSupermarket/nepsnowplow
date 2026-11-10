@@ -1,7 +1,7 @@
 import type { EventViewModel } from "../../../shared/event";
 import { Highlight } from "./Highlight";
 import { ValidityDot } from "./ui/validity-dot";
-import { displayTitle } from "../lib/event-display";
+import { displayTitle } from "../../../shared/event-display";
 
 interface Props {
     event: EventViewModel;

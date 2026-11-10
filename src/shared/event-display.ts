@@ -1,4 +1,4 @@
-import type { EventViewModel } from "../../../shared/event";
+import type { EventViewModel } from "./event";
 
 // Renders a human-readable title for an event without inventing data
 // the wire didn't carry:

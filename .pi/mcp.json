@@ -1,0 +1,8 @@
+{
+    "mcpServers": {
+        "nepsnowplow": {
+            "url": "http://127.0.0.1:3100/mcp",
+            "description": "Read Snowplow events captured live by NepperSnowplow"
+        }
+    }
+}
