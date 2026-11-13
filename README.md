@@ -62,7 +62,7 @@ Codex can also be configured by hand in `~/.codex/config.toml`:
 url = "http://127.0.0.1:3100/mcp"
 ```
 
-Inside this repository, `.mcp.json` (Claude Code) and `.pi/mcp.json` (pi) already contain the entry.
+Inside this repository, `.mcp.json` already contains the entry for Claude Code.
 
 ### Tools
 
