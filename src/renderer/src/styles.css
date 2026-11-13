@@ -1,0 +1,120 @@
+@import "tailwindcss";
+
+/* ----- Design tokens ----------------------------------------------------- */
+/*
+ * Single source of truth for colours, radii, fonts. Lives in @theme so
+ * Tailwind generates matching utilities (bg-surface, text-fg, border-border,
+ * rounded-sm, etc.). light-dark() flips values automatically based on the
+ * color-scheme on :root, so we don't need a parallel set of dark-mode
+ * variables or `dark:` variants.
+ */
+@theme {
+    /* Surfaces */
+    --color-surface: light-dark(#f6f6f7, #1c1c1e);
+    --color-elevated: light-dark(#ffffff, #2c2c2e);
+    --color-sunken: light-dark(#ececee, #141416);
+
+    /* Text */
+    --color-fg: light-dark(#1a1a1a, #e8e8ea);
+    --color-muted: light-dark(#6b6b70, #8e8e93);
+
+    /* Border */
+    --color-border: light-dark(#d8d8dc, #3a3a3c);
+
+    /* Accent */
+    --color-accent: #0a84ff;
+    --color-accent-soft: light-dark(rgba(10, 132, 255, 0.12), rgba(10, 132, 255, 0.22));
+
+    /* Selection / highlight */
+    --color-selected: light-dark(rgba(10, 132, 255, 0.12), rgba(10, 132, 255, 0.22));
+    --color-highlight: light-dark(rgba(255, 214, 10, 0.55), rgba(255, 214, 10, 0.4));
+    /* Active match in the cycle-through search (orange so it stands
+       out against the other yellow matches around it). */
+    --color-highlight-current: light-dark(rgba(255, 149, 0, 0.7), rgba(255, 175, 60, 0.6));
+    /* Sidebar filter matches inside the details pane — a distinct blue
+       tone so users can tell why an event is visible (filter) apart
+       from what they're actively grepping for (in-event search). */
+    --color-highlight-filter: light-dark(rgba(64, 156, 255, 0.3), rgba(64, 156, 255, 0.42));
+
+    /* Validity status */
+    --color-ok: #34c759;
+    --color-warn: #ff9f0a;
+    --color-bad: #ff3b30;
+
+    /* JSON tree syntax tones */
+    --color-json-string: light-dark(#b65f00, #ffb86c);
+    --color-json-bool: light-dark(#af52de, #d77be4);
+
+    /* Radii */
+    --radius-sm: 4px;
+    --radius: 6px;
+
+    /* Fonts */
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+}
+
+:root {
+    color-scheme: light dark;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--color-fg);
+    background: var(--color-surface);
+}
+
+/* ----- Reset / base ------------------------------------------------------ */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    user-select: none;
+}
+
+button,
+input {
+    font: inherit;
+    color: inherit;
+}
+
+/* ----- Platform chrome --------------------------------------------------- */
+
+/* macOS reserves a fixed strip at the top-left for the traffic-light
+   buttons; any element with [data-traffic-light-pad] reserves matching
+   space so its contents don't sit underneath. */
+:root[data-platform="darwin"] [data-traffic-light-pad] {
+    padding-left: 78px;
+}
+
+mark {
+    color: inherit;
+    border-radius: 2px;
+    padding: 0 1px;
+    background: transparent;
+}
+
+mark[data-kind="search"] {
+    background: var(--color-highlight);
+}
+
+mark[data-kind="search"][data-current="true"] {
+    background: var(--color-highlight-current);
+}
+
+mark[data-kind="filter"] {
+    background: var(--color-highlight-filter);
+}
+
+
+

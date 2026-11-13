@@ -1,0 +1,95 @@
+import { create } from "zustand";
+import type { ServerInfo } from "../../shared/ipc";
+import { EventViewModel, MAX_EVENTS } from "../../shared/event";
+
+interface State {
+    events: Map<number, EventViewModel>;
+    eventOrder: number[];
+    selectedId: number | null;
+    // Narrows the sidebar event list and highlights matches in the
+    // visible rows. Driven by the header search input (⌘⇧F).
+    filterQuery: string;
+    // Highlights matches inside the currently-selected event's payload
+    // and contexts. Driven by the in-event search input (⌘F).
+    detailsQuery: string;
+    filterValidEvents: boolean;
+    paused: boolean;
+    serverInfo: ServerInfo;
+}
+
+interface Actions {
+    ingestEvents(batch: EventViewModel[]): void;
+    clearEvents(): void;
+    select(id: number | null): void;
+    setFilterQuery(query: string): void;
+    setDetailsQuery(query: string): void;
+    setFilterValidEvents(value: boolean): void;
+    setPaused(value: boolean): void;
+    setServerInfo(info: ServerInfo): void;
+}
+
+export type Store = State & Actions;
+
+const initialState: State = {
+    events: new Map(),
+    eventOrder: [],
+    selectedId: null,
+    filterQuery: "",
+    detailsQuery: "",
+    filterValidEvents: false,
+    paused: false,
+    serverInfo: { ip: null, port: 0 },
+};
+
+export const useStore = create<Store>((set) => ({
+    ...initialState,
+
+    ingestEvents: (batch) =>
+        set((s) => {
+            if (batch.length === 0) {
+                return s;
+            }
+            const events = new Map(s.events);
+            const eventOrder = s.eventOrder.slice();
+            for (const e of batch) {
+                if (!events.has(e.id)) {
+                    eventOrder.push(e.id);
+                }
+                events.set(e.id, e);
+            }
+            // FIFO eviction: trim the oldest ids if we've grown past the cap.
+            // A burst large enough to exceed the cap in one ingest pass
+            // (window-reload seed, replay) still leaves us with exactly
+            // MAX_EVENTS at the head.
+            while (eventOrder.length > MAX_EVENTS) {
+                const evicted = eventOrder.shift();
+                if (evicted !== undefined) {
+                    events.delete(evicted);
+                }
+            }
+            // The currently-selected event may have just been evicted; in
+            // that case drop the selection rather than leave a dangling id.
+            const selectedId =
+                s.selectedId !== null && !events.has(s.selectedId) ? null : s.selectedId;
+            return { events, eventOrder, selectedId };
+        }),
+
+    clearEvents: () =>
+        set({
+            events: new Map(),
+            eventOrder: [],
+            selectedId: null,
+        }),
+
+    select: (id) => set({ selectedId: id }),
+
+    setFilterQuery: (query) => set({ filterQuery: query }),
+
+    setDetailsQuery: (query) => set({ detailsQuery: query }),
+
+    setFilterValidEvents: (value) => set({ filterValidEvents: value }),
+
+    setPaused: (value) => set({ paused: value }),
+
+    setServerInfo: (info) => set({ serverInfo: info }),
+}));
