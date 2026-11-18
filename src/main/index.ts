@@ -1,0 +1,253 @@
+import { app, BrowserWindow, dialog, ipcMain } from "electron";
+import fs from "node:fs";
+import path from "node:path";
+import os from "node:os";
+import { CH, Options, ServerInfo } from "../shared/ipc";
+import { EventViewModel } from "../shared/event";
+import { EventStore } from "./event-store";
+import { DEFAULT_MCP_PORT, RunningMcpServer, startMcpServer } from "./mcp/server";
+import { Collector } from "./server/collector";
+import { startUpdater } from "./updater";
+
+const DEFAULT_OPTIONS: Options = {
+    listeningPort: 3000,
+    mcpPort: DEFAULT_MCP_PORT,
+    filterValidEvents: false,
+    paused: false,
+};
+
+// Resolves the directory containing the bundled extra resources (jre/,
+// jars/, snowplow_micro_config/, settings.json). In packaged builds
+// electron-builder places these at process.resourcesPath; in dev and
+// e2e the bundled main entry sits at `<project>/out/main/index.mjs`,
+// so the project root is two dirs up.
+function resourcesPath(): string {
+    if (app.isPackaged) {
+        return process.resourcesPath;
+    }
+    return path.resolve(__dirname, "..", "..");
+}
+
+function settingsPath(): string {
+    return path.resolve(resourcesPath(), "settings.json");
+}
+
+function loadOptions(): Options {
+    try {
+        const raw = fs.readFileSync(settingsPath(), "utf-8");
+        const parsed = JSON.parse(raw) as Partial<Options>;
+        return { ...DEFAULT_OPTIONS, ...parsed };
+    } catch {
+        return { ...DEFAULT_OPTIONS };
+    }
+}
+
+// Persist the subset of options that survives across app restarts.
+// `filterValidEvents` is deliberately session-scoped (matches dev-tool
+// convention: filters reset between launches) so it stays out of the
+// file.
+function persistOptions(): void {
+    const payload = { listeningPort: options.listeningPort, mcpPort: options.mcpPort };
+    fs.writeFileSync(settingsPath(), `${JSON.stringify(payload, null, 4)}\n`, "utf-8");
+}
+
+function firstLanIp(): string | null {
+    for (const ifaces of Object.values(os.networkInterfaces())) {
+        for (const iface of ifaces ?? []) {
+            if (iface.family === "IPv4" && !iface.internal) {
+                return iface.address;
+            }
+        }
+    }
+    return null;
+}
+
+// Source-of-truth state owned by main. Window reloads re-seed the
+// renderer from this mirror so captured history survives a refresh.
+let options: Options = { ...DEFAULT_OPTIONS };
+const store = new EventStore();
+let serverInfo: ServerInfo = { ip: null, port: 0 };
+
+let mainWindow: BrowserWindow | null = null;
+let collector: Collector | null = null;
+let mcpServer: RunningMcpServer | null = null;
+
+function createMainWindow(): void {
+    const isMac = os.platform() === "darwin";
+
+    mainWindow = new BrowserWindow({
+        width: 1024,
+        height: 768,
+        minWidth: 1024,
+        minHeight: 768,
+        acceptFirstMouse: true,
+        title: "NepperSnowplow",
+        // On macOS we let the OS render the traffic lights inside a
+        // reserved area at the top-left. The renderer reserves an
+        // equivalent strip of padding so toolbar contents never overlap.
+        // Other platforms get the standard system frame.
+        titleBarStyle: isMac ? "hiddenInset" : "default",
+        webPreferences: {
+            contextIsolation: true,
+            nodeIntegration: false,
+            sandbox: true,
+            preload: path.join(__dirname, "../preload/index.cjs"),
+        },
+    });
+
+    const devUrl = process.env.ELECTRON_RENDERER_URL;
+    if (devUrl) {
+        mainWindow.loadURL(devUrl);
+    } else {
+        mainWindow.loadFile(path.join(__dirname, "../renderer/index.html"));
+    }
+
+    mainWindow.on("closed", () => {
+        mainWindow = null;
+    });
+}
+
+function registerIpc(): void {
+    ipcMain.handle(CH.GET_OPTIONS, () => options);
+
+    ipcMain.handle(CH.SET_FILTER_VALID_EVENTS, (_e, value: boolean) => {
+        options = { ...options, filterValidEvents: Boolean(value) };
+    });
+
+    ipcMain.handle(CH.SET_PAUSED, (_e, value: boolean) => {
+        options = { ...options, paused: Boolean(value) };
+    });
+
+    ipcMain.handle(CH.SET_LISTENING_PORT, async (_e, port: number) => {
+        if (!Number.isInteger(port) || port < 0 || port > 65535) {
+            throw new Error(`Invalid port: ${port}`);
+        }
+        options = { ...options, listeningPort: port };
+        persistOptions();
+        if (collector) {
+            await collector.restartListener(port);
+        }
+        return serverInfo.port;
+    });
+
+    ipcMain.handle(CH.GET_INITIAL_EVENTS, () => store.all().slice());
+
+    ipcMain.handle(CH.CLEAR_EVENTS, () => store.clear());
+
+    ipcMain.handle(CH.EXPORT_EVENTS, async (_e, payload: string) => {
+        if (!mainWindow) return false;
+        const today = new Date().toISOString().slice(0, 10);
+        const { canceled, filePath } = await dialog.showSaveDialog(mainWindow, {
+            title: "Export events",
+            defaultPath: `nepsnowplow-events-${today}.json`,
+            filters: [{ name: "JSON", extensions: ["json"] }],
+        });
+        if (canceled || !filePath) return false;
+        await fs.promises.writeFile(filePath, payload, "utf-8");
+        return true;
+    });
+
+    ipcMain.on(CH.WINDOW_MINIMIZE, () => mainWindow?.minimize());
+    ipcMain.on(CH.WINDOW_MAXIMIZE, () => {
+        if (!mainWindow) return;
+        if (mainWindow.isMaximized()) {
+            mainWindow.unmaximize();
+        } else {
+            mainWindow.maximize();
+        }
+    });
+    ipcMain.on(CH.WINDOW_CLOSE, () => mainWindow?.close());
+}
+
+function pushToRenderer(channel: string, payload: unknown): void {
+    // The renderer is the only consumer of push channels. When the window
+    // is closed (between `closed` and `activate`) we drop pushes silently
+    // — the renderer will re-seed from `trackedEvents` on next mount.
+    if (!mainWindow || mainWindow.isDestroyed()) return;
+    mainWindow.webContents.send(channel, payload);
+}
+
+function recordEvent(event: EventViewModel): void {
+    store.add(event);
+    pushToRenderer(CH.EVENT_PUSH, event);
+}
+
+// Debug hook read by the Playwright e2e suite to discover the actual
+// port the collector bound to (which may differ from the configured one
+// when the configured port is busy). Kept on globalThis rather than on
+// the IPC surface so it stays a test-only affordance.
+interface DebugGlobals {
+    __nepsnowplowPort?: number;
+}
+
+function recordServerReady(port: number): void {
+    serverInfo = { ip: firstLanIp(), port };
+    (globalThis as DebugGlobals).__nepsnowplowPort = port;
+    pushToRenderer(CH.SERVER_READY, serverInfo);
+}
+
+async function startCollector(): Promise<void> {
+    collector = new Collector({
+        resourcesPath: resourcesPath(),
+        proposedPort: options.listeningPort,
+        onEvent: recordEvent,
+        onReady: recordServerReady,
+        nextId: () => store.allocateId(),
+        // Polled on every POST; reading through a closure so flipping
+        // the flag at runtime affects subsequent requests without having
+        // to thread the new value back through the collector.
+        isPaused: () => options.paused,
+    });
+    try {
+        await collector.start();
+    } catch (err) {
+        console.error("Failed to start collector", err);
+    }
+}
+
+async function startMcp(): Promise<void> {
+    if (options.mcpPort === 0) return;
+    try {
+        mcpServer = await startMcpServer(
+            {
+                store,
+                getStatus: () => ({ collectorPort: serverInfo.port, paused: options.paused }),
+            },
+            options.mcpPort,
+        );
+        console.log(`MCP endpoint: http://127.0.0.1:${mcpServer.port}/mcp`);
+    } catch (err) {
+        // Agents hold the port in their config, so unlike the collector we
+        // don't fall back to a random one: a busy port is reported and the
+        // GUI keeps working without MCP.
+        console.error(`Failed to start MCP server on port ${options.mcpPort}`, err);
+    }
+}
+
+app.on("window-all-closed", () => {
+    void mcpServer?.close();
+    collector?.stop();
+    app.quit();
+});
+
+app.on("activate", () => {
+    if (mainWindow === null) {
+        createMainWindow();
+    }
+});
+
+app.whenReady().then(async () => {
+    options = loadOptions();
+    registerIpc();
+    createMainWindow();
+    // The auto-updater check is fire-and-forget; failures get logged but
+    // never block startup.
+    if (app.isPackaged) {
+        startUpdater();
+    }
+    await startMcp();
+    // The collector is the slow part of startup (JVM boot). Run it after
+    // the window is created so the renderer can paint its shell and
+    // show "waiting for collector…" instead of a blank screen.
+    await startCollector();
+});

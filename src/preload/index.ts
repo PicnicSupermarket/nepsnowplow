@@ -1,0 +1,53 @@
+import { contextBridge, ipcRenderer, IpcRendererEvent } from "electron";
+import { Api, CH, Options, ServerInfo } from "../shared/ipc";
+import type { EventViewModel } from "../shared/event";
+
+// The contextBridge boundary requires every value exposed to the renderer
+// to be cloneable; functions cross fine but listeners cannot, so push
+// channels are wrapped here and the renderer only ever sees the supplied
+// callback being invoked with the payload.
+const api: Api = {
+    platform: process.platform,
+
+    getOptions: () => ipcRenderer.invoke(CH.GET_OPTIONS) as Promise<Options>,
+
+    setFilterValidEvents: (value) =>
+        ipcRenderer.invoke(CH.SET_FILTER_VALID_EVENTS, value) as Promise<void>,
+
+    setPaused: (value) => ipcRenderer.invoke(CH.SET_PAUSED, value) as Promise<void>,
+
+    setListeningPort: (port) =>
+        ipcRenderer.invoke(CH.SET_LISTENING_PORT, port) as Promise<number>,
+
+    getInitialEvents: () =>
+        ipcRenderer.invoke(CH.GET_INITIAL_EVENTS) as Promise<EventViewModel[]>,
+
+    clearEvents: () => ipcRenderer.invoke(CH.CLEAR_EVENTS) as Promise<void>,
+
+    exportEvents: (payload) =>
+        ipcRenderer.invoke(CH.EXPORT_EVENTS, payload) as Promise<boolean>,
+
+    onEvent: (cb) => {
+        const listener = (_e: IpcRendererEvent, event: EventViewModel) => cb(event);
+        ipcRenderer.on(CH.EVENT_PUSH, listener);
+        return () => {
+            ipcRenderer.removeListener(CH.EVENT_PUSH, listener);
+        };
+    },
+
+    onServerReady: (cb) => {
+        const listener = (_e: IpcRendererEvent, info: ServerInfo) => cb(info);
+        ipcRenderer.on(CH.SERVER_READY, listener);
+        return () => {
+            ipcRenderer.removeListener(CH.SERVER_READY, listener);
+        };
+    },
+
+    window: {
+        minimize: () => ipcRenderer.send(CH.WINDOW_MINIMIZE),
+        maximize: () => ipcRenderer.send(CH.WINDOW_MAXIMIZE),
+        close: () => ipcRenderer.send(CH.WINDOW_CLOSE),
+    },
+};
+
+contextBridge.exposeInMainWorld("api", api);

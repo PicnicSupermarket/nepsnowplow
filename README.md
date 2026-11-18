@@ -1,4 +1,4 @@
-# <img src="https://github.com/PicnicSupermarket/nepsnowplow/blob/master/icon.png?raw=true" width="28" alt="NepSnowplow" /> NepSnowplow
+# <img src="https://github.com/PicnicSupermarket/nepsnowplow/blob/master/icon.png?raw=true" width="28" alt="NepperSnowplow" /> NepperSnowplow
 
 [![Code style: prettier][prettier-badge]][prettier]
 [![Build Status][travisci-badge]][travisci-builds]
@@ -15,7 +15,7 @@ Simply run:
 # Install dependencies and compile styles
 yarn
 
-# Start NepSnowplow
+# Start NepperSnowplow
 yarn start
 ```
 
@@ -26,7 +26,7 @@ and listening port is listed at the bottom of the app. Events should appear with
 
 ### Events
 
-For each event, NepSnowplow will list the event details and all associated contexts. For more
+For each event, NepperSnowplow will list the event details and all associated contexts. For more
 information about Snowplow events, check out the docs on the [Snowplow Canonical Event
 Model][canonical-event-model].
 
@@ -37,25 +37,74 @@ To validate events using Snowplow Micro, please make sure to add the required co
 Snowplow Micro configuration, see:
 https://github.com/snowplow-incubator/snowplow-micro#configuring-micro
 
+## MCP server (for AI agents)
+
+While NepperSnowplow is running it also serves an [MCP](https://modelcontextprotocol.io) endpoint so
+coding agents can read captured events. It is a streamable-HTTP server at
+`http://127.0.0.1:3100/mcp`, bound to localhost only, so there is nothing to install or spawn: start
+the app, then register the URL once in your agent.
+
+```sh
+# Claude Code
+claude mcp add --transport http nepsnowplow http://127.0.0.1:3100/mcp
+
+# Codex
+codex mcp add nepsnowplow --url http://127.0.0.1:3100/mcp
+
+# pi
+pi mcp add nepsnowplow --url http://127.0.0.1:3100/mcp
+```
+
+Codex can also be configured by hand in `~/.codex/config.toml`:
+
+```toml
+[mcp_servers.nepsnowplow]
+url = "http://127.0.0.1:3100/mcp"
+```
+
+Inside this repository, `.mcp.json` already contains the entry for Claude Code.
+
+### Tools
+
+Tools are designed to keep token usage low: listings are one plain-text line per event, and full
+payloads are only returned on request.
+
+| Tool              | Purpose                                                                                                     |
+| ----------------- | ----------------------------------------------------------------------------------------------------------- |
+| `wait_for_events` | **Listen live.** Blocks until new matching events arrive (or a timeout), then returns them.                 |
+| `search_events`   | **Search history.** Filter captured events by text, schema, context, kind or validity; newest first, paged. |
+| `list_schemas`    | Event counts per schema (with invalid counts), the cheapest way to see what is flowing.                     |
+| `get_event`       | Full JSON of one event. Long values are truncated and contexts are expanded only when asked for.            |
+| `get_status`      | Collector port, paused flag, buffered event count and newest event id.                                      |
+
+Following a stream: call `wait_for_events` (optionally with `schema` / `query` / `validity`
+filters), then pass the returned `next_after_id` as `after_id` on the next call to continue without
+gaps or repeats. Without `after_id` only events arriving after the call are returned.
+`timeout_seconds` is capped at 55 so it stays under common MCP client request timeouts.
+
+The endpoint port is `mcpPort` in `settings.json` (default `3100`, `0` disables it). Events are kept
+in memory (last 5000), and ids keep increasing even when events are cleared in the app.
+
 ## Configure
 
 Options can be set in `settings.json`, the defaults are:
 
 ```js
 {
-  "listeningPort": 3000          // port NepSnowplow listens to
+  "listeningPort": 3000,         // port NepperSnowplow listens to
+  "mcpPort": 3100                // port of the MCP endpoint for agents (0 = off)
 }
 ```
 
 Depending on your operating system, the settings can be found in the following location:
 
 -   Windows:
-    -   Installed version (exe): `C:\Users\<username>\AppData\Local\Programs\nepsnowplow\Resources`.
+    -   Installed version (exe): `C:\Users\<username>\AppData\Local\Programs\neppersnowplow\Resources`.
     -   Portable version (zip): where you've extracted the `*.zip` file.
--   OS X: `~/Applications/NepSnowplow/Contents/Resources`.
+-   OS X: `~/Applications/NepperSnowplow/Contents/Resources`.
 -   Linux: where you've extracted the `*.tar.gz` file.
 
-_If no events arrive, check if NepSnowplow is allowed by Windows Firewall_
+_If no events arrive, check if NepperSnowplow is allowed by Windows Firewall_
 
 ## Development
 
@@ -96,7 +145,7 @@ provider: github
 ```
 
 Finally, to make sure it works in production, you can execute `yarn build` and run
-`dist\<platform>-unpacked\NepSnowplow.exe`. Don't forget to set the version back to the right value
+`dist\<platform>-unpacked\NepperSnowplow.exe`. Don't forget to set the version back to the right value
 before pushing any commits.
 
 ## Roadmap

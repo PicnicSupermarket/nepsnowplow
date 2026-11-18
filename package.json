@@ -1,5 +1,5 @@
 {
-    "name": "nepsnowplow",
+    "name": "neppersnowplow",
     "version": "1.0.0",
     "description": "A local Snowplow Collector and GUI to inspect collected events",
     "author": "Picnic Technologies",
@@ -19,25 +19,24 @@
     },
     "licence": "MIT",
     "scripts": {
-        "build": "electron-builder",
-        "compile": "sass app/css/sass/app.scss app/css/app.css",
-        "postinstall": "yarn compile && yarn unzip",
+        "dev": "electron-vite dev",
+        "build": "electron-vite build && electron-builder",
+        "start": "electron-vite preview",
+        "typecheck": "tsc --build",
+        "lint": "eslint .",
+        "lint:fix": "eslint . --fix",
+        "postinstall": "yarn unzip",
         "format": "yarn prettier --write .",
         "format:ci": "yarn prettier --check .",
-        "lint": "yarn eslint . --fix",
-        "lint:ci": "yarn eslint .",
         "unzip": "(cd jre ; unzip -o -qq \\*.zip)",
-        "precommit": "pretty-quick --staged",
-        "start": "electron .",
         "test": "yarn playwright test",
-        "test:ci": "xvfb-run --auto-servernum --server-args=\"-screen 0 1280x960x24\" -- yarn test",
-        "watch": "yarn compile --watch"
+        "test:ci": "xvfb-run --auto-servernum --server-args=\"-screen 0 1280x960x24\" -- yarn test"
     },
-    "main": "app.js",
+    "main": "out/main/index.mjs",
     "build": {
-        "appId": "com.picnic.nepsnowplow",
-        "productName": "NepSnowplow",
-        "copyright": "Copyright © 2017-2018 Picnic Technologies BV",
+        "appId": "com.picnic.neppersnowplow",
+        "productName": "NepperSnowplow",
+        "copyright": "Copyright © 2017-2026 Picnic Technologies BV",
         "directories": {
             "output": "dist"
         },
@@ -45,9 +44,7 @@
             "writeUpdateInfo": false
         },
         "files": [
-            "app.js",
-            "app/**/*",
-            "server/**/*"
+            "out/**/*"
         ],
         "extraResources": [
             "settings.json",
@@ -83,7 +80,6 @@
                 {
                     "target": "dmg",
                     "arch": [
-                        "x64",
                         "arm64"
                     ]
                 }
@@ -96,35 +92,38 @@
         "releaseType": "draft"
     },
     "devDependencies": {
-        "@playwright/test": "^1.27.1",
-        "chai": "*",
-        "chai-as-promised": "^7.1.1",
-        "chai-http": "^4.3.0",
-        "electron": "^20.3.3",
-        "electron-builder": "^23.6.0",
-        "electron-reloader": "^1.2.3",
-        "eslint": "^8.30.0",
-        "eslint-config-airbnb-base": "^15.0.0",
-        "eslint-config-prettier": "^8.5.0",
-        "eslint-plugin-import": "^2.26.0",
-        "husky": "^4.3.0",
-        "playwright": "^1.27.1",
+        "@eslint/js": "^10.0.1",
+        "@playwright/test": "^1.50.0",
+        "@preact/preset-vite": "^2.10.5",
+        "@tailwindcss/vite": "^4.3.0",
+        "@types/body-parser": "^1.19.6",
+        "@types/express": "^5.0.6",
+        "@types/node": "^25.9.0",
+        "electron": "^41.6.1",
+        "electron-builder": "^26.0.0",
+        "electron-vite": "^5.0.0",
+        "eslint": "^10.4.0",
+        "eslint-config-prettier": "^10.1.8",
+        "eslint-plugin-react-hooks": "^7.1.1",
+        "playwright": "^1.50.0",
         "prettier": "^2.1.1",
-        "pretty-quick": "^3.0.0",
-        "sass": "^1.26.10"
+        "tailwindcss": "^4.3.0",
+        "typescript": "^6.0.3",
+        "typescript-eslint": "^8.59.4",
+        "vite": "^8.0.13"
     },
     "dependencies": {
-        "@electron/remote": "^2.0.8",
-        "ajv": "^6.12.4",
-        "axios": "^1.1.3",
-        "body-parser": "^1.19.0",
-        "electron-log": "^4.2.4",
-        "electron-updater": "^4.3.4",
-        "express": "^4.17.1",
-        "handlebars": "^4.7.6",
-        "jsonfile": "^6.0.1",
-        "mark.js": "^8.11.1",
-        "network": "^0.5.0",
-        "renderjson": "^1.4.0"
+        "@modelcontextprotocol/sdk": "^1.32.2",
+        "@tanstack/react-virtual": "^3.13.24",
+        "body-parser": "^2.2.2",
+        "class-variance-authority": "^0.7.1",
+        "clsx": "^2.1.1",
+        "electron-log": "^5.4.4",
+        "electron-updater": "^6.8.3",
+        "express": "^5.2.1",
+        "preact": "^10.29.2",
+        "tailwind-merge": "^3.6.0",
+        "zod": "^4.6.7",
+        "zustand": "^5.0.13"
     }
 }
